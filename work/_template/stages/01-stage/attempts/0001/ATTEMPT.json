@@ -8,9 +8,10 @@
   "completed_at": null,
   "input_artifacts": [],
   "output_artifacts": [],
+  "validations": [],
   "validation": {
     "status": "NOT_RUN",
-    "evidence": []
+    "checks": {}
   },
   "handoff": {
     "selected_next_stage": null,

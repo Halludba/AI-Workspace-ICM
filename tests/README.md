@@ -1,9 +1,9 @@
-# Tests
+﻿# Tests
 
-Machine-verifiable invariants live here.
+Machine-verifiable invariants for the reusable ICM base live here.
 
-The ICM structure remains human-readable, but important guarantees should eventually be enforced by tests rather than prose alone.
+Current coverage includes context routing, workflow/stage contracts, journal-backed run creation, definition sealing, explicit attempt lifecycle, retry semantics, artifact confinement/hashing, append-only validation history, operation-id idempotency/conflicts, projection recovery, checkpoint fallback, journal sequence corruption, event ceilings, lock ownership/recovery, malformed JSON structures, fenced-Markdown parsing, symlink escapes, platform-specific process identity, and randomized legal state-machine sequences.
 
-Future tests should cover workspace integrity, routing, stage contracts, authority boundaries, artifact handoffs, fail-closed behavior, and deterministic tool guarantees.
+Passing tests are evidence for the implemented contract, not proof of arbitrary semantic correctness. Reachability tests establish graph reachability only; they do not prove that a permitted looping execution will terminate.
 
-Step 1 intentionally establishes the testing boundary without prematurely implementing the runtime/test suite.
+For release closure run the complete suite, both validators, Python compilation, stale-reference checks, and `git diff --check`.

@@ -11,6 +11,7 @@ Use this root only for the workstation's constitutional architecture.
 - Reusable workflow grammar -> `WORKFLOW_PROTOCOL.md`
 - Reusable stage grammar -> `STAGE_PROTOCOL.md`
 - Concrete run lifecycle -> `RUN_PROTOCOL.md`
+- Deterministic run mutation/journal/recovery -> `EXECUTION_KERNEL.md`
 - Run artifact integrity/provenance -> `ARTIFACT_PROTOCOL.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
 

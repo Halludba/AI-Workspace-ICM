@@ -1,10 +1,10 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.4.0",
+  "workspace_version": "0.5.0",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
-  "status": "RUN_ARCHITECTURE",
+  "status": "EXECUTABLE_GENERIC_RUNTIME",
   "entrypoints": {
     "orientation": "WORKSPACE.md",
     "router": "CONTEXT.md",
@@ -25,7 +25,10 @@
     "artifact_protocol": "_core/ARTIFACT_PROTOCOL.md",
     "run_policy": "config/run_policy.json",
     "run_validator": "tools/run_validator.py",
-    "run_creator": "tools/create_run.py"
+    "execution_kernel": "_core/EXECUTION_KERNEL.md",
+    "run_manager": "tools/run_manager.py",
+    "run_initializer": "tools/run_manager.py",
+    "cli": "icm"
   },
   "roots": {
     "core": "_core",
@@ -38,9 +41,5 @@
     "tools": "tools",
     "tests": "tests",
     "archive": "archive"
-  },
-  "legacy_source": {
-    "repository": "Halludba/AI-Workspace",
-    "authority": "migration_reference_only"
   }
 }

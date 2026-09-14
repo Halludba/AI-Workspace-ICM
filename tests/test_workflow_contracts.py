@@ -91,6 +91,16 @@ class WorkflowContractTests(unittest.TestCase):
         errors = workflow_validator.validate_workflow(path)
         self.assertTrue(any("unreachable stage(s): 02-transform" in error for error in errors))
 
+    def test_stage_output_contract_requires_confined_object_path(self):
+        path = self.scaffold()
+        stage_path = path / "01-intake" / "STAGE.json"
+        stage = json.loads(stage_path.read_text(encoding="utf-8"))
+        stage["outputs"] = ["result.txt", {"path": "../escape.txt"}]
+        stage_path.write_text(json.dumps(stage, indent=2) + "\n", encoding="utf-8")
+        errors = workflow_validator.validate_workflow(path)
+        self.assertTrue(any("outputs[0] must be an object" in error for error in errors))
+        self.assertTrue(any("outputs[1].path must stay inside" in error for error in errors))
+
     def test_live_output_directory_is_forbidden_in_definition(self):
         path = self.scaffold()
         (path / "01-intake" / "output").mkdir()

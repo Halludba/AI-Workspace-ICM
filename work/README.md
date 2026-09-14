@@ -1,13 +1,13 @@
-# Work
+﻿# Work
 
-Concrete workflow executions live here.
+Concrete workflow executions live here. Each real run is isolated under its own run directory.
 
-Each run is isolated under `work/<run-id>/` and records its own inputs, workflow-definition snapshot, current pointer, stage attempts, validation evidence, and final artifacts.
+Preferred CLI:
+- POSIX/macOS/Linux: `./icm run init <workflow-id> <run-id>`
+- Windows: `icm.cmd run init <workflow-id> <run-id>`
 
-The reusable workflow remains under `workflows/`; the run records one execution of it.
+`python tools/run_manager.py ...` remains the direct Python entrypoint for development/testing, but `run_manager.py` is the same single lifecycle authority in either case.
 
-Use `tools/create_run.py` to create a run from an `ACTIVE` workflow and `tools/run_validator.py` to validate run integrity.
+Canonical execution history lives under each run's immutable `journal/`. `RUN.json` and `ATTEMPT.json` are derived projections for fast orientation and are regenerated from the journal when drift is detected.
 
-Do not place reusable global rules here. Run artifacts become canonical/reference state only through an explicit governed promotion.
-
-`work/_template/` is structural documentation only and is never executable.
+The reserved `_template/` directory is non-executable and exists only as a structural reference.

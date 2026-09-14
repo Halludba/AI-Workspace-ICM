@@ -8,18 +8,16 @@
     "definition_path": "workflows/_template",
     "snapshot_path": "definition",
     "workflow_sha256": null,
-    "workspace_commit": null,
-    "workspace_dirty": false
+    "snapshot_sha256": null,
+    "workspace_commit": null
   },
   "current": {
     "stage_id": "01-stage",
-    "attempt": 1,
-    "execution_sequence": 1
+    "attempt": null,
+    "execution_sequence": 0
   },
   "created_at": null,
   "updated_at": null,
-  "inputs": [],
-  "final_artifacts": [],
   "completion": {
     "terminal_stage": null,
     "completed_at": null

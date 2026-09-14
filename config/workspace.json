@@ -17,7 +17,7 @@
     "conversation_history_authority": "evidence_only"
   },
   "interaction": {
-    "visible_role_prefix": "╰── <ROLE OR AGENT NAME>",
+    "visible_role_prefix": "╰── ֎ [<ROLE OR AGENT NAME>] ◄",
     "blank_line_after_prefix": true
   },
   "planning": {

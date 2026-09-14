@@ -27,8 +27,9 @@ A stage may use higher-authority inherited contracts plus declared workflow/stag
 It does not inherit sibling stage context by proximity.
 
 ## Outputs
-Outputs are logical artifact contracts, not files stored inside the workflow definition.
-During a concrete run, output files belong under that run's state in `work/`.
+Outputs are machine-enforceable artifact contracts, not files stored inside the workflow definition.
+Each `STAGE.json.outputs` item is an object with required `path` (POSIX-style path relative to the active attempt `artifacts/` directory) and optional `role`. Every declared output is required for successful attempt completion.
+During a concrete run, each declared output must be registered by the kernel and its current bytes must match the registered SHA-256 before the attempt can become `SUCCEEDED`.
 
 ## Validation
 Validation must state how completion is checked.

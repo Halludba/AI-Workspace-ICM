@@ -1,60 +1,57 @@
-# Run Protocol
+﻿# Run Protocol
 
 ## Purpose
-Define the domain-neutral structure for one concrete execution of a reusable workflow.
+Define the domain-neutral structure and lifecycle of one concrete execution of a reusable workflow.
 
 ## Definition vs execution
-`workflows/<workflow-id>/` defines what should happen.
-`work/<run-id>/` records what did happen in one execution.
-Run state never changes the canonical workflow definition by itself.
+`workflows/<workflow-id>/` defines what should happen. `work/<run-id>/` records what did happen. A run never changes its canonical workflow definition by itself.
 
 ## Run identity
-Run directories use `YYYY-MM-DD_short-description` unless a specialized clone defines a stronger identifier.
-A run ID must match its directory name.
+Run directories use `YYYY-MM-DD_short-description` unless a specialized clone defines a stronger identifier. The `run_id` must match its directory name.
 
 ## Required run contract
-Every run contains:
-- `RUN.md` for human orientation and resume instructions.
-- `RUN.json` for current machine-readable state.
-- `definition/` for the workflow contract snapshot used at run creation.
-- `inputs/` for run-entry source artifacts.
-- `stages/` for stage attempts and their artifacts.
+Every real run contains:
+- `RUN.md` for human orientation/resume guidance;
+- `journal/` for immutable canonical execution events;
+- `RUN.json` for the shallow materialized current-state projection;
+- `definition/` for the snapshotted workflow/stage contracts;
+- `inputs/` for run-entry source artifacts;
+- `stages/` for numbered attempt projections and local evidence;
 - `final/` for terminal/user-facing deliverables when applicable.
 
+Normal lifecycle mutation goes only through `tools/run_manager.py` and `_core/EXECUTION_KERNEL.md`. Direct edits to `RUN.json` or `ATTEMPT.json` are projection drift, not supported mutation.
+
 ## Lifecycle
-Generic run statuses are `TEMPLATE`, `READY`, `RUNNING`, `BLOCKED`, `COMPLETED`, `FAILED`, and `CANCELLED`.
-Only `READY`, `RUNNING`, and `BLOCKED` are resumable execution states.
-Terminal states are immutable except through an explicit governed repair/migration.
+Real run states are `READY`, `RUNNING`, `BLOCKED`, `FAILED`, and `COMPLETED`. Only `READY`, `RUNNING`, and `BLOCKED` are resumable. `FAILED` and `COMPLETED` are terminal/immutable under normal execution.
+
+Run creation commits `RUN_CREATED` and produces a `READY` run with the entry stage selected but no attempt yet. `RUN_STARTED` moves the run to `RUNNING`; `ATTEMPT_CREATED` then creates attempt 1 as `PENDING`; `ATTEMPT_STARTED` begins execution.
 
 ## Workflow binding
-A run may be created only from an `ACTIVE`, executable workflow.
-At creation, the workflow and stage contracts are copied into `definition/` as an evidence snapshot and hashed.
-The snapshot is not new canonical authority; it proves which contract governed this run.
+Runs may initialize only from `ACTIVE`, executable workflows. Creation copies governing workflow/stage files into `definition/`, creates `snapshot.json`, hashes `WORKFLOW.json` and `snapshot.json`, and records both root hashes in `RUN_CREATED`. The snapshot is evidence of the contract governing the run, not new workspace authority.
 
 ## Current pointer
-`RUN.json` records the current stage and attempt number.
-Resume by reading `RUN.md`, `RUN.json`, the matching definition snapshot, then only the current attempt and its declared inputs.
-Do not scan unrelated runs or unrelated stage attempts.
+`RUN.json` contains the current stage, attempt number (or `null` before the first attempt), and global execution sequence. Resume by reading `RUN.md`, `RUN.json`, the matching snapshotted stage contract, and only the current `ATTEMPT.json` plus declared inputs/artifacts. Do not scan unrelated runs/attempts by default.
 
 ## Attempts
-Each stage execution is an immutable numbered attempt under `stages/<stage-id>/attempts/<NNNN>/`.
-Retries and loops create new attempts instead of overwriting earlier evidence.
-Every attempt has `ATTEMPT.json`, an artifact directory, and a validation directory.
+Every actual stage execution is a numbered attempt under `stages/<stage-id>/attempts/<NNNN>/`. `ATTEMPT.json` is derived from the journal; its artifact and validation directories contain the attempt's physical evidence.
+Retries never overwrite failed attempts. `ATTEMPT_FAILED` preserves failure evidence while keeping the run non-terminal, then a new `ATTEMPT_CREATED` allocates the next attempt number for the same stage. Workflow loops similarly create new attempts rather than overwriting history.
 
 ## Transition recording
-A successful non-terminal attempt records the selected next stage.
-That next stage must be allowed by the snapshotted workflow and stage contracts.
-Semantic branch choices may be made by a model or human, but the chosen transition must be persisted.
+A successful non-terminal attempt persists a semantic `selected_next_stage` through `ATTEMPT_COMPLETED`. That target must be permitted by the snapshotted workflow graph. Creating/starting the next attempt is a separate deterministic lifecycle step.
+Terminal attempt success and `RUN_COMPLETED` are also separate events.
 
 ## Validation gate
-An attempt cannot be considered successful until its declared validation is satisfied.
-Machine-verifiable invariants should be validated deterministically.
-A run cannot become `COMPLETED` unless its final successful attempt is a declared terminal stage and required final artifacts validate.
+Validation events are append-only and named by `check_id`; earlier evidence is never overwritten. A derived aggregate view reflects the latest result for each check. Attempt completion requires aggregate `PASS` and every stage-declared required check to be currently `PASS`.
+
+## Artifacts
+Run inputs, attempt outputs, validation evidence, and final deliverables remain confined to their owning run paths and are registered with SHA-256 integrity metadata. A registered path must resolve inside the required boundary after symlink resolution.
 
 ## Atomicity and recovery
-Writers should update run state atomically where the host permits it.
-If current state and attempt evidence disagree, fail closed and surface the inconsistency rather than guessing which state is newer.
+One committed immutable journal event is the transaction boundary. Event commit uses temp-file write, flush/`fsync`, atomic replace, and POSIX journal-directory `fsync` where supported. Projections/checkpoints are derived and may be regenerated after interruption.
+Sequence gaps, malformed events, conflicting operation IDs, ambiguous locks, invalid projections, or definition-integrity failures fail closed.
+
+## Termination
+Workflow validation may prove that every stage has a path to a terminal stage. This is terminal reachability only. Because loops are permitted, it does not guarantee that a particular execution will terminate. The journal event ceiling provides runaway protection, not a proof of semantic termination.
 
 ## Template rule
-`work/_template/` is non-executable and domain-neutral.
-It demonstrates run structure only and contains no task-specific data or history.
+`work/_template/` is non-executable and domain-neutral. It demonstrates directory/projection structure only; its `journal/` contains no committed run events.

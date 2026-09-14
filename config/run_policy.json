@@ -1,72 +1,47 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.2",
   "run_root": "work",
   "template_path": "work/_template",
   "run_id_pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}_[a-z0-9]+(?:-[a-z0-9]+)*$",
-  "required_run_files": [
-    "RUN.md",
-    "RUN.json"
-  ],
-  "required_run_directories": [
-    "definition",
-    "inputs",
-    "stages",
-    "final"
-  ],
-  "required_run_sections": [
-    "Purpose",
-    "Workflow",
-    "Current State",
-    "Resume",
-    "Artifacts"
+  "required_run_files": ["RUN.md", "RUN.json"],
+  "required_run_directories": ["definition", "inputs", "stages", "final", "journal"],
+  "required_run_sections": ["Purpose", "Workflow", "Current State", "Resume", "Artifacts"],
+  "journal_event_pattern": "^[0-9]{6}_OP-[A-Za-z0-9_-]+\\.json$",
+  "checkpoint_pattern": "^\\.snapshot_seq_[0-9]{6}\\.json$",
+  "projection_source": "journal",
+  "max_events_per_run": 500,
+  "reserved_terminal_sequence": 500,
+  "event_types": [
+    "RUN_CREATED",
+    "RUN_STARTED",
+    "ATTEMPT_CREATED",
+    "ATTEMPT_STARTED",
+    "ARTIFACT_REGISTERED",
+    "VALIDATION_RECORDED",
+    "ATTEMPT_COMPLETED",
+    "ATTEMPT_FAILED",
+    "RUN_BLOCKED",
+    "RUN_RESUMED",
+    "RUN_FAILED",
+    "RUN_COMPLETED"
   ],
   "workflow_required_status": "ACTIVE",
   "workflow_must_be_executable": true,
-  "run_statuses": [
-    "TEMPLATE",
-    "READY",
-    "RUNNING",
-    "BLOCKED",
-    "COMPLETED",
-    "FAILED",
-    "CANCELLED"
-  ],
-  "resumable_statuses": [
-    "READY",
-    "RUNNING",
-    "BLOCKED"
-  ],
-  "terminal_statuses": [
-    "COMPLETED",
-    "FAILED",
-    "CANCELLED"
-  ],
-  "attempt_statuses": [
-    "PENDING",
-    "RUNNING",
-    "SUCCEEDED",
-    "FAILED",
-    "BLOCKED",
-    "CANCELLED"
-  ],
-  "validation_statuses": [
-    "NOT_RUN",
-    "PASS",
-    "FAIL",
-    "BLOCKED"
-  ],
+  "run_statuses": ["TEMPLATE", "READY", "RUNNING", "BLOCKED", "COMPLETED", "FAILED"],
+  "resumable_statuses": ["READY", "RUNNING", "BLOCKED"],
+  "terminal_statuses": ["COMPLETED", "FAILED"],
+  "attempt_statuses": ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "BLOCKED"],
+  "validation_statuses": ["NOT_RUN", "PASS", "FAIL", "BLOCKED"],
   "attempt_directory_pattern": "^[0-9]{4}$",
   "artifact_hash": "sha256",
   "definition_snapshot_required": true,
-  "initial_attempt_number": 1,
-  "initial_execution_sequence": 1,
+  "initial_execution_sequence": 0,
   "initial_run_status": "READY",
-  "initial_attempt_status": "PENDING",
-  "initial_validation_status": "NOT_RUN",
+  "initial_attempt_exists": false,
   "template_status": "TEMPLATE",
   "template_is_executable": false,
   "require_terminal_stage_for_completion": true,
   "require_hash_match": true,
   "reject_path_escape": true,
-  "allow_external_artifact_locators": true
+  "allow_external_artifact_locators": false
 }

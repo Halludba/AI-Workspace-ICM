@@ -2,7 +2,7 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current release: **v0.4.0 - generic run/artifact architecture**.
+Current release: **v0.5.0 - filesystem-native execution kernel**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -10,9 +10,10 @@ Start here:
 3. The selected local `CONTEXT.md` - scoped instructions.
 4. Only the references/artifacts declared by that local context or workflow stage.
 
-The base repository is intentionally domain-neutral and designed to be cloned into specialized ICM environments.
+The base repository is intentionally domain-neutral and designed to be pinned as the reusable parent for specialized ICM environments.
 
-`workflows/` stores reusable workflow definitions.
-`work/` stores isolated, resumable executions with snapshotted workflow contracts, numbered attempts, validation evidence, and final artifacts.
+`workflows/` stores reusable workflow definitions. `work/` stores isolated executions whose canonical run state is an immutable file-per-event journal. `RUN.json` and `ATTEMPT.json` are derived projections for efficient human/model orientation.
 
-The model performs semantic reasoning; the filesystem carries context and durable state; deterministic tools validate mechanical invariants; Git is canonical history.
+Run lifecycle operations use the single `icm run ...` / `tools/run_manager.py` authority. The kernel owns sequencing, attempt numbering, hashing, idempotency, confinement, state transitions, crash recovery, checkpoints, and projection materialization; models/humans retain semantic decision authority.
+
+The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.

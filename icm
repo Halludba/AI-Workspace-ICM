@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""ICM workspace trampoline. v0.5 exposes the run lifecycle surface only."""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+def main() -> int:
+    if len(sys.argv) < 2 or sys.argv[1] != "run":
+        print("usage: icm run <command> [args]", file=sys.stderr)
+        return 2
+    from tools.run_manager import main as run_main
+    sys.argv = [sys.argv[0], *sys.argv[2:]]
+    return run_main()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

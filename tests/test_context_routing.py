@@ -82,13 +82,13 @@ class ContextRoutingTests(unittest.TestCase):
         )
         self.assertEqual(
             cfg["interaction"]["visible_role_prefix"],
-            "╰── <ROLE OR AGENT NAME>",
+            '╰── ֎ [<ROLE OR AGENT NAME>] ◄',
         )
 
     def test_workspace_version(self):
         ws = json.loads((ROOT / "WORKSPACE.json").read_text(encoding="utf-8"))
-        self.assertEqual(ws["workspace_version"], "0.4.0")
-        self.assertEqual(ws["status"], "RUN_ARCHITECTURE")
+        self.assertEqual(ws["workspace_version"], "0.5.0")
+        self.assertEqual(ws["status"], "EXECUTABLE_GENERIC_RUNTIME")
 
     def test_supporting_routes_are_explicit_and_ordered(self):
         plan = resolver.build_plan(

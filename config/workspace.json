@@ -1,0 +1,27 @@
+{
+  "config_schema": "1.0",
+  "context_loading": {
+    "default": "scoped",
+    "allow_global_escalation": true,
+    "global_requires_reason": true
+  },
+  "execution": {
+    "fail_closed": true,
+    "fabricated_execution_claims_forbidden": true
+  },
+  "history": {
+    "canonical": "git",
+    "conversation_history_authority": "evidence_only"
+  },
+  "interaction": {
+    "visible_role_prefix": "â•°â”€â”€ <ROLE OR AGENT NAME>",
+    "blank_line_after_prefix": true
+  },
+  "planning": {
+    "major_step_policy": "one-at-a-time",
+    "preserve_future_steps_durably": true
+  },
+  "portability": {
+    "host_neutral_canonical_contracts": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "workspace_schema": "1.0",
+  "workspace_version": "0.1.0",
+  "workspace_name": "AI Workspace ICM",
+  "architecture": "filesystem-first-context-routing",
+  "canonical_branch": "main",
+  "status": "FOUNDATION",
+  "entrypoints": {
+    "orientation": "WORKSPACE.md",
+    "router": "CONTEXT.md",
+    "conventions": "_core/CONVENTIONS.md",
+    "authority": "_core/AUTHORITY.md",
+    "state_model": "_core/STATE_MODEL.md"
+  },
+  "roots": {
+    "core": "_core",
+    "config": "config",
+    "references": "references",
+    "profiles": "profiles",
+    "skills": "skills",
+    "workflows": "workflows",
+    "runs": "work",
+    "tools": "tools",
+    "tests": "tests",
+    "archive": "archive"
+  },
+  "legacy_source": {
+    "repository": "Halludba/AI-Workspace",
+    "authority": "migration_reference_only"
+  }
+}

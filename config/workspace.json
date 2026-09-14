@@ -1,5 +1,5 @@
 {
-  "config_schema": "1.1",
+  "config_schema": "1.2",
   "context_loading": {
     "default": "SCOPED",
     "allow_global_escalation": true,
@@ -17,8 +17,40 @@
     "conversation_history_authority": "evidence_only"
   },
   "interaction": {
-    "visible_role_prefix": "╰── ֎ [<ROLE OR AGENT NAME>] ◄",
-    "blank_line_after_prefix": true
+    "visible_role_prefix": "╰── ֎ [<ROLE OR PROFILE NAME>] ◄",
+    "blank_line_after_prefix": true,
+    "persona_marker": {
+      "required": true,
+      "prefix": "╰── ֎ [",
+      "suffix": "] ◄",
+      "pattern": "^╰── ֎ \\[([^\\]\\r\\n]+)\\] ◄(?:\\r?\\n){2}"
+    },
+    "firmware_lock": {
+      "required": true,
+      "declaration": "[LOCKED: .icm/*, _core/*]",
+      "pattern": "\\[LOCKED:\\s*\\.icm/\\*,\\s*_core/\\*\\]",
+      "enforcement": "declaration_only"
+    },
+    "mutation_target": {
+      "required": true,
+      "none_declaration": "[TARGET: NONE]",
+      "single_pattern": "\\[TARGET:\\s*([^\\]\\r\\n]+)\\]",
+      "multi_open": "[TARGETS:",
+      "enforcement": "declaration_only"
+    },
+    "no_op_policy": {
+      "recognized_actions": ["NO_OP", "NO-OP"],
+      "token_pattern": "\\bACTION:\\s*(NO_OP|NO-OP)\\b",
+      "valid_success_outcome": true
+    },
+    "terminal_seal": {
+      "required": true,
+      "boundary_length": 40,
+      "boundary_char": "═",
+      "require_final_position": true,
+      "valid_statuses": ["RESPONSE_COMPLETE", "COMPLETE", "BLOCKED", "REJECTED", "FAILED"],
+      "execution_statuses": ["COMPLETE", "BLOCKED", "REJECTED", "FAILED"]
+    }
   },
   "planning": {
     "major_step_policy": "one-at-a-time",

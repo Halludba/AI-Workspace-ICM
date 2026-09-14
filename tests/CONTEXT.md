@@ -4,6 +4,7 @@ Machine-verifiable invariants live here. During iteration run the narrowest rele
 
 Current suites:
 - `test_context_routing.py` -> context-routing invariants.
+- `test_bios_invariants.py` -> universal persona/lock/target/NO_OP/terminal-seal response invariants.
 - `test_workflow_contracts.py` -> workflow/stage/template invariants.
 - `test_run_contracts.py` -> run creation, snapshot, projection, and artifact invariants.
 - `test_run_manager.py` -> deterministic journal lifecycle, retries, idempotency, recovery, checkpoints, limits, and confinement.

@@ -8,6 +8,7 @@ Current generic tools:
 - `create_workflow.py` -> validated DRAFT workflow scaffolding.
 - `run_validator.py` -> full journal/projection/artifact/definition validation.
 - `run_manager.py` -> the single run lifecycle CLI/mutation authority, including run initialization.
+- `check_invariants.py` -> deterministic parser for universal BIOS response declarations and terminal closure.
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.
 - `kernel/events.py` -> event envelope, taxonomy, and kernel error contracts.
 - `kernel/reducer.py` -> pure event fold/state-machine enforcement.

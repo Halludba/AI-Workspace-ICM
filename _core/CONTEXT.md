@@ -8,6 +8,9 @@ Use this root only for the workstation's constitutional architecture.
 - Files as data vs instructions -> `REFERENCE_POLICY.md`
 - Canonical/reference/run/derived state -> `STATE_MODEL.md`
 - Naming/path semantics -> `NAMING.md`
+- Reusable workflow grammar -> `WORKFLOW_PROTOCOL.md`
+- Reusable stage grammar -> `STAGE_PROTOCOL.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
 
-Do not load every core contract for an unrelated task. Core rules outrank lower local contracts according to `AUTHORITY.md`.
+Do not load every core contract for an unrelated task.
+Core rules outrank lower local contracts according to `AUTHORITY.md`.

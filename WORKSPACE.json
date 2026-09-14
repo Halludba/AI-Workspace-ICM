@@ -1,10 +1,10 @@
 {
-  "workspace_schema": "1.1",
-  "workspace_version": "0.2.0",
+  "workspace_schema": "1.2",
+  "workspace_version": "0.3.0",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
-  "status": "CONTEXT_ROUTING",
+  "status": "WORKFLOW_ARCHITECTURE",
   "entrypoints": {
     "orientation": "WORKSPACE.md",
     "router": "CONTEXT.md",
@@ -15,7 +15,12 @@
     "reference_policy": "_core/REFERENCE_POLICY.md",
     "route_registry": "config/routes.json",
     "context_policy": "config/context_policy.json",
-    "context_resolver": "tools/context_resolver.py"
+    "context_resolver": "tools/context_resolver.py",
+    "workflow_protocol": "_core/WORKFLOW_PROTOCOL.md",
+    "stage_protocol": "_core/STAGE_PROTOCOL.md",
+    "workflow_policy": "config/workflow_policy.json",
+    "workflow_validator": "tools/workflow_validator.py",
+    "workflow_creator": "tools/create_workflow.py"
   },
   "roots": {
     "core": "_core",

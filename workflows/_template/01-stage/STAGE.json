@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "stage_id": "01-stage",
+  "execution_mode": "semantic",
+  "inputs": [],
+  "outputs": [],
+  "validation": {
+    "required": []
+  },
+  "allowed_next": []
+}

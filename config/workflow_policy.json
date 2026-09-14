@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.1",
+  "workflow_root": "workflows",
+  "template_path": "workflows/_template",
+  "definition_state": "canonical",
+  "run_state_root": "work",
+  "required_workflow_files": [
+    "CONTEXT.md",
+    "WORKFLOW.json"
+  ],
+  "required_stage_files": [
+    "CONTEXT.md",
+    "STAGE.json"
+  ],
+  "workflow_id_pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+  "stage_name_pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+  "stage_directory_pattern": "^[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$",
+  "required_workflow_sections": [
+    "Purpose",
+    "Applicability",
+    "Workflow Inputs",
+    "Stage Sequence",
+    "Context Dependencies",
+    "Completion"
+  ],
+  "required_stage_sections": [
+    "Purpose",
+    "Inputs",
+    "Process",
+    "Outputs",
+    "Validation",
+    "Handoff"
+  ],  "execution_modes": [
+    "semantic",
+    "deterministic",
+    "hybrid",
+    "manual"
+  ],
+  "workflow_statuses": [
+    "TEMPLATE",
+    "DRAFT",
+    "ACTIVE",
+    "RETIRED"
+  ],
+  "status_executable": {
+    "TEMPLATE": false,
+    "DRAFT": false,
+    "ACTIVE": true,
+    "RETIRED": false
+  },
+  "transition_model": "explicit_allowed_next",
+  "outputs_live_under_work": true,
+  "template_is_executable": false,
+  "template_reserved_name": "_template",
+  "context_dependencies": [
+    "profiles",
+    "skills",
+    "references",
+    "config"
+  ],
+  "require_all_stages_reachable": true,
+  "require_terminal_reachable_from_every_stage": true
+}

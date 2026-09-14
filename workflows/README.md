@@ -1,9 +1,16 @@
 # Workflows
 
-Reusable multi-stage processes live here.
+This root contains reusable workflow definitions, not execution history.
 
-Every implemented workflow must have a local `CONTEXT.md` and ordered stages. Each stage must declare Purpose, Inputs, Process, Outputs, Validation, and Handoff.
+Each executable workflow has:
+- `CONTEXT.md`
+- `WORKFLOW.json`
+- ordered stage directories
 
-Workflow structure should carry routing meaning. Do not create empty pseudo-workflows merely to reserve names.
+Each stage has:
+- `CONTEXT.md`
+- `STAGE.json`
 
-Planned families include system development, agent development, research, theme design, document production, and profile performance audit. They will be added incrementally.
+The reserved `_template/` workflow is non-executable and exists only to scaffold new workflows in this repository or future clones.
+
+Run-specific artifacts belong under `work/`, never inside `workflows/`.

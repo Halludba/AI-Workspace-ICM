@@ -34,3 +34,8 @@ When a named profile, agent, or workflow role is used in user-facing communicati
 
 ## Large-plan policy
 Complete one major architectural step at a time unless the user explicitly requests otherwise. Preserve future work durably rather than compressing essential detail to fit one response.
+
+## Template principle
+This repository is the shared domain-neutral ICM template. Clone it for specialized environments. Add domain rules, task-specific references, approved agents/profiles, and concrete workflows to those clones unless they are truly universal.
+
+Reusable workflow definitions live under `workflows/`. Concrete execution state and artifacts live under `work/`.

@@ -21,3 +21,5 @@ These conventions define the structural grammar of the workspace. They are small
 17. **Host neutrality.** Host-specific adapters may exist but do not become competing canonical authority.
 18. **Archive is non-authoritative.** Historical material informs analysis only when routed.
 19. **Visible role marker.** Named user-facing roles begin with `╰── <ROLE OR AGENT NAME>`, followed by a blank line.
+20. **Workflow definitions are not executions.** Reusable contracts live under `workflows/`; concrete run state and artifacts live under `work/`.
+21. **Template neutrality.** The base repository remains domain-neutral. Task-specific rules, profiles, references, and workflows belong in specialized clones unless explicitly promoted into the shared template.

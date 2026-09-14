@@ -6,7 +6,7 @@ Define how an AI enters, narrows, inherits, expands, and exits context in this w
 ## Five context layers
 0. Orientation - `WORKSPACE.md`: what environment is this?
 1. Routing - root/local `CONTEXT.md`: where should I go?
-2. Workflow/stage contract - future workflow `CONTEXT.md`: what transformation should I perform?
+2. Workflow/stage contract - selected workflow and stage `CONTEXT.md`: what transformation should I perform?
 3. Selected stable context - references, profiles, skills, config: what reusable rules/data apply?
 4. Run artifacts - `work/<run>/`: what has happened in this execution?
 
@@ -15,7 +15,7 @@ Derived indexes/caches may accelerate selection but are not an authority layer.
 ## Startup and inheritance
 Startup reads `WORKSPACE.md` then `/CONTEXT.md`. Before semantic execution, `_core/AUTHORITY.md` is inherited. `_core/CONVENTIONS.md` is additionally required for workspace mutation. A local `CONTEXT.md` may narrow behavior but cannot override higher authority.
 
-Inheritance is vertical, not lateral. Selecting `profiles/` does not automatically load `skills/`, `references/`, or sibling profile contexts. Every cross-root dependency must be explicit.
+Inheritance is vertical, not lateral. Selecting `profiles/` does not automatically load `skills/`, `references/`, or sibling profile contexts. Selecting a workflow stage does not load sibling stages unless the workflow contract explicitly requires them.
 
 ## Scope classes
 ### DIRECT

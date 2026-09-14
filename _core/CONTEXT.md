@@ -10,6 +10,8 @@ Use this root only for the workstation's constitutional architecture.
 - Naming/path semantics -> `NAMING.md`
 - Reusable workflow grammar -> `WORKFLOW_PROTOCOL.md`
 - Reusable stage grammar -> `STAGE_PROTOCOL.md`
+- Concrete run lifecycle -> `RUN_PROTOCOL.md`
+- Run artifact integrity/provenance -> `ARTIFACT_PROTOCOL.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
 
 Do not load every core contract for an unrelated task.

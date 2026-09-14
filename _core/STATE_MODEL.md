@@ -9,7 +9,7 @@ Intentional persistent system configuration and contracts: core rules, active pr
 Stable reusable knowledge that informs work but is not execution state. Lives primarily under `references/`.
 
 ## 3. Run state
-State for one concrete execution: inputs, stage outputs, approvals, checkpoints, verification evidence, and final artifacts. Lives under `work/`.
+State for one concrete execution: workflow snapshot, inputs, numbered stage attempts, outputs, approvals, checkpoints, validation evidence, current resume pointer, and final artifacts. Lives under `work/`.
 
 ## 4. Derived state
 Regenerable indexes, caches, summaries, renders, manifests, and exports. Derived state must identify its source inputs and must not silently become canonical.

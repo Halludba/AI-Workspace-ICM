@@ -23,3 +23,5 @@ These conventions define the structural grammar of the workspace. They are small
 19. **Visible role marker.** Named user-facing roles begin with `╰── <ROLE OR AGENT NAME>`, followed by a blank line.
 20. **Workflow definitions are not executions.** Reusable contracts live under `workflows/`; concrete run state and artifacts live under `work/`.
 21. **Template neutrality.** The base repository remains domain-neutral. Task-specific rules, profiles, references, and workflows belong in specialized clones unless explicitly promoted into the shared template.
+22. **Run provenance is durable.** Each concrete run snapshots its governing workflow/stage contracts and verifies recorded artifact hashes.
+23. **Attempts are append-preserving.** Retries or loops create new numbered stage attempts rather than overwriting prior execution evidence.

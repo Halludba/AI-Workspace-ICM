@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import importlib.util
 import re
 import shutil
 import tempfile
@@ -14,6 +15,10 @@ WORKFLOWS = ROOT / "workflows"
 POLICY = json.loads(
     (ROOT / "config/workflow_policy.json").read_text(encoding="utf-8")
 )
+
+_spec = importlib.util.spec_from_file_location("workflow_validator", ROOT / "tools/workflow_validator.py")
+_workflow_validator = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_workflow_validator)
 
 
 class ScaffoldError(RuntimeError):
@@ -178,8 +183,7 @@ def scaffold(
                 encoding="utf-8",
             )
 
-        from workflow_validator import validate_workflow
-        errors = validate_workflow(temp_dir)
+        errors = _workflow_validator.validate_workflow(temp_dir)
         if errors:
             raise ScaffoldError("generated workflow failed validation: " + "; ".join(errors))
         temp_dir.rename(target)

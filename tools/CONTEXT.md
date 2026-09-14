@@ -7,6 +7,8 @@ Current generic tools:
 - `context_resolver.py` -> context selection plans
 - `workflow_validator.py` -> workflow/stage structural validation
 - `create_workflow.py` -> validated DRAFT workflow scaffolding
+- `run_validator.py` -> run/artifact/state validation
+- `create_run.py` -> validated run creation from ACTIVE workflows
 
 Tools enforce mechanical invariants; they do not decide semantic policy.
 Tool output is derived evidence unless a governing contract promotes a result into canonical state.

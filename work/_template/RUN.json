@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "run_id": "template-run",
+  "template": true,
+  "status": "TEMPLATE",
+  "workflow": {
+    "id": "template-workflow",
+    "definition_path": "workflows/_template",
+    "snapshot_path": "definition",
+    "workflow_sha256": null,
+    "workspace_commit": null,
+    "workspace_dirty": false
+  },
+  "current": {
+    "stage_id": "01-stage",
+    "attempt": 1,
+    "execution_sequence": 1
+  },
+  "created_at": null,
+  "updated_at": null,
+  "inputs": [],
+  "final_artifacts": [],
+  "completion": {
+    "terminal_stage": null,
+    "completed_at": null
+  }
+}

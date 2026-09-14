@@ -8,7 +8,7 @@ Define how an AI enters, narrows, inherits, expands, and exits context in this w
 1. Routing - root/local `CONTEXT.md`: where should I go?
 2. Workflow/stage contract - selected workflow and stage `CONTEXT.md`: what transformation should I perform?
 3. Selected stable context - references, profiles, skills, config: what reusable rules/data apply?
-4. Run artifacts - `work/<run>/`: what has happened in this execution?
+4. Run state/artifacts - `work/<run-id>/`: what has happened, what is current, and what can resume?
 
 Derived indexes/caches may accelerate selection but are not an authority layer.
 

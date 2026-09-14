@@ -1,7 +1,13 @@
 # Work
 
-Run-specific execution state and artifacts live here.
+Concrete workflow executions live here.
 
-Each substantial execution will eventually receive a dedicated run directory containing local orientation/state plus stage artifacts. Durable files, not conversation memory alone, should carry important state across stages.
+Each run is isolated under `work/<run-id>/` and records its own inputs, workflow-definition snapshot, current pointer, stage attempts, validation evidence, and final artifacts.
 
-Do not place reusable global rules here. Promotion from run state to canonical/reference state requires an explicit governed decision.
+The reusable workflow remains under `workflows/`; the run records one execution of it.
+
+Use `tools/create_run.py` to create a run from an `ACTIVE` workflow and `tools/run_validator.py` to validate run integrity.
+
+Do not place reusable global rules here. Run artifacts become canonical/reference state only through an explicit governed promotion.
+
+`work/_template/` is structural documentation only and is never executable.

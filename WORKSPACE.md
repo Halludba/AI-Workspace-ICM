@@ -38,4 +38,4 @@ Complete one major architectural step at a time unless the user explicitly reque
 ## Template principle
 This repository is the shared domain-neutral ICM template. Clone it for specialized environments. Add domain rules, task-specific references, approved agents/profiles, and concrete workflows to those clones unless they are truly universal.
 
-Reusable workflow definitions live under `workflows/`. Concrete execution state and artifacts live under `work/`.
+Reusable workflow definitions live under `workflows/`. Concrete execution state and artifacts live under `work/`. Each run snapshots its governing workflow contract and preserves retries/loops as numbered attempts rather than overwriting history.

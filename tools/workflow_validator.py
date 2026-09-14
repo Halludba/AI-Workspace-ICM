@@ -92,7 +92,7 @@ def validate_stage(
     return errors
 
 
-def validate_workflow(workflow_dir: Path, pol: dict | None = None) -> list[str]:
+def validate_workflow(workflow_dir: Path, pol: dict | None = None, expected_workflow_id: str | None = None) -> list[str]:
     pol = pol or policy()
     errors = []
 
@@ -131,8 +131,9 @@ def validate_workflow(workflow_dir: Path, pol: dict | None = None) -> list[str]:
             errors.append("non-template workflow cannot have TEMPLATE status")
         if not re.fullmatch(pol["workflow_id_pattern"], workflow_id):
             errors.append("invalid workflow_id")
-        if workflow_id != workflow_dir.name:
-            errors.append("workflow_id must match directory name")
+        expected_id = expected_workflow_id or workflow_dir.name
+        if workflow_id != expected_id:
+            errors.append("workflow_id must match expected workflow identity")
 
     stages = data.get("stages", [])
     stage_ids = [stage.get("id") for stage in stages]

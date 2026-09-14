@@ -33,7 +33,7 @@ They are not auto-loaded merely because they exist in the clone.
 
 ## Execution boundary
 The workflow defines what should happen.
-A future run layer records what did happen.
+The run layer records what did happen in an isolated `work/<run-id>/` execution snapshot.
 The model may choose among declared transitions when semantics require judgment, but the run must record the chosen transition.
 
 ## Template rule

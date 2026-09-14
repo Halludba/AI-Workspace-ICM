@@ -1,9 +1,12 @@
 {
-  "config_schema": "1.0",
+  "config_schema": "1.1",
   "context_loading": {
-    "default": "scoped",
+    "default": "SCOPED",
     "allow_global_escalation": true,
-    "global_requires_reason": true
+    "global_requires_reason": true,
+    "protocol": "_core/CONTEXT_PROTOCOL.md",
+    "route_registry": "config/routes.json",
+    "policy": "config/context_policy.json"
   },
   "execution": {
     "fail_closed": true,
@@ -14,7 +17,7 @@
     "conversation_history_authority": "evidence_only"
   },
   "interaction": {
-    "visible_role_prefix": "â•°â”€â”€ <ROLE OR AGENT NAME>",
+    "visible_role_prefix": "╰── <ROLE OR AGENT NAME>",
     "blank_line_after_prefix": true
   },
   "planning": {

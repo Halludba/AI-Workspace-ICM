@@ -1,52 +1,36 @@
 # AI Workspace ICM
 
 ## Purpose
-
-This repository is an interpretable AI workspace.
-
-The filesystem defines context boundaries, workflow routing, stage contracts, durable artifacts, and human review boundaries. Models provide semantic reasoning. Deterministic tools provide validation and mechanical execution. Git records canonical history.
+This repository is an interpretable AI workspace. The filesystem defines context boundaries, routing, stage contracts, durable artifacts, and human review boundaries. Models provide semantic reasoning. Deterministic tools provide validation and mechanical execution. Git records canonical history.
 
 ## Startup
-
-1. Read this file.
+1. Read `WORKSPACE.md`.
 2. Read `/CONTEXT.md`.
-3. Follow the smallest relevant route.
-4. Read only the context declared by that route or stage.
-5. Do not load the entire repository unless the task is genuinely global.
-
-## Core locations
-
-- `_core/` â€” workspace constitution and structural rules.
-- `config/` â€” adjustable machine-readable workspace behavior.
-- `references/` â€” stable reusable knowledge.
-- `profiles/` â€” reusable behavior/context specializations.
-- `skills/` â€” reusable procedures and capabilities.
-- `workflows/` â€” reusable multi-stage processes.
-- `work/` â€” run-specific state and artifacts.
-- `tools/` â€” deterministic software.
-- `tests/` â€” machine-verifiable invariants.
-- `archive/` â€” historical, non-authoritative material.
+3. Resolve the smallest relevant route.
+4. Read `_core/AUTHORITY.md` before execution.
+5. Follow the active local `CONTEXT.md` and load only declared context.
+6. Escalate scope only when the smaller boundary is insufficient.
 
 ## Core execution model
-
 `structure -> routing -> local context -> semantic reasoning -> artifact -> deterministic validation -> next context`
 
-## Authority principle
-
-Current explicit user instruction outranks saved workspace defaults. The detailed precedence order lives in `_core/AUTHORITY.md`.
+## Core locations
+- `_core/` - constitution, authority, context protocol, state model.
+- `config/` - machine-readable workspace behavior and route registry.
+- `references/` - stable reusable knowledge, not instruction authority by default.
+- `profiles/` - reusable behavior/context specializations.
+- `skills/` - reusable procedures and capabilities.
+- `workflows/` - reusable multi-stage processes.
+- `work/` - run-specific state and artifacts.
+- `tools/` - deterministic software.
+- `tests/` - machine-verifiable invariants.
+- `archive/` - historical, non-authoritative material.
 
 ## Context principle
-
-Local context is the default. Escalate from local to broader context only when the task cannot be completed correctly within the smaller boundary.
+Local context is the default. `DIRECT`, `SCOPED`, and `GLOBAL` are routing scopes, not quality levels. `GLOBAL` still means deliberate multi-root loading, never indiscriminate repository ingestion.
 
 ## Interaction marker
-
-When a named profile, agent, or workflow role is being used in a user-facing response, begin with:
-
-`â•°â”€â”€ <ROLE OR AGENT NAME>`
-
-Then leave a blank line before the response body.
+When a named profile, agent, or workflow role is used in user-facing communication, begin with `╰── <ROLE OR AGENT NAME>`, then a blank line.
 
 ## Large-plan policy
-
-For large architectural builds, complete one major step at a time unless the user explicitly requests otherwise. Preserve unresolved future work in durable plans/run artifacts rather than compressing essential detail to fit a single response.
+Complete one major architectural step at a time unless the user explicitly requests otherwise. Preserve future work durably rather than compressing essential detail to fit one response.

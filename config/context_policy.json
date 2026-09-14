@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "protocol": "_core/CONTEXT_PROTOCOL.md",
+  "reference_policy": "_core/REFERENCE_POLICY.md",
+  "startup": [
+    "WORKSPACE.md",
+    "CONTEXT.md"
+  ],
+  "execution_inherits": [
+    "_core/AUTHORITY.md"
+  ],
+  "workspace_mutation_adds": [
+    "_core/CONVENTIONS.md"
+  ],
+  "scope_modes": {
+    "DIRECT": {
+      "max_primary_routes": 1,
+      "global_reason_required": false
+    },
+    "SCOPED": {
+      "max_primary_routes": 1,
+      "explicit_supporting_routes": true,
+      "global_reason_required": false
+    },
+    "GLOBAL": {
+      "explicit_roots_required": true,
+      "global_reason_required": true
+    }
+  },
+  "progressive_disclosure": {
+    "enabled": true,
+    "inheritance": "vertical_only",
+    "siblings_auto_loaded": false,
+    "whole_repo_default": false,
+    "escalation_order": [
+      "DIRECT",
+      "SCOPED",
+      "GLOBAL"
+    ]
+  },
+  "content_roles": {
+    "references": "data_by_default",
+    "work": "data_and_state_by_default",
+    "archive": "historical_evidence_only",
+    "derived": "non_authoritative",
+    "profiles": "instruction_bearing_only_when_selected",
+    "skills": "instruction_bearing_only_when_selected"
+  },
+  "fail_closed": {
+    "unknown_route": true,
+    "missing_local_context": true,
+    "path_escape": true
+  }
+}

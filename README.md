@@ -1,18 +1,13 @@
 # AI Workspace ICM
 
-A host-agnostic, filesystem-first environment for structured AI workflows.
+A host-neutral, filesystem-first environment for structured AI work.
 
-This repository is the clean ICM-native rebuild of the existing AI Workstation architecture. It uses filesystem structure for context routing, scoped contracts for local behavior, durable artifacts for workflow state, semantic models for reasoning, deterministic tools for validation, and Git for canonical history.
+Current release: **v0.2.0 - context routing foundation**.
 
-## Start here
+Start here:
+1. `WORKSPACE.md` - orientation.
+2. `CONTEXT.md` - root router.
+3. The selected local `CONTEXT.md` - scoped instructions.
+4. Only the references/artifacts declared by that local context or future workflow stage.
 
-1. Read `WORKSPACE.md`.
-2. Read `CONTEXT.md`.
-3. Follow the smallest relevant route.
-4. Load only the context declared by that route or stage.
-
-## Architectural boundary
-
-The legacy `Halludba/AI-Workspace` repository remains separate. It is a migration/reference source, not something to copy wholesale into this repository.
-
-The new repository starts at `v0.1.0` because this is a new architecture, not a continuation of the legacy version line.
+The model performs semantic reasoning; the filesystem carries context and durable state; deterministic tools validate mechanical invariants; Git is canonical history.

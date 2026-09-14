@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0",
+  "default_mode": "SCOPED",
+  "routes": [
+    {
+      "id": "workspace-architecture",
+      "root": "_core",
+      "context": "_core/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Workspace architecture, authority, state, naming, context protocol"
+    },
+    {
+      "id": "workspace-config",
+      "root": "config",
+      "context": "config/CONTEXT.md",
+      "default_mode": "DIRECT",
+      "purpose": "Adjustable machine-readable workspace behavior"
+    },
+    {
+      "id": "reference-maintenance",
+      "root": "references",
+      "context": "references/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Stable reusable knowledge"
+    },
+    {
+      "id": "profile-development",
+      "root": "profiles",
+      "context": "profiles/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Behavior/context specializations"
+    },
+    {
+      "id": "skill-development",
+      "root": "skills",
+      "context": "skills/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Reusable procedures/capabilities"
+    },
+    {
+      "id": "workflow-development",
+      "root": "workflows",
+      "context": "workflows/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Reusable multi-stage process design"
+    },
+    {
+      "id": "run-resume",
+      "root": "work",
+      "context": "work/CONTEXT.md",
+      "default_mode": "SCOPED",
+      "purpose": "Existing run state/artifacts"
+    },
+    {
+      "id": "tool-development",
+      "root": "tools",
+      "context": "tools/CONTEXT.md",
+      "default_mode": "DIRECT",
+      "purpose": "Deterministic execution/validation software"
+    },
+    {
+      "id": "test-development",
+      "root": "tests",
+      "context": "tests/CONTEXT.md",
+      "default_mode": "DIRECT",
+      "purpose": "Machine-verifiable invariants"
+    },
+    {
+      "id": "history-lookup",
+      "root": "archive",
+      "context": "archive/CONTEXT.md",
+      "default_mode": "DIRECT",
+      "purpose": "Historical evidence only"
+    }
+  ]
+}

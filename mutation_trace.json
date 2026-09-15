@@ -1,46 +1,46 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-150-local-compute",
+  "directive_id": "DIR-2026-09-15:T-160-ornith-v1",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-150 by adding read-only local compute/software capability discovery and workload readiness separate from model reasoning and repository authority.",
+  "summary": "Execute planner task T-160 by adding bounded loopback Ollama/Ornith worker delegation with exact-source packets, candidate-only Git patches, bounded repair attempts, and no canonical mutation authority.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "_core/LOCAL_COMPUTE_PROTOCOL.md",
-        "config/local_compute_policy.json",
-        "tools/local_compute.py",
-        "tests/test_local_compute.py"
+        "_core/LOCAL_WORKER_PROTOCOL.md",
+        "config/local_worker_policy.json",
+        "tools/local_worker.py",
+        "tests/test_local_worker.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add a fixed allowlisted discovery boundary and named workload prerequisite resolver for CPU/GPU/software capability without arbitrary command execution."
+      "rationale": "Add the bounded local-worker contract, policy, deterministic packet/result/attempt validation, and regression coverage."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
+        "README.md",
         "WORKSPACE.json",
         "config/CONTEXT.md",
         "config/impact_policy.json",
         "icm",
         "tests/CONTEXT.md",
         "tests/test_impact_classifier.py",
-        "tools/CONTEXT.md",
-        "tools/README.md"
+        "tools/CONTEXT.md"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate local compute discovery into workspace/CLI/docs and full-regression scope without writing host observations into canonical policy."
+      "rationale": "Integrate the worker surface into workspace discovery, CLI routing, verification impact, and scoped documentation."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added noncanonical host discovery plus READY/BLOCKED workload resolution for NVENC, Ollama, and Python with no execution/mutation authority."
+      "description": "Added exact-base-revision worker packets, loopback-only bounded Ollama transport, structured candidate patch validation through Git, single-flight attempt guarding, explicit repair feedback, telemetry mapping, and fail-closed missing-Ollama behavior."
     },
     {
       "candidate_id": "C-002",
-      "description": "Integrated local compute protocol/policy/tool into ICM discovery, documentation, and impact classification."
+      "description": "Registered the local-worker entrypoints, CLI surface, full-regression classification, repository documentation, and test discovery."
     }
   ]
 }

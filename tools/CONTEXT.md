@@ -32,3 +32,4 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `context_escalation.py` -> validates adjacent C0-C5 context escalation records, exact-source provenance, and positive context deltas; it does not retrieve source or raise assurance.
 - `context_runtime.py` -> deterministic stable/dynamic prompt planning plus validation/comparison of host-observed runtime telemetry; cache controls remain performance hints only.
 - `local_compute.py` -> read-only host CPU/GPU/executable discovery and named workload readiness; observations are noncanonical and grant no execution or mutation authority.
+- `local_worker.py` -> builds base-revision-verified bounded worker packets, validates candidate Git patches, enforces bounded attempts, and optionally calls loopback Ollama without applying changes.

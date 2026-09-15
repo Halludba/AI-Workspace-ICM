@@ -22,3 +22,4 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_context_escalation.py` -> bounded context-level transitions, exact provenance, positive deltas, assurance separation, source-navigator integration, and escalation CLI invariants.
 - `test_context_runtime.py` -> stable-prefix invariants, no-padding policy, telemetry availability/reconciliation, context-source integrity metadata, cold/warm comparison, and CLI coverage.
 - `test_local_compute.py` -> noncanonical discovery, missing dependency blocking, NVENC/Ollama workload readiness, no-authority semantics, policy privacy, and CLI coverage.
+- `test_local_worker.py` -> exact base-source packet provenance, bounded context, candidate patch scope/applicability, no-private-reasoning result schema, Ollama-unavailable preflight, attempt locking/repair budget, and telemetry invariants.

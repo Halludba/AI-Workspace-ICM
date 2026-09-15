@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "provider": "ollama",
+  "endpoint": "http://127.0.0.1:11434/api/chat",
+  "model": "ornith-1.5:35b",
+  "timeout_seconds": 600,
+  "max_packet_estimated_tokens": 20000,
+  "max_context_items": 32,
+  "max_changed_files": 20,
+  "max_repair_cycles": 1,
+  "session_state_root": ".session/workers",
+  "require_current_base_revision": true,
+  "structured_output_required": true,
+  "capture_private_reasoning": false,
+  "canonical_mutation": false,
+  "result_statuses": [
+    "SUCCESS",
+    "NEEDS_REPAIR",
+    "BLOCKED"
+  ],
+  "test_statuses": [
+    "PROPOSED",
+    "NOT_RUN"
+  ],
+  "max_response_bytes": 4194304,
+  "max_patch_bytes": 2097152
+}

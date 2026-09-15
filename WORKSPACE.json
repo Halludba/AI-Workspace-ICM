@@ -60,7 +60,10 @@
     "context_runtime": "tools/context_runtime.py",
     "local_compute_protocol": "_core/LOCAL_COMPUTE_PROTOCOL.md",
     "local_compute_policy": "config/local_compute_policy.json",
-    "local_compute": "tools/local_compute.py"
+    "local_compute": "tools/local_compute.py",
+    "local_worker_protocol": "_core/LOCAL_WORKER_PROTOCOL.md",
+    "local_worker_policy": "config/local_worker_policy.json",
+    "local_worker": "tools/local_worker.py"
   },
   "roots": {
     "core": "_core",

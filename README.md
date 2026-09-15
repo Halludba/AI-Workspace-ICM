@@ -28,6 +28,8 @@ Upload-only hosts use `icm export capsule ...`: ICM resolves the task before pac
 
 Role governance is exposed through `icm role ...`: System Architect is the default read-only ICM role, mutation requires explicit user authorization, and scoped workflow/profile/skill authors cannot silently widen their write envelope. Bounded role handoffs carry decisions and constraints rather than whole-chat context.
 
+Local worker delegation is exposed through `icm worker ...`: Runtime Architect may build a bounded exact-source packet for the configured loopback Ollama worker, but the worker receives no repository tools or canonical mutation authority and can return only a validated candidate patch/evidence result. Missing Ollama blocks cleanly; architect review and deterministic verification remain mandatory.
+
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.

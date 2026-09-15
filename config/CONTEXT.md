@@ -25,3 +25,4 @@ Do not load unrelated config files.
 - `context_escalation_policy.json` -> bounded C0-C5 context-sufficiency transitions, permitted evidence reasons, provenance requirements, and assurance separation.
 - `context_runtime_policy.json` -> stable/dynamic prompt-block ordering, padding prohibition, cache-hint authority, telemetry availability/cache states, and shared benchmark metric schema reference.
 - `local_compute_policy.json` -> fixed read-only probe allowlist, generic host feature definitions, and named workload prerequisites; it contains no observed machine state.
+- `local_worker_policy.json` -> bounded Ollama/Ornith worker packet, result, attempt, response-size, and repair-cycle limits; it grants no mutation authority.

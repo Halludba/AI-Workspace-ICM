@@ -30,6 +30,16 @@ def confined(rel: str) -> Path:
 def registry() -> tuple[dict, dict]:
     policy = load_json("config/context_policy.json")
     routes_doc = load_json("config/routes.json")
+    required_policy = {"schema_version", "protocol", "reference_policy", "startup", "execution_inherits", "workspace_mutation_adds", "scope_modes", "progressive_disclosure", "content_roles", "fail_closed"}
+    if set(policy) != required_policy or policy.get("schema_version") != "1.0":
+        raise ContextError("Context policy fields must match contract")
+    if policy.get("execution_inherits") != ["_core/AUTHORITY.md"]:
+        raise ContextError("Execution must inherit _core/AUTHORITY.md")
+    for key in ("startup", "execution_inherits", "workspace_mutation_adds"):
+        if not isinstance(policy.get(key), list) or not all(isinstance(v, str) and v for v in policy[key]):
+            raise ContextError(f"Context policy {key} must be a list of paths")
+    if not isinstance(routes_doc.get("routes"), list):
+        raise ContextError("Routes must be a list")
     routes = {r["id"]: r for r in routes_doc.get("routes", [])}
     if len(routes) != len(routes_doc.get("routes", [])):
         raise ContextError("Duplicate route id")
@@ -46,6 +56,14 @@ def validate_registry() -> list[str]:
         path = confined(rel)
         if not path.exists():
             missing.append(rel)
+    for rel in list(policy["startup"]) + list(policy["execution_inherits"]) + list(policy["workspace_mutation_adds"]) + [policy["protocol"], policy["reference_policy"]]:
+        if not confined(rel).is_file():
+            raise ContextError(f"Required context file is not a file: {rel}")
+    for route in reg["routes"].values():
+        if not confined(route["root"]).is_dir():
+            raise ContextError(f"Route root is not a directory: {route['root']}")
+        if not confined(route["context"]).is_file():
+            raise ContextError(f"Route context is not a file: {route['context']}")
     if missing:
         raise ContextError("Missing context path(s): " + ", ".join(missing))
     return required

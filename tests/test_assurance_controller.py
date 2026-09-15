@@ -263,6 +263,39 @@ class AssuranceControllerTests(unittest.TestCase):
             with self.assertRaises(assurance.AssuranceError):
                 assurance.load_policy(root)
 
+    def test_inline_cache_is_ignored_when_use_cache_is_false(self):
+        value = self.base("LOW", "UNKNOWN")
+        value["basis_fingerprint"] = "a" * 64
+        value["cache_record"] = {
+            "subject_id": value["subject_id"],
+            "basis_fingerprint": value["basis_fingerprint"],
+            "assurance": "SUPPORTED",
+            "level": "L3_CORROBORATE",
+            "evidence_refs": ["source:cached"],
+        }
+        result = assurance.evaluate_assessment(value, use_cache=False)
+        self.assertEqual(result["cache_status"], "DISABLED")
+        self.assertNotEqual(result.get("outcome"), "ASSURED")
+
+    def test_inline_cache_is_ignored_when_policy_disables_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self._temp_root(tmp)
+            policy = json.loads((root / "config/assurance_policy.json").read_text(encoding="utf-8"))
+            policy["cache"]["enabled"] = False
+            (root / "config/assurance_policy.json").write_text(json.dumps(policy), encoding="utf-8")
+            value = self.base("LOW", "UNKNOWN")
+            value["basis_fingerprint"] = "a" * 64
+            value["cache_record"] = {
+                "subject_id": value["subject_id"],
+                "basis_fingerprint": value["basis_fingerprint"],
+                "assurance": "SUPPORTED",
+                "level": "L3_CORROBORATE",
+                "evidence_refs": ["source:cached"],
+            }
+            result = assurance.evaluate_assessment(value, root)
+            self.assertEqual(result["cache_status"], "DISABLED")
+            self.assertNotEqual(result.get("outcome"), "ASSURED")
+
 
     def quick(self, risk="LOW", impact="SCOPED_VALIDATION", mode="AUTO"):
         return {

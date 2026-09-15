@@ -407,8 +407,9 @@ def evaluate_assessment(value: dict, root: Path = ROOT, use_cache: bool = True) 
     policy = load_policy(root)
     assessment = dict(value)
     validate_assessment(assessment, policy)
-    cache_status = "NOT_APPLICABLE"
-    if use_cache and not assessment.get("cache_record") and assessment.get("basis_fingerprint"):
+    effective_cache = bool(use_cache and policy["cache"]["enabled"])
+    cache_status = "NOT_APPLICABLE" if effective_cache else "DISABLED"
+    if effective_cache and not assessment.get("cache_record") and assessment.get("basis_fingerprint"):
         cached = read_cache(assessment["subject_id"], root)
         if cached is not None:
             assessment["cache_record"] = cached
@@ -423,7 +424,7 @@ def evaluate_assessment(value: dict, root: Path = ROOT, use_cache: bool = True) 
     levels = policy["deliberation_levels"]
     current_ok = states.index(assessment["current_assurance"]) >= states.index(required_assurance)
     level_ok = levels.index(_highest_history_level(assessment["history"], policy)) >= levels.index(minimum_level)
-    if _cache_hit(assessment, required_assurance, causes, policy):
+    if effective_cache and _cache_hit(assessment, required_assurance, causes, policy):
         cache_status = "HIT"
         cached = assessment["cache_record"]
         return {

@@ -55,11 +55,17 @@ def fidelity_audit(style: dict) -> dict:
             fonts.append(spec["font"])
     missing_fonts = sorted({f for f in fonts if f not in BUILTIN_FONTS})
     assets = style.get("assets", {})
-    missing_assets = [name for name, path in assets.items() if path and not (ROOT / path).exists()]
+    missing_assets = sorted(name for name, path in assets.items() if path and not (ROOT / path).exists())
+    unsupported = []
+    unsupported.extend(f"components.{key}" for key in sorted(style.get("components", {})))
+    unsupported.extend(f"pagination.{key}" for key in sorted(style.get("pagination", {})))
+    exact = not missing_fonts and not missing_assets and not unsupported
     return {
-        "status": "EXACT" if not missing_fonts and not missing_assets else "PARTIAL",
+        "status": "EXACT" if exact else "PARTIAL",
+        "dependency_status": "AVAILABLE" if not missing_fonts and not missing_assets else "MISSING",
         "missing_fonts": missing_fonts,
-        "missing_assets": sorted(missing_assets),
+        "missing_assets": missing_assets,
+        "unsupported_renderer_controls": unsupported,
     }
 
 

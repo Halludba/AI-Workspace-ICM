@@ -1,25 +1,215 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v080-release-closure",
-  "summary": "Finalize v0.8.0 Shared Capabilities & Context Economics after verified context economics, lazy capability routing, PDF Styler, and upload-only capsule milestones.",
+  "directive_id": "DIR-2026-09-15:v081-codex-audit-hardening",
+  "summary": "Patch the independently audited v0.8.0 correctness, confinement, idempotency, integrity, validation, context-metric, and measured performance findings as bounded v0.8.1-dev hardening.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": ["README.md", "WORKSPACE.json"],
+      "target_paths": [
+        "tools/kernel/lock.py",
+        "tests/test_kernel_hardening.py",
+        "_core/EXECUTION_KERNEL.md"
+      ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Promote v0.8.0-dev metadata to the verified v0.8.0 public release identity and record v0.9 local worker delegation as the next planned line."
+      "rationale": "Require explicit recovery for stale locks so normal acquisition cannot delete a replacement owner lock."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": ["tests/test_context_routing.py", "tests/test_release_policy.py"],
+      "target_paths": [
+        "tools/kernel/journal.py",
+        "tests/test_run_manager.py",
+        "_core/EXECUTION_KERNEL.md"
+      ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Align executable release/context assertions with the final v0.8.0 metadata and runtime status."
+      "rationale": "Confine generated projection destinations and cover Windows junction/symlink escape attempts."
+    },
+    {
+      "candidate_id": "C-003",
+      "target_paths": [
+        "tools/run_manager.py",
+        "tests/test_run_manager.py",
+        "_core/EXECUTION_KERNEL.md"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Resolve lifecycle idempotency under the run lock before deriving mutable-state payloads or timestamps."
+    },
+    {
+      "candidate_id": "C-004",
+      "target_paths": [
+        "tools/kernel/journal.py",
+        "tests/test_run_manager.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Revalidate registered final-artifact integrity before committing RUN_COMPLETED."
+    },
+    {
+      "candidate_id": "C-005",
+      "target_paths": [
+        "tools/capsule_exporter.py",
+        "tests/test_capsule_exporter.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Package the exact planned bytes, reserve generated member names, reject source/output collisions, and atomically replace completed archives."
+    },
+    {
+      "candidate_id": "C-006",
+      "target_paths": [
+        "tools/assurance_controller.py",
+        "tests/test_assurance_controller.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Apply one effective cache-enabled gate to both cache loading and inline cache consumption."
+    },
+    {
+      "candidate_id": "C-007",
+      "target_paths": [
+        "tools/context_resolver.py",
+        "tests/test_context_routing.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Validate mandatory authority inheritance and file/directory policy structure before context planning."
+    },
+    {
+      "candidate_id": "C-008",
+      "target_paths": [
+        "skills/pdf-styler/pdf_style_schema.json",
+        "tests/test_pdf_styler_skill.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Bind typography entries to the renderer-consumed textStyle schema and validate consumed page/palette/spacing fields."
+    },
+    {
+      "candidate_id": "C-009",
+      "target_paths": [
+        "skills/pdf-styler/tools/pdf_styler.py",
+        "skills/pdf-styler/SKILL.md",
+        "tests/test_pdf_styler_skill.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Stop overclaiming PDF fidelity by reporting unsupported renderer controls separately from dependency availability."
+    },
+    {
+      "candidate_id": "C-010",
+      "target_paths": [
+        "tools/token_profiler.py",
+        "tests/test_token_profiler.py",
+        "tools/README.md"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Normalize text newlines, distinguish worktree scope, and align orientation metrics with configured startup context."
+    },
+    {
+      "candidate_id": "C-011",
+      "target_paths": [
+        "tools/token_profiler.py",
+        "tests/test_token_profiler.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Batch Git-ref blob reads instead of launching one git show process per file."
+    },
+    {
+      "candidate_id": "C-012",
+      "target_paths": [
+        "tools/kernel/journal.py",
+        "tests/test_run_manager.py",
+        "_core/EXECUTION_KERNEL.md"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Use full replay by default while retaining checkpoints as explicit compatibility/verification snapshots."
+    },
+    {
+      "candidate_id": "C-013",
+      "target_paths": [
+        "tools/release_validator.py",
+        "tools/token_profiler.py",
+        "tests/test_release_policy.py",
+        "tests/test_token_profiler.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Reject nonfinite growth thresholds, invalid previous versions, and empty release-note sections."
+    },
+    {
+      "candidate_id": "C-014",
+      "target_paths": [
+        "README.md",
+        "WORKSPACE.json",
+        "tests/test_context_routing.py",
+        "tests/test_release_policy.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Open the verified v0.8.1-dev correctness hardening patch line without changing the published v0.8.0 tag."
     }
   ],
   "applied_changes": [
-    {"candidate_id": "C-001", "description": "Promoted workspace and README release identity to v0.8.0 Shared Capabilities & Context Economics."},
-    {"candidate_id": "C-002", "description": "Updated release and context-routing assertions for the final v0.8.0 identity."}
+    {
+      "candidate_id": "C-001",
+      "description": "Require explicit recovery for stale locks so normal acquisition cannot delete a replacement owner lock."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Confine generated projection destinations and cover Windows junction/symlink escape attempts."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Resolve lifecycle idempotency under the run lock before deriving mutable-state payloads or timestamps."
+    },
+    {
+      "candidate_id": "C-004",
+      "description": "Revalidate registered final-artifact integrity before committing RUN_COMPLETED."
+    },
+    {
+      "candidate_id": "C-005",
+      "description": "Package the exact planned bytes, reserve generated member names, reject source/output collisions, and atomically replace completed archives."
+    },
+    {
+      "candidate_id": "C-006",
+      "description": "Apply one effective cache-enabled gate to both cache loading and inline cache consumption."
+    },
+    {
+      "candidate_id": "C-007",
+      "description": "Validate mandatory authority inheritance and file/directory policy structure before context planning."
+    },
+    {
+      "candidate_id": "C-008",
+      "description": "Bind typography entries to the renderer-consumed textStyle schema and validate consumed page/palette/spacing fields."
+    },
+    {
+      "candidate_id": "C-009",
+      "description": "Stop overclaiming PDF fidelity by reporting unsupported renderer controls separately from dependency availability."
+    },
+    {
+      "candidate_id": "C-010",
+      "description": "Normalize text newlines, distinguish worktree scope, and align orientation metrics with configured startup context."
+    },
+    {
+      "candidate_id": "C-011",
+      "description": "Batch Git-ref blob reads instead of launching one git show process per file."
+    },
+    {
+      "candidate_id": "C-012",
+      "description": "Use full replay by default while retaining checkpoints as explicit compatibility/verification snapshots."
+    },
+    {
+      "candidate_id": "C-013",
+      "description": "Reject nonfinite growth thresholds, invalid previous versions, and empty release-note sections."
+    },
+    {
+      "candidate_id": "C-014",
+      "description": "Open the verified v0.8.1-dev correctness hardening patch line without changing the published v0.8.0 tag."
+    }
   ]
 }

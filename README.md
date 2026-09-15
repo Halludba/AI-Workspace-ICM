@@ -4,7 +4,9 @@ A host-neutral, filesystem-first template for structured AI work.
 
 Current stable release: **v0.8.0 - Shared Capabilities & Context Economics**.
 
-Next planned development: **v0.9.0 - Local Worker Delegation**.
+Development line: **v0.8.1-dev - Correctness & Boundary Hardening**.
+
+Next planned major development after the patch line: **v0.9.0 - Local Worker Delegation**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.

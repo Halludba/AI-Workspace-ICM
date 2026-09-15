@@ -141,6 +141,75 @@ class CapsuleExporterTests(unittest.TestCase):
             self.assertIn("not a complete clone", bootstrap)
             self.assertIn("omitted repository content", manifest["scope_note"])
 
+    def test_export_uses_exact_planned_bytes_and_manifest_hashes(self):
+        temp, root = self.make_workspace()
+        with temp:
+            source = root / "input.txt"
+            source.write_text("planned\n", encoding="utf-8")
+            planned_bytes = source.read_bytes()
+            plan = capsule.build_plan(target="qwen", mode="MINIMAL", request=self.request(), input_paths=["input.txt"], root=root)
+            source.write_text("changed-after-plan\n", encoding="utf-8")
+            capsule.export_capsule(plan, root / "capsule.zip", root)
+            with zipfile.ZipFile(root / "capsule.zip") as archive:
+                archived = archive.read("input.txt")
+                manifest = json.loads(archive.read("CAPSULE_MANIFEST.json"))
+            record = next(item for item in manifest["members"] if item["path"] == "input.txt")
+            self.assertEqual(archived, planned_bytes)
+            self.assertEqual(record["sha256"], capsule._sha256(archived))
+
+    def test_reserved_generated_member_names_are_rejected(self):
+        temp, root = self.make_workspace()
+        with temp:
+            (root / "CAPSULE_MANIFEST.json").write_text("shadow", encoding="utf-8")
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.build_plan(target="qwen", mode="MINIMAL", request=self.request(), input_paths=["CAPSULE_MANIFEST.json"], root=root)
+            (root / "BOOTSTRAP.md").write_text("shadow", encoding="utf-8")
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.build_plan(target="qwen", mode="MINIMAL", request=self.request(), input_paths=["BOOTSTRAP.md"], root=root)
+
+    def test_output_cannot_overwrite_packaged_source(self):
+        temp, root = self.make_workspace()
+        with temp:
+            source = root / "input.zip"
+            source.write_bytes(b"source")
+            plan = capsule.build_plan(target="qwen", mode="MINIMAL", request=self.request(), input_paths=["input.zip"], root=root)
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.export_capsule(plan, source, root)
+            self.assertEqual(source.read_bytes(), b"source")
+
+
+    def test_reserved_generated_names_reject_portable_aliases(self):
+        temp, root = self.make_workspace()
+        with temp:
+            (root / "capsule_manifest.json").write_text("shadow", encoding="utf-8")
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.build_plan(
+                    target="qwen", mode="MINIMAL", request=self.request(),
+                    input_paths=["capsule_manifest.json"], root=root,
+                )
+            (root / "bootstrap.md").write_text("shadow", encoding="utf-8")
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.build_plan(
+                    target="qwen", mode="MINIMAL", request=self.request(),
+                    input_paths=["./bootstrap.md"], root=root,
+                )
+            with self.assertRaises(capsule.CapsuleError):
+                capsule._validate_member_names(["CAPSULE_MANIFEST.json."])
+            with self.assertRaises(capsule.CapsuleError):
+                capsule._validate_member_names(["folder/a.txt", "folder/A.TXT"])
+
+    def test_source_member_aliases_cannot_collide_after_normalization(self):
+        temp, root = self.make_workspace()
+        with temp:
+            path = root / "inputs" / "data.txt"
+            path.parent.mkdir()
+            path.write_text("data", encoding="utf-8")
+            with self.assertRaises(capsule.CapsuleError):
+                capsule.build_plan(
+                    target="qwen", mode="MINIMAL", request=self.request(),
+                    input_paths=["inputs/data.txt", "inputs//data.txt"], root=root,
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

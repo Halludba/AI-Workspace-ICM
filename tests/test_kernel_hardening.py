@@ -11,6 +11,7 @@ from tools import create_workflow, run_manager, run_validator, workflow_validato
 from tools.init import initialize_run
 from tools.kernel import journal
 from tools.kernel.events import JournalError, KernelError, LockError, LockRecoveryRequired
+from tools.kernel import lock as kernel_lock_module
 from tools.kernel.lock import kernel_lock, probe_process
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -199,6 +200,19 @@ class KernelHardeningTests(unittest.TestCase):
                             next_stage = None if current["stage_id"] == "02-verify" else "02-verify"
                             run_manager.complete_attempt(run, operation, next_stage=next_stage)
                 self.assertEqual(run_validator.validate_run(run), [], f"seed={seed}")
+
+    def test_proven_stale_lock_requires_explicit_recovery(self):
+        run = self.make_run("stale-lock")
+        lock_dir = run / ".kernel.lock"
+        lock_dir.mkdir()
+        original = kernel_lock_module.inspect_lock
+        kernel_lock_module.inspect_lock = lambda run_dir: {"exists": True, "status": "stale_dead_process", "owner": {}}
+        try:
+            with self.assertRaises(LockRecoveryRequired):
+                kernel_lock_module._reclaim_if_proven_stale(run)
+            self.assertTrue(lock_dir.exists())
+        finally:
+            kernel_lock_module.inspect_lock = original
 
 
 if __name__ == "__main__":

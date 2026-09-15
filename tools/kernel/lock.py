@@ -164,13 +164,14 @@ def _reclaim_if_proven_stale(run_dir: Path) -> bool:
     info = inspect_lock(run_dir)
     if not info["exists"]:
         return True
-    if info["status"] in {"stale_dead_process", "stale_pid_reused"}:
-        shutil.rmtree(run_dir / ".kernel.lock")
-        return True
     if info["status"] == "busy":
         raise LockError("run is locked by a live matching kernel process")
     if info["status"] == "foreign_host":
         raise LockError("run lock belongs to another host; explicit recovery is required")
+    if info["status"] in {"stale_dead_process", "stale_pid_reused"}:
+        raise LockRecoveryRequired(
+            "run lock is proven stale but automatic reclamation is race-prone; explicit recovery is required"
+        )
     raise LockRecoveryRequired("run lock ownership cannot be proven stale; explicit recovery is required")
 
 

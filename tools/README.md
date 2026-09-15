@@ -18,11 +18,11 @@ Use `session_planner.py` for Git-ignored per-agent continuity queues under `.ses
 
 Use `assurance_controller.py` for the adaptive-assurance boundary. Run its cheap `trigger` path first; only invoke full assessment when a policy floor or known uncertainty signal fires. Self-reported confidence is observational only, assurance increases require evidence-backed epistemic deltas, and `.session/assurance/` cache entries are noncanonical performance hints keyed by caller-supplied basis fingerprints.
 
-Use `token_profiler.py` / `icm inspect tokens ...` only for diagnostics and release context-economics checks. Estimates are explicitly heuristic; a growth warning requests review and never proves redundancy or authorizes deletion.
+Use `token_profiler.py` / `icm inspect tokens ...` only for diagnostics and release context-economics checks. Text estimates normalize line endings. Release comparisons use tracked files only; ordinary worktree profiles may also include nonignored untracked files and label that scope explicitly. The orientation metric is the configured startup pair (`WORKSPACE.md`, `CONTEXT.md`). Estimates are heuristic; a growth warning requests review and never proves redundancy or authorizes deletion.
 
 Use `capability_resolver.py` / `icm capability ...` to select reusable skills from declared operation + artifact type. The resolver reads registry/manifest metadata only and returns context paths; it never loads all skill instructions or grants capabilities the host does not possess.
 
-Use `capsule_exporter.py` / `icm export capsule ...` for upload-only hosts such as consumer chat apps. It routes first, then packages only base authority/context, selected skill material, and explicitly named task inputs. `MINIMAL` excludes skill runtime code unless declared as capsule context; `PORTABLE` adds only manifest-declared portable files. ZIP inventory, timestamps, hashes, and ordering are deterministic.
+Use `capsule_exporter.py` / `icm export capsule ...` for upload-only hosts such as consumer chat apps. It routes first, then packages only base authority/context, selected skill material, and explicitly named task inputs. `MINIMAL` excludes skill runtime code unless declared as capsule context; `PORTABLE` adds only manifest-declared portable files. ZIP inventory, timestamps, hashes, and ordering are deterministic; member names that collide under portable extraction normalization are rejected.
 
 The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
 

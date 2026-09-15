@@ -6,7 +6,10 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import subprocess
+import tempfile
+import unicodedata
 import zipfile
 from pathlib import Path, PurePosixPath
 
@@ -80,6 +83,40 @@ def _text_tokens(data: bytes) -> int:
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _portable_member_key(name: str) -> str:
+    if not isinstance(name, str) or not name or "\\" in name:
+        raise CapsuleError(f"invalid capsule member name: {name!r}")
+    pure = PurePosixPath(name)
+    if pure.is_absolute() or ".." in pure.parts:
+        raise CapsuleError(f"invalid capsule member name: {name!r}")
+    parts = [part for part in pure.parts if part not in {"", "."}]
+    if not parts:
+        raise CapsuleError(f"invalid capsule member name: {name!r}")
+    portable = []
+    for part in parts:
+        normalized = unicodedata.normalize("NFC", part).rstrip(" .")
+        if not normalized:
+            raise CapsuleError(f"invalid portable capsule member name: {name!r}")
+        portable.append(normalized.casefold())
+    return "/".join(portable)
+
+
+def _validate_member_names(names: list[str]) -> None:
+    generated = {
+        _portable_member_key("BOOTSTRAP.md"),
+        _portable_member_key("CAPSULE_MANIFEST.json"),
+    }
+    seen: dict[str, str] = {}
+    for name in names:
+        key = _portable_member_key(name)
+        if key in generated:
+            raise CapsuleError(f"reserved capsule member name: {name}")
+        prior = seen.get(key)
+        if prior is not None:
+            raise CapsuleError(f"portable capsule member collision: {prior!r} and {name!r}")
+        seen[key] = name
 
 
 def _git_state(root: Path = ROOT) -> dict:
@@ -175,11 +212,16 @@ def build_plan(*, target: str, mode: str, request: dict,
             files.extend(_skill_portable_files(selected, root))
     files.extend(input_paths)
     ordered = sorted(dict.fromkeys(files))
+    _validate_member_names(ordered)
     members = []
+    member_bytes = {}
+    member_sources = {}
     token_total = 0
     for rel in ordered:
         path = _confined_file(rel, root)
         data = path.read_bytes()
+        member_bytes[rel] = data
+        member_sources[rel] = str(path.resolve())
         tokens = _text_tokens(data)
         token_total += tokens
         members.append({
@@ -196,6 +238,8 @@ def build_plan(*, target: str, mode: str, request: dict,
         "request": request,
         "routing": routed,
         "members": members,
+        "member_bytes": member_bytes,
+        "member_sources": member_sources,
         "bootstrap_bytes": bootstrap,
         "estimated_text_tokens_before_manifest": token_total,
         "git": _git_state(root),
@@ -252,18 +296,27 @@ def _zip_write(zf: zipfile.ZipFile, name: str, data: bytes) -> None:
 
 def export_capsule(plan: dict, output: Path, root: Path = ROOT) -> dict:
     output = output.resolve()
+    source_paths = {Path(path).resolve() for path in plan["member_sources"].values()}
+    if output in source_paths:
+        raise CapsuleError("capsule output cannot overwrite a packaged source input")
     output.parent.mkdir(parents=True, exist_ok=True)
     manifest = _manifest_bytes(plan)
     payloads = {
         "BOOTSTRAP.md": plan["bootstrap_bytes"],
         "CAPSULE_MANIFEST.json": manifest,
+        **plan["member_bytes"],
     }
-    for member in plan["members"]:
-        rel = member["path"]
-        payloads[rel] = _confined_file(rel, root).read_bytes()
-    with zipfile.ZipFile(output, "w") as zf:
-        for name in sorted(payloads):
-            _zip_write(zf, name, payloads[name])
+    fd, temp_name = tempfile.mkstemp(prefix=f".{output.name}.", suffix=".tmp", dir=output.parent)
+    os.close(fd)
+    temp = Path(temp_name)
+    try:
+        with zipfile.ZipFile(temp, "w") as zf:
+            for name in sorted(payloads):
+                _zip_write(zf, name, payloads[name])
+        os.replace(temp, output)
+    except Exception:
+        temp.unlink(missing_ok=True)
+        raise
     archive = output.read_bytes()
     parsed_manifest = json.loads(manifest.decode("utf-8"))
     return {

@@ -16,8 +16,8 @@ class ReleasePolicyTests(unittest.TestCase):
     def test_current_workspace_release_is_valid(self):
         result = release_validator.validate_workspace()
         self.assertTrue(result["valid"])
-        self.assertEqual(result["workspace_version"], "0.8.0")
-        self.assertEqual(result["expected_tag"], "v0.8.0")
+        self.assertEqual(result["workspace_version"], "0.8.1-dev")
+        self.assertEqual(result["expected_tag"], "v0.8.1-dev")
 
     def test_standard_semver_versions_pass(self):
         for version in ["0.6.1", "0.7.0", "1.0.0", "0.7.0-dev.1", "1.2.3+build.7"]:
@@ -91,6 +91,43 @@ Changed
             (root / "config" / "release_policy.json").write_text(
                 json.dumps(policy), encoding="utf-8"
             )
+            with self.assertRaises(release_validator.ReleasePolicyError):
+                release_validator.load_policy(root)
+
+    def test_tag_note_rejects_empty_sections(self):
+        note = """ICM v0.8.1 - Hardening
+
+Previous: v0.8.0
+
+Fixed
+- Correctness fixes.
+
+Verification
+"""
+        with self.assertRaises(release_validator.ReleasePolicyError):
+            release_validator.validate_tag_message(note, "0.8.1")
+
+    def test_tag_note_rejects_invalid_previous_version(self):
+        note = """ICM v0.8.1 - Hardening
+
+Previous: vbanana
+
+Fixed
+- Correctness fixes.
+
+Verification
+- Tests PASS.
+"""
+        with self.assertRaises(release_validator.ReleasePolicyError):
+            release_validator.validate_tag_message(note, "0.8.1")
+
+    def test_context_metric_thresholds_must_be_finite(self):
+        policy = release_validator.load_policy()
+        policy["release"]["context_metrics"]["tracked_text_growth_warning_percent"] = float("nan")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "config" / "release_policy.json").write_text(json.dumps(policy), encoding="utf-8")
             with self.assertRaises(release_validator.ReleasePolicyError):
                 release_validator.load_policy(root)
 

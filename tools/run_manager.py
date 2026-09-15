@@ -12,7 +12,7 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tools.init import initialize_run
-from tools.kernel.events import KernelError, TransitionError, now_utc
+from tools.kernel.events import IdempotencyConflictError, KernelError, TransitionError, now_utc
 from tools.kernel.journal import (
     current_state,
     execute_event,
@@ -21,9 +21,10 @@ from tools.kernel.journal import (
     read_events,
     recover,
     reduce_journal,
+    resolve_user_path,
     verify_definition_binding,
 )
-from tools.kernel.lock import force_recover_lock, inspect_lock
+from tools.kernel.lock import force_recover_lock, inspect_lock, kernel_lock
 
 ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / "work"
@@ -43,162 +44,124 @@ def run_path(run_id: str) -> Path:
     return path
 
 
+def _locked_lifecycle(run_dir: Path, event_type: str, operation_id: str, payload_builder, retry_match=None) -> dict:
+    with kernel_lock(run_dir, operation_id):
+        events = read_events(run_dir)
+        existing = next((event for event in events if event.get("operation_id") == operation_id), None)
+        if existing is not None:
+            if existing.get("event_type") != event_type:
+                raise IdempotencyConflictError(f"operation_id conflict: {operation_id}")
+            if retry_match is not None and not retry_match(existing.get("payload", {})):
+                raise IdempotencyConflictError(f"operation_id conflict: {operation_id}")
+            return execute_event(run_dir, event_type, existing["payload"], operation_id, lock=False)
+        state = reduce_journal(run_dir, events) if events else None
+        payload = payload_builder(state)
+        return execute_event(run_dir, event_type, payload, operation_id, lock=False)
+
+
 def start_run(run_dir: Path, operation_id: str) -> dict:
-    return execute_event(run_dir, "RUN_STARTED", {}, operation_id)
+    return _locked_lifecycle(run_dir, "RUN_STARTED", operation_id, lambda state: {})
 
 
 def create_attempt(run_dir: Path, operation_id: str) -> dict:
-    state, _ = current_state(run_dir)
-    active = _active_attempt(state)
-    if state["status"] != "RUNNING":
-        raise TransitionError("create-attempt requires RUNNING run")
-    if active is None:
-        stage_id = state["entry_stage"]
-        execution_sequence = 1
-    elif active["status"] == "SUCCEEDED":
-        stage_id = active["handoff"].get("selected_next_stage")
-        if not stage_id:
-            raise TransitionError("terminal successful attempt cannot create another attempt")
-        execution_sequence = state["current"]["execution_sequence"] + 1
-    elif active["status"] == "FAILED":
-        stage_id = state["current"]["stage_id"]
-        execution_sequence = state["current"]["execution_sequence"] + 1
-    else:
-        raise TransitionError("create-attempt requires no active attempt, SUCCEEDED, or FAILED attempt")
-    attempts = state["stages"].get(stage_id, {"attempts": {}})["attempts"]
-    attempt = max((int(key) for key in attempts), default=0) + 1
-    return execute_event(
-        run_dir,
-        "ATTEMPT_CREATED",
-        {"stage_id": stage_id, "attempt": attempt, "execution_sequence": execution_sequence},
-        operation_id,
-    )
+    def build(state: dict) -> dict:
+        active = _active_attempt(state)
+        if state["status"] != "RUNNING":
+            raise TransitionError("create-attempt requires RUNNING run")
+        if active is None:
+            stage_id = state["entry_stage"]
+            execution_sequence = 1
+        elif active["status"] == "SUCCEEDED":
+            stage_id = active["handoff"].get("selected_next_stage")
+            if not stage_id:
+                raise TransitionError("terminal successful attempt cannot create another attempt")
+            execution_sequence = state["current"]["execution_sequence"] + 1
+        elif active["status"] == "FAILED":
+            stage_id = state["current"]["stage_id"]
+            execution_sequence = state["current"]["execution_sequence"] + 1
+        else:
+            raise TransitionError("create-attempt requires no active attempt, SUCCEEDED, or FAILED attempt")
+        attempts = state["stages"].get(stage_id, {"attempts": {}})["attempts"]
+        attempt = max((int(key) for key in attempts), default=0) + 1
+        return {"stage_id": stage_id, "attempt": attempt, "execution_sequence": execution_sequence}
+    return _locked_lifecycle(run_dir, "ATTEMPT_CREATED", operation_id, build)
 
 
 def start_attempt(run_dir: Path, operation_id: str) -> dict:
-    state, _ = current_state(run_dir)
-    current = state["current"]
-    if current.get("attempt") is None:
-        raise TransitionError("no attempt exists; create-attempt first")
-    return execute_event(
-        run_dir,
-        "ATTEMPT_STARTED",
-        {
-            "stage_id": current["stage_id"],
-            "attempt": current["attempt"],
-            "execution_sequence": current["execution_sequence"],
-        },
-        operation_id,
+    def build(state: dict) -> dict:
+        current = state["current"]
+        if current.get("attempt") is None:
+            raise TransitionError("no attempt exists; create-attempt first")
+        return {"stage_id": current["stage_id"], "attempt": current["attempt"], "execution_sequence": current["execution_sequence"]}
+    return _locked_lifecycle(run_dir, "ATTEMPT_STARTED", operation_id, build)
+
+
+def register_artifact(run_dir: Path, operation_id: str, path_value: str, role: str, *, final: bool = False, media_type: str | None = None) -> dict:
+    _, intended_rel = resolve_user_path(run_dir, path_value)
+    intended_final = bool(final)
+    intended_media_type = media_type or None
+    def match(payload: dict) -> bool:
+        if payload.get("path") != intended_rel or payload.get("role") != role or payload.get("is_final") is not intended_final:
+            return False
+        # Omitted/empty media_type means "infer at first commit"; inferred storage data is not caller intent.
+        return intended_media_type is None or payload.get("media_type") == intended_media_type
+    build = lambda state: make_artifact_payload(
+        run_dir, path_value, role, final=intended_final, media_type=intended_media_type
     )
+    return _locked_lifecycle(run_dir, "ARTIFACT_REGISTERED", operation_id, build, match)
 
 
-def register_artifact(
-    run_dir: Path,
-    operation_id: str,
-    path_value: str,
-    role: str,
-    *,
-    final: bool = False,
-    media_type: str | None = None,
-) -> dict:
-    payload = make_artifact_payload(run_dir, path_value, role, final=final, media_type=media_type)
-    return execute_event(run_dir, "ARTIFACT_REGISTERED", payload, operation_id)
+def record_validation(run_dir: Path, operation_id: str, status: str, *, check_id: str = "default", evidence_paths: list[str] | None = None) -> dict:
+    evidence_paths = evidence_paths or []
+    intended = [resolve_user_path(run_dir, path)[1] for path in evidence_paths]
+    def match(payload: dict) -> bool:
+        return payload.get("check_id") == check_id and payload.get("status") == status and [r.get("path") for r in payload.get("evidence", [])] == intended
+    def build(state: dict) -> dict:
+        current = state["current"]
+        if current.get("attempt") is None:
+            raise TransitionError("validation requires an active attempt")
+        return {"stage_id": current["stage_id"], "attempt": current["attempt"], "check_id": check_id, "status": status, "evidence": make_evidence_records(run_dir, evidence_paths)}
+    return _locked_lifecycle(run_dir, "VALIDATION_RECORDED", operation_id, build, match)
 
 
-def record_validation(
-    run_dir: Path,
-    operation_id: str,
-    status: str,
-    *,
-    check_id: str = "default",
-    evidence_paths: list[str] | None = None,
-) -> dict:
-    state, _ = current_state(run_dir)
-    current = state["current"]
-    if current.get("attempt") is None:
-        raise TransitionError("validation requires an active attempt")
-    return execute_event(
-        run_dir,
-        "VALIDATION_RECORDED",
-        {
-            "stage_id": current["stage_id"],
-            "attempt": current["attempt"],
-            "check_id": check_id,
-            "status": status,
-            "evidence": make_evidence_records(run_dir, evidence_paths or []),
-        },
-        operation_id,
-    )
-
-
-def complete_attempt(
-    run_dir: Path,
-    operation_id: str,
-    *,
-    next_stage: str | None = None,
-    reason: str | None = None,
-) -> dict:
-    state, _ = current_state(run_dir)
-    current = state["current"]
-    if current.get("attempt") is None:
-        raise TransitionError("complete-attempt requires an active attempt")
-    return execute_event(
-        run_dir,
-        "ATTEMPT_COMPLETED",
-        {
-            "stage_id": current["stage_id"],
-            "attempt": current["attempt"],
-            "selected_next_stage": next_stage,
-            "reason": reason,
-        },
-        operation_id,
-    )
+def complete_attempt(run_dir: Path, operation_id: str, *, next_stage: str | None = None, reason: str | None = None) -> dict:
+    match = lambda payload: payload.get("selected_next_stage") == next_stage and payload.get("reason") == reason
+    def build(state: dict) -> dict:
+        current = state["current"]
+        if current.get("attempt") is None:
+            raise TransitionError("complete-attempt requires an active attempt")
+        return {"stage_id": current["stage_id"], "attempt": current["attempt"], "selected_next_stage": next_stage, "reason": reason}
+    return _locked_lifecycle(run_dir, "ATTEMPT_COMPLETED", operation_id, build, match)
 
 
 def fail_attempt(run_dir: Path, operation_id: str, reason: str) -> dict:
-    state, _ = current_state(run_dir)
-    current = state["current"]
-    if current.get("attempt") is None:
-        raise TransitionError("fail-attempt requires an active attempt")
-    return execute_event(
-        run_dir,
-        "ATTEMPT_FAILED",
-        {"stage_id": current["stage_id"], "attempt": current["attempt"], "reason": reason},
-        operation_id,
-    )
+    def build(state: dict) -> dict:
+        current = state["current"]
+        if current.get("attempt") is None:
+            raise TransitionError("fail-attempt requires an active attempt")
+        return {"stage_id": current["stage_id"], "attempt": current["attempt"], "reason": reason}
+    return _locked_lifecycle(run_dir, "ATTEMPT_FAILED", operation_id, build, lambda p: p.get("reason") == reason)
 
 
 def block_run(run_dir: Path, operation_id: str, reason: str) -> dict:
-    return execute_event(run_dir, "RUN_BLOCKED", {"reason": reason}, operation_id)
+    return _locked_lifecycle(run_dir, "RUN_BLOCKED", operation_id, lambda state: {"reason": reason}, lambda p: p.get("reason") == reason)
 
 
 def resume_run(run_dir: Path, operation_id: str) -> dict:
-    return execute_event(run_dir, "RUN_RESUMED", {}, operation_id)
+    return _locked_lifecycle(run_dir, "RUN_RESUMED", operation_id, lambda state: {})
 
 
 def fail_run(run_dir: Path, operation_id: str, reason: str) -> dict:
-    state, _ = current_state(run_dir)
-    current = state["current"]
-    return execute_event(
-        run_dir,
-        "RUN_FAILED",
-        {
-            "reason": reason,
-            "failed_at_stage": current["stage_id"],
-            "failed_at_attempt": current.get("attempt"),
-        },
-        operation_id,
-    )
+    def build(state: dict) -> dict:
+        current = state["current"]
+        return {"reason": reason, "failed_at_stage": current["stage_id"], "failed_at_attempt": current.get("attempt")}
+    return _locked_lifecycle(run_dir, "RUN_FAILED", operation_id, build, lambda p: p.get("reason") == reason)
 
 
 def complete_run(run_dir: Path, operation_id: str) -> dict:
-    state, _ = current_state(run_dir)
-    return execute_event(
-        run_dir,
-        "RUN_COMPLETED",
-        {"terminal_stage": state["current"]["stage_id"], "completed_at": now_utc()},
-        operation_id,
-    )
+    def build(state: dict) -> dict:
+        return {"terminal_stage": state["current"]["stage_id"], "completed_at": now_utc()}
+    return _locked_lifecycle(run_dir, "RUN_COMPLETED", operation_id, build)
 
 
 def verify(run_dir: Path) -> dict:

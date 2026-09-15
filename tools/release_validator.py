@@ -1,5 +1,6 @@
 import argparse
 import json
+import math
 import re
 from pathlib import Path
 
@@ -56,7 +57,7 @@ def load_policy(root: Path = ROOT) -> dict:
         raise ReleasePolicyError("release context_metrics fields must match contract")
     for key in ("tracked_text_growth_warning_percent", "orientation_growth_warning_percent"):
         value = metrics[key]
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
             raise ReleasePolicyError(f"release context metric {key} must be positive")
     skill = metrics["growth_review_skill"]
     if not isinstance(skill, str) or not skill.startswith("skills/") or not skill.endswith("/SKILL.md"):
@@ -75,8 +76,10 @@ def validate_tag_message(text: str, version: str, policy: dict | None = None) ->
     lines = [line.rstrip() for line in text.splitlines()]
     if not lines or not lines[0].startswith(f"ICM v{version} - "):
         raise ReleasePolicyError("tag note title must identify the exact release version")
-    if not any(line.startswith("Previous: v") for line in lines):
+    previous = next((line.removeprefix("Previous: v") for line in lines if line.startswith("Previous: v")), None)
+    if previous is None:
         raise ReleasePolicyError("tag note must declare Previous: v<version>")
+    validate_version(previous)
     allowed = policy["release"]["tag_note_sections"]
     seen = [line for line in lines if line in allowed]
     if len(seen) != len(set(seen)):
@@ -88,6 +91,13 @@ def validate_tag_message(text: str, version: str, policy: dict | None = None) ->
     ]
     if unknown_headings:
         raise ReleasePolicyError(f"unknown tag note heading: {unknown_headings[0]}")
+    section_positions = {line: i for i, line in enumerate(lines) if line in allowed}
+    for section in seen:
+        start = section_positions[section] + 1
+        later = [i for name, i in section_positions.items() if i > section_positions[section]]
+        end = min(later) if later else len(lines)
+        if not any(line.startswith("- ") and line[2:].strip() for line in lines[start:end]):
+            raise ReleasePolicyError(f"tag note section must contain evidence/content: {section}")
     for required in policy["release"]["required_tag_note_sections"]:
         if required not in seen:
             raise ReleasePolicyError(f"tag note missing required section: {required}")

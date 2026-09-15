@@ -2,49 +2,258 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Reusable PDF Style Preset",
   "type": "object",
-  "required": ["id", "type", "version", "page", "palette", "typography", "spacing", "components", "pagination", "fidelity"],
+  "required": [
+    "id",
+    "type",
+    "version",
+    "page",
+    "palette",
+    "typography",
+    "spacing",
+    "components",
+    "pagination",
+    "fidelity"
+  ],
   "properties": {
-    "id": {"type": "string", "pattern": "^style\\.pdf\\.[a-z0-9_.-]+$"},
-    "type": {"const": "pdf_style"},
-    "version": {"type": "string", "minLength": 1},
-    "source_reference": {"type": ["string", "null"]},
-    "scope": {"type": "array", "items": {"type": "string"}},
-    "page": {
-      "type": "object",
-      "required": ["size", "orientation", "margins"],
-      "properties": {
-        "size": {"enum": ["A4", "LETTER"]},
-        "orientation": {"enum": ["portrait", "landscape"]},
-        "margins": {"type": "object", "required": ["left", "right", "top", "bottom"]}
+    "id": {
+      "type": "string",
+      "pattern": "^style\\.pdf\\.[a-z0-9_.-]+$"
+    },
+    "type": {
+      "const": "pdf_style"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     },
-    "palette": {"type": "object", "required": ["background", "text", "muted", "line"]},
-    "typography": {"type": "object", "required": ["title", "subtitle", "heading_1", "heading_2", "heading_3", "body", "small", "code"]},
-    "spacing": {"type": "object"},
-    "components": {"type": "object"},
-    "pagination": {"type": "object"},
-    "assets": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
-    "adaptation": {"type": "object"},
+    "page": {
+      "type": "object",
+      "required": [
+        "size",
+        "orientation",
+        "margins"
+      ],
+      "properties": {
+        "size": {
+          "enum": [
+            "A4",
+            "LETTER"
+          ]
+        },
+        "orientation": {
+          "enum": [
+            "portrait",
+            "landscape"
+          ]
+        },
+        "margins": {
+          "type": "object",
+          "required": [
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ],
+          "properties": {
+            "left": {
+              "type": "number",
+              "minimum": 0
+            },
+            "right": {
+              "type": "number",
+              "minimum": 0
+            },
+            "top": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bottom": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    },
+    "palette": {
+      "type": "object",
+      "required": [
+        "background",
+        "text",
+        "muted",
+        "line"
+      ],
+      "properties": {
+        "background": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "text": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "muted": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "line": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "required": [
+        "title",
+        "subtitle",
+        "heading_1",
+        "heading_2",
+        "heading_3",
+        "body",
+        "small",
+        "code"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "subtitle": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "heading_1": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "heading_2": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "heading_3": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "body": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "small": {
+          "$ref": "#/$defs/textStyle"
+        },
+        "code": {
+          "$ref": "#/$defs/textStyle"
+        }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "properties": {
+        "base_gap": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "components": {
+      "type": "object"
+    },
+    "pagination": {
+      "type": "object"
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "adaptation": {
+      "type": "object"
+    },
     "fidelity": {
       "type": "object",
-      "required": ["missing_font_policy", "missing_asset_policy", "claim_rule"],
+      "required": [
+        "missing_font_policy",
+        "missing_asset_policy",
+        "claim_rule"
+      ],
       "properties": {
-        "missing_font_policy": {"type": "string"},
-        "missing_asset_policy": {"type": "string"},
-        "claim_rule": {"type": "string"}
+        "missing_font_policy": {
+          "type": "string"
+        },
+        "missing_asset_policy": {
+          "type": "string"
+        },
+        "claim_rule": {
+          "type": "string"
+        }
       }
     }
   },
   "$defs": {
     "textStyle": {
       "type": "object",
-      "required": ["font", "size", "leading"],
+      "required": [
+        "font",
+        "size",
+        "leading"
+      ],
       "properties": {
-        "font": {"type": "string"}, "size": {"type": "number", "exclusiveMinimum": 0},
-        "leading": {"type": "number", "exclusiveMinimum": 0}, "color": {"type": "string"},
-        "align": {"enum": ["left", "center", "right"]}, "left_indent": {"type": "number"},
-        "right_indent": {"type": "number"}, "background": {"type": ["string", "null"]},
-        "border_color": {"type": ["string", "null"]}, "border_width": {"type": "number"}, "padding": {"type": "number"}
+        "font": {
+          "type": "string"
+        },
+        "size": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "leading": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "color": {
+          "type": "string"
+        },
+        "align": {
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "left_indent": {
+          "type": "number"
+        },
+        "right_indent": {
+          "type": "number"
+        },
+        "background": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "border_color": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "border_width": {
+          "type": "number"
+        },
+        "padding": {
+          "type": "number"
+        }
       }
     }
   }

@@ -1,5 +1,7 @@
 import json
 import os
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -282,6 +284,125 @@ class RunManagerTests(unittest.TestCase):
         self.start_first_attempt(run)
         self.assertEqual(run_validator.validate_run(run), [])
         run_manager.verify(run)
+
+    def test_create_attempt_retry_returns_original_committed_event(self):
+        run = self.make_run()
+        run_manager.start_run(run, "START")
+        first = run_manager.create_attempt(run, "CREATE-RETRY")
+        second = run_manager.create_attempt(run, "CREATE-RETRY")
+        self.assertEqual(first, second)
+        self.assertEqual(len(journal.read_events(run)), 3)
+
+    def test_complete_run_retry_ignores_later_clock_value(self):
+        run = self.make_run()
+        self.start_first_attempt(run)
+        run_manager.record_validation(run, "V1", "PASS")
+        run_manager.complete_attempt(run, "C1", next_stage="02-verify")
+        run_manager.create_attempt(run, "CA2")
+        run_manager.start_attempt(run, "SA2")
+        run_manager.record_validation(run, "V2", "PASS")
+        run_manager.complete_attempt(run, "C2")
+        first = run_manager.complete_run(run, "DONE-RETRY")
+        second = run_manager.complete_run(run, "DONE-RETRY")
+        self.assertEqual(first, second)
+        self.assertEqual(self.state(run)["status"], "COMPLETED")
+
+    def test_stale_registered_final_artifact_blocks_run_completion(self):
+        run = self.make_run()
+        self.start_first_attempt(run)
+        run_manager.record_validation(run, "V1", "PASS")
+        run_manager.complete_attempt(run, "C1", next_stage="02-verify")
+        run_manager.create_attempt(run, "CA2")
+        run_manager.start_attempt(run, "SA2")
+        final = run / "final" / "deliverable.txt"
+        final.write_text("original\n", encoding="utf-8")
+        run_manager.register_artifact(run, "FINAL", str(final), "final_output", final=True)
+        run_manager.record_validation(run, "V2", "PASS")
+        run_manager.complete_attempt(run, "C2")
+        final.write_text("tampered\n", encoding="utf-8")
+        with self.assertRaises(Exception):
+            run_manager.complete_run(run, "DONE")
+        self.assertEqual(self.state(run)["status"], "RUNNING")
+
+    def test_generated_projection_path_escape_is_rejected_when_supported(self):
+        run = self.make_run()
+        run_manager.start_run(run, "START")
+        run_manager.create_attempt(run, "CREATE")
+        state, events = journal.current_state(run)
+        stage = run / "stages" / "01-intake"
+        outside = self.tmp / "outside-stage"
+        outside.mkdir()
+        shutil.rmtree(stage)
+        try:
+            os.symlink(outside, stage, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("directory symlink creation not available")
+        with self.assertRaises(Exception):
+            journal.materialize_projections(run, state, events)
+        self.assertFalse((outside / "attempts" / "0001" / "ATTEMPT.json").exists())
+
+    def test_normal_replay_does_not_depend_on_checkpoint_prefix_reduction(self):
+        run = self.make_run()
+        run_manager.start_run(run, "START")
+        run_manager.create_attempt(run, "CREATE")
+        original = journal.load_latest_checkpoint
+        journal.load_latest_checkpoint = lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("checkpoint loaded on normal replay"))
+        try:
+            state = journal.reduce_journal(run)
+            self.assertEqual(state["current"]["attempt"], 1)
+        finally:
+            journal.load_latest_checkpoint = original
+
+    @unittest.skipUnless(os.name == "nt", "Windows junction test")
+    def test_generated_projection_windows_junction_escape_is_rejected(self):
+        run = self.make_run()
+        run_manager.start_run(run, "START")
+        run_manager.create_attempt(run, "CREATE")
+        state, events = journal.current_state(run)
+        stage = run / "stages" / "01-intake"
+        outside = self.tmp / "junction-outside"
+        outside.mkdir()
+        shutil.rmtree(stage)
+        result = subprocess.run(["cmd.exe", "/d", "/c", "mklink", "/J", str(stage), str(outside)], text=True, capture_output=True, check=False)
+        if result.returncode != 0:
+            self.skipTest("Windows junction creation unavailable")
+        try:
+            with self.assertRaises(Exception):
+                journal.materialize_projections(run, state, events)
+            self.assertFalse((outside / "attempts" / "0001" / "ATTEMPT.json").exists())
+        finally:
+            if stage.exists():
+                stage.rmdir()
+
+
+    def test_artifact_retry_compares_caller_intent_not_inferred_media_type(self):
+        run = self.make_run()
+        self.start_first_attempt(run)
+        artifact = run / "stages/01-intake/attempts/0001/artifacts/retry.txt"
+        artifact.write_text("payload\n", encoding="utf-8")
+
+        first = run_manager.register_artifact(run, "ART-RETRY", str(artifact), "stage_output")
+        second = run_manager.register_artifact(run, "ART-RETRY", str(artifact), "stage_output")
+        third = run_manager.register_artifact(
+            run, "ART-RETRY", str(artifact), "stage_output", media_type=""
+        )
+        self.assertEqual(first, second)
+        self.assertEqual(first, third)
+        self.assertEqual(first["payload"]["media_type"], "text/plain")
+
+        explicit = run / "stages/01-intake/attempts/0001/artifacts/explicit.bin"
+        explicit.write_bytes(b"payload")
+        first_explicit = run_manager.register_artifact(
+            run, "ART-EXPLICIT", str(explicit), "stage_output", media_type="application/x-icm-test"
+        )
+        second_explicit = run_manager.register_artifact(
+            run, "ART-EXPLICIT", str(explicit), "stage_output", media_type="application/x-icm-test"
+        )
+        self.assertEqual(first_explicit, second_explicit)
+        with self.assertRaises(IdempotencyConflictError):
+            run_manager.register_artifact(
+                run, "ART-EXPLICIT", str(explicit), "stage_output", media_type="application/octet-stream"
+            )
 
 
 if __name__ == "__main__":

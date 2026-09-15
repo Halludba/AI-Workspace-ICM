@@ -244,7 +244,7 @@ def load_latest_checkpoint(
     return None, 0
 
 
-def reduce_journal(run_dir: Path, events: list[dict] | None = None, *, use_checkpoint: bool = True) -> dict:
+def reduce_journal(run_dir: Path, events: list[dict] | None = None, *, use_checkpoint: bool = False) -> dict:
     events = read_events(run_dir) if events is None else events
     if not events:
         raise JournalError("journal is empty")
@@ -371,7 +371,7 @@ def materialize_projections(run_dir: Path, state: dict, events: list[dict], *, w
     changed = False
     materialized_at = now_utc()
     expected_run = run_projection(state, events, materialized_at)
-    run_path = run_dir / "RUN.json"
+    run_path = confined(run_dir, "RUN.json")
     if not projection_matches(run_path, expected_run):
         if warn and run_path.exists():
             print("warning: RUN.json drift detected; rebuilding from journal", file=sys.stderr)
@@ -379,9 +379,10 @@ def materialize_projections(run_dir: Path, state: dict, events: list[dict], *, w
         changed = True
     for stage_id, stage in state["stages"].items():
         for attempt_key, attempt in stage["attempts"].items():
-            attempt_dir = run_dir / "stages" / stage_id / "attempts" / f"{int(attempt_key):04d}"
-            (attempt_dir / "artifacts").mkdir(parents=True, exist_ok=True)
-            (attempt_dir / "validation").mkdir(parents=True, exist_ok=True)
+            attempt_rel = f"stages/{stage_id}/attempts/{int(attempt_key):04d}"
+            attempt_dir = confined(run_dir, attempt_rel)
+            (confined(run_dir, f"{attempt_rel}/artifacts")).mkdir(parents=True, exist_ok=True)
+            (confined(run_dir, f"{attempt_rel}/validation")).mkdir(parents=True, exist_ok=True)
             path = attempt_dir / "ATTEMPT.json"
             expected = attempt_projection(attempt, materialized_at)
             if not projection_matches(path, expected):
@@ -416,6 +417,11 @@ def validate_physical_delta(
         return
     if state is None:
         raise KernelError(f"{event_type} requires existing state")
+    if event_type == "RUN_COMPLETED":
+        final_root = run_dir.resolve() / "final"
+        for record in state.get("final_artifacts", []):
+            _verify_artifact_file(run_dir, record, final_root)
+        return
     current = state["current"]
     if event_type == "ATTEMPT_COMPLETED":
         if current.get("attempt") is None:

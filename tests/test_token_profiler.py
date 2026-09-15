@@ -127,6 +127,66 @@ class TokenProfilerTests(unittest.TestCase):
         self.assertNotIn("registry.json", result["by_skill"])
         self.assertNotIn("CONTEXT.md", result["by_skill"])
 
+    def test_crlf_and_lf_are_equivalent_for_release_comparison(self):
+        temp, root = self.make_repo()
+        with temp:
+            self.seed_baseline(root)
+            original = (root / "module.py").read_text(encoding="utf-8")
+            (root / "module.py").write_bytes(original.replace("\n", "\r\n").encode("utf-8"))
+            result = profiler.compare("base", None, root)
+            self.assertEqual(result["delta_percent"]["tracked_text"], 0.0)
+            self.assertEqual(result["current"]["scope"], "TRACKED_WORKTREE")
+
+    def test_release_comparison_excludes_untracked_files(self):
+        temp, root = self.make_repo()
+        with temp:
+            self.seed_baseline(root)
+            (root / "untracked.txt").write_text("x" * 5000, encoding="utf-8")
+            compared = profiler.compare("base", None, root)
+            diagnostic = profiler.profile(None, root)
+            self.assertEqual(compared["delta_percent"]["tracked_text"], 0.0)
+            self.assertEqual(compared["current"]["scope"], "TRACKED_WORKTREE")
+            self.assertEqual(diagnostic["scope"], "WORKTREE_WITH_UNTRACKED")
+            self.assertGreater(diagnostic["total"]["estimated_tokens"], compared["current"]["total"]["estimated_tokens"])
+
+    def test_orientation_definition_matches_startup_files(self):
+        result = profiler.profile("v0.8.0")
+        self.assertEqual(result["orientation_definition"], ["WORKSPACE.md", "CONTEXT.md"])
+
+    def test_git_ref_profile_uses_batch_blob_reader(self):
+        original = profiler._ref_bytes
+        profiler._ref_bytes = lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("per-file git show used"))
+        try:
+            result = profiler.profile("v0.8.0")
+            self.assertEqual(result["scope"], "GIT_REF")
+        finally:
+            profiler._ref_bytes = original
+
+
+    def test_git_ref_batch_reader_preserves_legal_unusual_paths(self):
+        temp, root = self.make_repo()
+        with temp:
+            names = ["ordinary.py", "line\nbreak.py", "space name.py", "unicode-?.py"]
+            records = []
+            for index, name in enumerate(names):
+                content = f"VALUE = {index}\n".encode("utf-8")
+                blob = subprocess.run(
+                    ["git", "hash-object", "-w", "--stdin"], cwd=root,
+                    input=content, capture_output=True, check=True,
+                ).stdout.strip().decode("ascii")
+                records.append(f"100644 blob {blob}\t".encode("ascii") + name.encode("utf-8") + b"\x00")
+            tree = subprocess.run(
+                ["git", "mktree", "-z"], cwd=root, input=b"".join(records),
+                capture_output=True, check=True,
+            ).stdout.strip().decode("ascii")
+            commit = subprocess.run(
+                ["git", "commit-tree", tree, "-m", "pathological paths"], cwd=root,
+                capture_output=True, check=True,
+            ).stdout.strip().decode("ascii")
+            result = profiler.profile(commit, root, include_files=True)
+            self.assertEqual(set(result["by_file"]), set(names))
+            self.assertEqual(result["text_files"], len(names))
+
 
 if __name__ == "__main__":
     unittest.main()

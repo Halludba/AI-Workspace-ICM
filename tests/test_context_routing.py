@@ -93,7 +93,7 @@ class ContextRoutingTests(unittest.TestCase):
 
     def test_workspace_version(self):
         ws = json.loads((ROOT / "WORKSPACE.json").read_text(encoding="utf-8"))
-        self.assertEqual(ws["workspace_version"], "0.8.0")
+        self.assertEqual(ws["workspace_version"], "0.8.1-dev")
         self.assertEqual(ws["status"], "EXECUTABLE_SHARED_CAPABILITY_RUNTIME")
 
     def test_supporting_routes_are_explicit_and_ordered(self):
@@ -120,6 +120,21 @@ class ContextRoutingTests(unittest.TestCase):
                 resolver.build_plan("profile-development")
         finally:
             resolver.confined = original
+
+    def test_execution_authority_inheritance_cannot_be_removed(self):
+        original = resolver.load_json
+        def fake_load(rel):
+            value = original(rel)
+            if rel == "config/context_policy.json":
+                value = json.loads(json.dumps(value))
+                value["execution_inherits"] = []
+            return value
+        resolver.load_json = fake_load
+        try:
+            with self.assertRaises(resolver.ContextError):
+                resolver.build_plan("tool-development")
+        finally:
+            resolver.load_json = original
 
 
 if __name__ == "__main__":

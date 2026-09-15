@@ -45,7 +45,7 @@ Graph terminal reachability does not guarantee runtime termination; loops may be
 After a hypothetical `ATTEMPT_COMPLETED` reduction, the kernel derives a normalized persisted working-state fingerprint from run-input hashes, the latest successful output/aggregate-validation state for each stage, final-artifact hashes, and the declared next-stage cursor. Attempt numbers, timestamps, and attempt-directory prefixes are excluded. Adjacent identical fingerprints are `STABLE` and are not failed. A non-adjacent revisit after an intervening different fingerprint is a cycle: the requested completion is not committed and the kernel instead commits one `RUN_FAILED` event with reason `CYCLE_DETECTED` plus reconstructible trigger provenance. Full validation independently replays that rejected completion and confirms the cycle. The guard is event-derived and stores no mutable tracker state. Hidden model/conversation state is not treated as progress because material cross-stage state must cross durable artifact boundaries.
 
 ## Idempotency
-Idempotency is resolved before commit. Re-submitting the same `operation_id` with identical event type/payload returns the already-committed event. Reusing it for different intent raises `IdempotencyConflictError`. Two committed event files containing the same operation ID are journal corruption, not a valid duplicate/no-op.
+Idempotency is resolved under the per-run lock before mutable-state-derived lifecycle payloads are constructed. Re-submitting the same `operation_id` for the same canonical command intent returns the already-committed event. Reusing it for different intent raises `IdempotencyConflictError`. Two committed event files containing the same operation ID are journal corruption, not a valid duplicate/no-op.
 
 ## Durable commit
 For a new mutation the kernel:
@@ -65,21 +65,21 @@ One committed event is the transaction boundary. Projection/checkpoint writes ar
 ## Lock ownership and recovery
 Lock metadata contains hostname, PID, platform, platform-native process identity, operation ID, acquisition time, and an ownership token.
 On Windows process liveness/identity uses Win32 process APIs and creation FILETIME; `os.kill(pid, 0)` is never used. On Linux identity uses `/proc/<pid>/stat` start ticks, not epoch timestamps.
-Time alone never proves staleness. A valid same-host lock may be automatically reclaimed only when the recorded process is confirmed dead or the PID is confirmed reused. Foreign-host or ambiguous ownership fails closed.
+Time alone never proves staleness. Normal acquisition never deletes an existing lock, including one whose recorded process is confirmed dead or whose PID is confirmed reused, because inspection followed by deletion is race-prone. Proven stale, foreign-host, and ambiguous ownership all require explicit recovery; a live matching owner fails busy.
 If `.kernel.lock` exists but `owner.json` is missing/malformed, normal execution fails closed. `run_manager recover-lock --force` is the explicit administrative recovery path and first verifies the committed journal/definition state before removing the lock.
 
 ## Recovery and replay
 The journal reader accepts exact event filenames only and ignores dotfiles such as `.tmp_*` and derived checkpoints. Missing sequences fail closed. Recovery removes abandoned temp events, validates the journal and root definition seals, replays state, and regenerates drifted projections.
 
 ## Checkpoints
-At attempt/stage boundaries the kernel may write derived `journal/.snapshot_seq_NNNNNN.json` checkpoints. A checkpoint records its through-sequence/operation, a journal-prefix hash, a reduced-state hash, and reduced state. A checkpoint is usable only when its metadata/hashes match and its stored state is byte-semantically identical to an independent reduction of the journal prefix it claims to cover. Invalid, stale, corrupt, or self-consistent-but-forged checkpoints are ignored and replay falls back to event 1. Checkpoints are derived hints and can never change correctness.
+At attempt/stage boundaries the kernel may write derived `journal/.snapshot_seq_NNNNNN.json` checkpoints. A checkpoint records its through-sequence/operation, a journal-prefix hash, a reduced-state hash, and reduced state. A checkpoint is usable only when its metadata/hashes match and its stored state is byte-semantically identical to an independent reduction of the journal prefix it claims to cover. Invalid, stale, corrupt, or self-consistent-but-forged checkpoints are ignored and replay falls back to event 1. Normal replay starts from event 1; checkpoint loading is an explicit compatibility/verification path rather than the default replay accelerator. Checkpoints are derived hints and can never change correctness.
 
 ## Projection contract
 `RUN.json` is deliberately shallow: identity, status, workflow hashes, current pointer, timestamps, and completion orientation. `ATTEMPT.json` contains local attempt detail, artifacts, validation history, aggregate validation, and handoff.
 Every projection carries `_projection.source=journal`, last relevant sequence/operation, and materialization time. Semantic drift is detected against fresh reduction; the journal wins.
 
 ## Path semantics and confinement
-CLI file arguments resolve from the caller's current working directory before run-boundary checks. Canonical resolution must remain under the owning run and the required artifact/validation/final directory. Traversal and symlink escapes fail closed.
+CLI file arguments resolve from the caller's current working directory before run-boundary checks. Canonical resolution must remain under the owning run and the required artifact/validation/final directory. Generated projection destinations are resolved through the same run boundary before directory creation or writes. Traversal, symlink, and resolvable junction/reparse escapes fail closed; this is confinement checking, not a complete OS sandbox against concurrent hostile filesystem replacement.
 
 ## Event ceiling
 `max_events_per_run` is 500. Normal events may occupy sequences 1-499. Sequence 500 is reserved for emergency terminalization. If a non-terminal command would require sequence 500, that command is rejected and the kernel commits `RUN_FAILED` at sequence 500 with reason `EXCEEDED_MAX_JOURNAL_EVENTS`. The run is then immutable.

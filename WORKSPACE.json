@@ -1,10 +1,10 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.6.0-dev",
+  "workspace_version": "0.6.0",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
-  "status": "GOVERNANCE_CONTINUITY_DEV",
+  "status": "EXECUTABLE_GOVERNED_RUNTIME",
   "entrypoints": {
     "orientation": "WORKSPACE.md",
     "router": "CONTEXT.md",

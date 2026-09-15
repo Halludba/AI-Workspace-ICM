@@ -2,7 +2,7 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current release: **v0.5.0 - filesystem-native execution kernel**.
+Current release: **v0.6.0 - governance and continuity runtime**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -17,3 +17,5 @@ The base repository is intentionally domain-neutral and designed to be pinned as
 Run lifecycle operations use the single `icm run ...` / `tools/run_manager.py` authority. The kernel owns sequencing, attempt numbering, hashing, idempotency, confinement, state transitions, crash recovery, checkpoints, and projection materialization; models/humans retain semantic decision authority.
 
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
+
+v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.

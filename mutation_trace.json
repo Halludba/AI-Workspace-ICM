@@ -1,55 +1,49 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step7",
-  "summary": "Install three opt-in reusable specialist profiles without adding resident profile authority.",
+  "directive_id": "DIR-2026-09-15:v06-release",
+  "summary": "Freeze v0.6.0 release metadata and public release description after all governance and continuity milestones passed.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "profiles/reasoning-auditor/PROFILE.md",
-        "profiles/prompt-architect/PROFILE.md",
-        "profiles/project-scout/PROFILE.md"
+        "WORKSPACE.json",
+        "tests/test_context_routing.py"
       ],
-      "change_kind": "NEW",
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Add the approved Reasoning Auditor, Prompt Architect, and Project Scout specialists as explicit routed context."
+      "rationale": "Replace development version/status metadata with the final v0.6.0 governed runtime identity and matching regression expectation."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "profiles/CONTEXT.md",
-        "profiles/README.md",
-        "_core/CONVENTIONS.md",
-        "_core/WORKFLOW_PROTOCOL.md"
+        "README.md"
       ],
-      "change_kind": "MERGE",
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Standardize profile grammar and exact-ID routing while preserving lower authority and no sibling autoload."
+      "rationale": "Publish the v0.6.0 release identity and implemented governance/continuity capabilities without changing runtime semantics."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
-        "tests/test_profiles.py",
-        "tests/CONTEXT.md",
-        "tests/README.md"
+        "icm"
       ],
-      "change_kind": "NEW",
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Add machine-verifiable specialist profile grammar, portability, activation, and authority tests."
+      "rationale": "Record the POSIX launcher as executable in Git metadata so the documented ./icm entrypoint is actually runnable after clone."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added three reusable opt-in specialist PROFILE.md contracts."
+      "description": "Finalized workspace version/status and regression expectation."
     },
     {
       "candidate_id": "C-002",
-      "description": "Integrated exact profile routing and authority boundaries into profile/core/workflow documentation."
+      "description": "Updated public release description for v0.6.0."
     },
     {
       "candidate_id": "C-003",
-      "description": "Added specialist profile regression coverage and test indexes."
+      "description": "Recorded executable Git mode for the POSIX icm launcher."
     }
   ]
 }

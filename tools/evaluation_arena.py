@@ -14,7 +14,7 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
     p=_read(root/'config/evaluation_arena_policy.json','evaluation arena policy')
-    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items'}
+    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items','strategy_runner'}
     if set(p)!=required or p.get('schema_version')!='1.0' or p.get('experiment_outputs_canonical') is not False or p.get('execution_authority')!='NONE' or p.get('automatic_promotion') is not False or p.get('quality_floor_required') is not True: raise EvaluationArenaError('evaluation arena policy safety contract invalid')
     for key in ('partitions','task_kinds','evaluator_kinds','forbidden_keys'):
         if not isinstance(p[key],list) or not p[key] or len(p[key])!=len(set(p[key])) or any(not isinstance(v,str) or not v for v in p[key]): raise EvaluationArenaError(f'{key} must be unique non-empty strings')
@@ -27,6 +27,23 @@ def load_policy(root:Path=ROOT):
     if isinstance(p['max_trials'],bool) or not isinstance(p['max_trials'],int) or p['max_trials']<1: raise EvaluationArenaError('max_trials must be positive integer')
     all_frontier=p['required_frontier_metrics']+p['optional_frontier_metrics'] if isinstance(p['required_frontier_metrics'],list) and isinstance(p['optional_frontier_metrics'],list) else []
     if not p['required_frontier_metrics'] or len(all_frontier)!=len(set(all_frontier)) or set(p['metric_directions'])!=set(all_frontier) or any(p['metric_directions'][m] not in {'MAXIMIZE','MINIMIZE'} for m in all_frontier): raise EvaluationArenaError('frontier metric policy invalid')
+    sr=p['strategy_runner']
+    sr_required={'max_variants','max_cases','max_trials','max_replicates','allowlisted_dimensions','strategy_param_allowlist','budget_maxima','required_budget_metrics','optional_token_budget_metric','early_stop','executor_partition_visible','executor_evaluator_visible','automatic_promotion'}
+    if not isinstance(sr,dict) or set(sr)!=sr_required: raise EvaluationArenaError('strategy runner policy fields invalid')
+    for key in ('max_variants','max_cases','max_trials','max_replicates'):
+        if isinstance(sr[key],bool) or not isinstance(sr[key],int) or sr[key]<1: raise EvaluationArenaError(f'strategy runner {key} must be positive integer')
+    dims=sr['allowlisted_dimensions']
+    if not isinstance(dims,list) or not dims or len(dims)!=len(set(dims)) or any(not isinstance(v,str) or not v for v in dims): raise EvaluationArenaError('strategy runner allowlisted_dimensions invalid')
+    allow=sr['strategy_param_allowlist']
+    if not isinstance(allow,dict) or any(not isinstance(k,str) or not k or not isinstance(v,list) or not v or len(v)!=len(set(map(str,v))) for k,v in allow.items()): raise EvaluationArenaError('strategy_param_allowlist invalid')
+    maxima=sr['budget_maxima']; budget_keys={'wall_time_ms','model_calls','tool_calls','input_tokens_total'}
+    if not isinstance(maxima,dict) or set(maxima)!=budget_keys or any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<=0 for v in maxima.values()): raise EvaluationArenaError('strategy runner budget_maxima invalid')
+    req_budget=sr['required_budget_metrics']
+    if not isinstance(req_budget,list) or not req_budget or len(req_budget)!=len(set(req_budget)) or any(v not in budget_keys for v in req_budget): raise EvaluationArenaError('required_budget_metrics invalid')
+    if sr['optional_token_budget_metric']!='input_tokens_total': raise EvaluationArenaError('optional token budget metric invalid')
+    stop=sr['early_stop']
+    if not isinstance(stop,dict) or set(stop)!={'min_trials','quality_floor_failure','failed_or_blocked'} or isinstance(stop['min_trials'],bool) or not isinstance(stop['min_trials'],int) or stop['min_trials']<1 or not isinstance(stop['quality_floor_failure'],bool) or not isinstance(stop['failed_or_blocked'],bool): raise EvaluationArenaError('strategy runner early_stop invalid')
+    if sr['executor_partition_visible'] is not False or sr['executor_evaluator_visible'] is not False or sr['automatic_promotion'] is not False: raise EvaluationArenaError('strategy runner safety boundary invalid')
     rel=PurePosixPath(str(p['state_root']).replace('\\','/'))
     if rel.is_absolute() or '..' in rel.parts or not rel.parts or rel.parts[0]!='.session': raise EvaluationArenaError('state_root must remain under .session')
     return p
@@ -242,6 +259,140 @@ def compare_partitions(tune:dict,holdout:dict):
     return {'schema_version':'1.0','experiment_id':tune['experiment_id'],'tune_frontier':sorted(tune_front),'holdout_frontier':sorted(hold_front),'stable_frontier':sorted(tune_front&hold_front),'variants':variants,'generalization_claim':'HOLDOUT_EVIDENCE_ONLY_NOT_PROOF_OF_GENERALIZATION','automatic_promotion':False,'authority':'DERIVED_HOLDOUT_COMPARISON','execution_authority':'NONE'}
 
 
+
+def _strategy_runner_policy(root:Path=ROOT):
+    return load_policy(root)['strategy_runner']
+
+def _validate_runner_variant(variant:dict,root:Path=ROOT):
+    value=validate_variant(variant,root); sr=_strategy_runner_policy(root); allow=sr['strategy_param_allowlist']; params=value['strategy_params']
+    unknown=sorted(set(params)-set(allow))
+    if unknown: raise EvaluationArenaError('strategy runner parameter not allowlisted: '+', '.join(unknown))
+    for key,val in params.items():
+        if val not in allow[key]: raise EvaluationArenaError(f'strategy runner parameter {key} value not allowlisted')
+    return value
+
+def validate_strategy_run_request(request:dict,root:Path=ROOT):
+    p=load_policy(root); sr=p['strategy_runner']; _privacy(request,{x.lower() for x in p['forbidden_keys']})
+    required={'schema_version','run_id','partition','variant_ids','replicates','budget'}
+    if not isinstance(request,dict) or set(request)!=required or request.get('schema_version')!='1.0': raise EvaluationArenaError('strategy run request fields must match contract')
+    _nonempty(request['run_id'],'run_id')
+    if request['partition'] not in p['partitions']: raise EvaluationArenaError('strategy run partition invalid')
+    ids=request['variant_ids']
+    if not isinstance(ids,list) or not ids or len(ids)>sr['max_variants'] or len(ids)!=len(set(ids)) or any(not isinstance(v,str) or not v.strip() for v in ids): raise EvaluationArenaError('variant_ids must be unique bounded non-empty strings')
+    reps=request['replicates']
+    if isinstance(reps,bool) or not isinstance(reps,int) or reps<1 or reps>sr['max_replicates']: raise EvaluationArenaError('replicates out of range')
+    budget=request['budget']; maxima=sr['budget_maxima']
+    if not isinstance(budget,dict) or set(budget)!=set(maxima): raise EvaluationArenaError('strategy run budget fields invalid')
+    normalized={}
+    for key,cap in maxima.items():
+        value=budget[key]
+        if key==sr['optional_token_budget_metric'] and value is None:
+            normalized[key]=None; continue
+        if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<0 or value>cap: raise EvaluationArenaError(f'budget {key} out of range')
+        normalized[key]=float(value)
+    if normalized['wall_time_ms']<=0: raise EvaluationArenaError('wall_time_ms budget must be positive')
+    return {**request,'run_id':request['run_id'].strip(),'variant_ids':[v.strip() for v in ids],'budget':normalized}
+
+def validate_execution_observation(value:dict,root:Path=ROOT):
+    p=load_policy(root); sr=p['strategy_runner']; bp=_benchmark_policy(root); op=_observatory_policy(root); _privacy(value,{x.lower() for x in p['forbidden_keys']})
+    required={'schema_version','outcome','observed_metrics','rework_class','evidence_refs'}
+    if not isinstance(value,dict) or set(value)!=required or value.get('schema_version')!='1.0': raise EvaluationArenaError('execution observation fields must match contract')
+    if value['outcome'] not in op['outcomes']: raise EvaluationArenaError('execution observation outcome invalid')
+    refs=_refs(value['evidence_refs'],'evidence_refs',p['max_source_refs']); metrics=value['observed_metrics']
+    if not isinstance(metrics,dict) or set(metrics)!=set(bp['required_metrics']): raise EvaluationArenaError('execution observation metrics must match benchmark metric vocabulary')
+    normalized={}
+    for key,item in metrics.items():
+        if item is None: normalized[key]=None; continue
+        if isinstance(item,bool) or not isinstance(item,(int,float)) or not math.isfinite(item) or item<0: raise EvaluationArenaError(f'observed metric {key} must be non-negative finite number or null')
+        if key in {'correctness_score','context_recall','unnecessary_context_ratio'} and item>1: raise EvaluationArenaError(f'observed metric {key} must be <= 1')
+        if key in {'model_calls','tool_calls'} and float(item).is_integer() is False: raise EvaluationArenaError(f'observed metric {key} must be integral')
+        normalized[key]=float(item)
+    for key in sr['required_budget_metrics']:
+        if normalized.get(key) is None: raise EvaluationArenaError(f'required budget metric {key} is unavailable')
+    rw=value['rework_class']
+    if value['outcome']=='REWORK':
+        if rw not in op['rework_classes']: raise EvaluationArenaError('REWORK observation requires valid rework_class')
+    elif rw is not None: raise EvaluationArenaError('rework_class only valid for REWORK outcome')
+    return {**value,'observed_metrics':normalized,'evidence_refs':refs,'authority':'OBSERVED_STRATEGY_EXECUTION','execution_authority':'NONE'}
+
+def _remaining_budget(budget:dict,consumed:dict):
+    out={}
+    for key,limit in budget.items():
+        if limit is None: out[key]=None
+        elif consumed.get(key) is None: out[key]=None
+        else: out[key]=max(0.0,float(limit)-float(consumed[key]))
+    return out
+
+def _consume_budget(budget:dict,consumed:dict,observation:dict,root:Path=ROOT):
+    sr=_strategy_runner_policy(root); metrics=observation['observed_metrics']; new=dict(consumed)
+    for key in sr['required_budget_metrics']:
+        total=float(new[key])+float(metrics[key])
+        if total>float(budget[key])+1e-9: raise EvaluationArenaError(f'executor exceeded hard budget: {key}')
+        new[key]=total
+    token_key=sr['optional_token_budget_metric']; token=metrics[token_key]
+    if token is None:
+        if budget[token_key] is not None: raise EvaluationArenaError('token budget configured but input token usage is unavailable')
+        new[token_key]=None
+    elif new[token_key] is not None:
+        total=float(new[token_key])+float(token)
+        if budget[token_key] is not None and total>float(budget[token_key])+1e-9: raise EvaluationArenaError('executor exceeded hard budget: input_tokens_total')
+        new[token_key]=total
+    return new
+
+def run_strategy_search(suite:dict,request:dict,executor=None,evaluator=None,root:Path=ROOT):
+    if not callable(executor): raise EvaluationArenaError('strategy execution capability unavailable')
+    if not callable(evaluator): raise EvaluationArenaError('strategy evaluator capability unavailable')
+    if not isinstance(suite,dict) or set(suite)!={'cases','variants','experiment_config','experiment_id'}: raise EvaluationArenaError('suite payload fields invalid for strategy run')
+    req=validate_strategy_run_request(request,root); sr=_strategy_runner_policy(root)
+    manifest=build_suite_manifest(suite['cases'],suite['variants'],suite['experiment_config'],suite['experiment_id'],root)
+    case_pairs=[(raw,validate_case(raw,root)) for raw in suite['cases']]; variant_pairs=[(raw,_validate_runner_variant(raw,root)) for raw in suite['variants']]
+    if len({v['case_id'] for _,v in case_pairs})!=len(case_pairs) or len({v['variant_id'] for _,v in variant_pairs})!=len(variant_pairs): raise EvaluationArenaError('strategy run requires unique case_id and variant_id values')
+    cases=[pair for pair in case_pairs if pair[1]['partition']==req['partition']]
+    if not cases: raise EvaluationArenaError('strategy run partition has no cases')
+    if len(cases)>sr['max_cases']: raise EvaluationArenaError('strategy run exceeds max_cases')
+    by_variant={v['variant_id']:(raw,v) for raw,v in variant_pairs}; selected=[]
+    for variant_id in req['variant_ids']:
+        if variant_id not in by_variant: raise EvaluationArenaError(f'unknown strategy variant_id: {variant_id}')
+        selected.append(by_variant[variant_id])
+    potential=len(cases)*len(selected)*req['replicates']
+    if potential>sr['max_trials']: raise EvaluationArenaError('strategy run exceeds max_trials')
+    exec_cases={c['case_id']:c for c in manifest['execution_view']['cases']}; exec_variants={v['variant_id']:v for v in manifest['execution_view']['variants']}
+    consumed={'wall_time_ms':0.0,'model_calls':0.0,'tool_calls':0.0,'input_tokens_total':0.0}; attempts=[]; trials=[]; discarded=[]; completed=[]
+    expected_per_variant=len(cases)*req['replicates']; stop_cfg=sr['early_stop']
+    for raw_variant,variant in selected:
+        variant_trial_count=0; stopped=False
+        for raw_case,case in cases:
+            if stopped: break
+            for replicate in range(req['replicates']):
+                packet={'schema_version':'1.0','run_id':req['run_id'],'experiment_id':suite['experiment_id'],'suite_fingerprint':manifest['suite_fingerprint'],'case':exec_cases[case['case_id']],'variant':exec_variants[variant['variant_id']],'replicate':replicate,'remaining_budget':_remaining_budget(req['budget'],consumed),'authority':'BOUNDED_STRATEGY_EXECUTION_PACKET','execution_authority':'NONE'}
+                observation=validate_execution_observation(executor(packet),root); consumed=_consume_budget(req['budget'],consumed,observation,root)
+                attempt={'case_id':case['case_id'],'variant_id':variant['variant_id'],'replicate':replicate,'outcome':observation['outcome'],'observed_metrics':observation['observed_metrics'],'evidence_refs':observation['evidence_refs']}; attempts.append(attempt)
+                if observation['outcome'] in {'FAILED','BLOCKED'} and stop_cfg['failed_or_blocked']:
+                    discarded.append({'variant_id':variant['variant_id'],'variant_fingerprint':variant['variant_fingerprint'],'reason':'EXECUTION_'+observation['outcome'],'evidence_refs':observation['evidence_refs']}); stopped=True; break
+                quality_raw=evaluator(raw_case,observation,packet); quality=validate_quality_evidence(quality_raw,case['evaluator']['quality_floor'],root)
+                pair_manifest=prepare_manifest(raw_case,raw_variant,suite['experiment_id'],root)
+                trial={'schema_version':'1.0','trial_id':f"{req['run_id']}:{variant['variant_id']}:{case['case_id']}:{replicate}",'experiment_id':suite['experiment_id'],'manifest_fingerprint':pair_manifest['manifest_fingerprint'],'case_fingerprint':case['case_fingerprint'],'variant_fingerprint':variant['variant_fingerprint'],'partition':req['partition'],'replicate':replicate,'quality_floor':case['evaluator']['quality_floor'],'quality_evidence':quality_raw,'observed_metrics':observation['observed_metrics'],'outcome':observation['outcome'],'rework_class':observation['rework_class']}
+                validate_trial(trial,root); trials.append(trial); variant_trial_count+=1
+                if variant_trial_count>=stop_cfg['min_trials'] and not quality['meets_quality_floor'] and stop_cfg['quality_floor_failure']:
+                    discarded.append({'variant_id':variant['variant_id'],'variant_fingerprint':variant['variant_fingerprint'],'reason':'QUALITY_FLOOR_FAILURE','evidence_refs':quality['evidence_refs']}); stopped=True; break
+        if not stopped and variant_trial_count==expected_per_variant: completed.append({'variant_id':variant['variant_id'],'variant_fingerprint':variant['variant_fingerprint']})
+    completed_fps={v['variant_fingerprint'] for v in completed}; analysis_trials=[t for t in trials if t['variant_fingerprint'] in completed_fps]
+    analysis=analyze_trials(analysis_trials,root) if analysis_trials else None
+    return {'schema_version':'1.0','run_id':req['run_id'],'experiment_id':suite['experiment_id'],'suite_fingerprint':manifest['suite_fingerprint'],'partition':req['partition'],'selected_variant_ids':req['variant_ids'],'potential_trial_count':potential,'attempt_count':len(attempts),'trial_count':len(trials),'completed_variants':completed,'discarded_variants':discarded,'budget':req['budget'],'budget_consumed':consumed,'analysis':analysis,'comparison_ready':len(completed)>=2,'executor_partition_visible':False,'executor_evaluator_visible':False,'search_bounded':True,'automatic_promotion':False,'authority':'DERIVED_BOUNDED_STRATEGY_RUN','execution_authority':'NONE'}
+
+def fixture_callbacks(fixture:dict):
+    if not isinstance(fixture,dict) or set(fixture)!={'schema_version','executions','evaluations'} or fixture.get('schema_version')!='1.0' or not isinstance(fixture['executions'],dict) or not isinstance(fixture['evaluations'],dict): raise EvaluationArenaError('strategy fixture fields invalid')
+    def key(packet): return f"{packet['case']['case_id']}|{packet['variant']['variant_id']}|{packet['replicate']}"
+    def executor(packet):
+        k=key(packet)
+        if k not in fixture['executions']: raise EvaluationArenaError(f'fixture execution missing: {k}')
+        return fixture['executions'][k]
+    def evaluator(case,observation,packet):
+        k=key(packet)
+        if k not in fixture['evaluations']: raise EvaluationArenaError(f'fixture evaluation missing: {k}')
+        return fixture['evaluations'][k]
+    return executor,evaluator
+
 def main():
     ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True)
     c=sub.add_parser('case'); c.add_argument('case_json')
@@ -251,6 +402,7 @@ def main():
     a=sub.add_parser('analyze'); a.add_argument('trials_json')
     sm=sub.add_parser('suite'); sm.add_argument('suite_json')
     cp=sub.add_parser('compare-partitions'); cp.add_argument('tune_json'); cp.add_argument('holdout_json')
+    r=sub.add_parser('run'); r.add_argument('suite_json'); r.add_argument('request_json'); r.add_argument('--fixture')
     args=ap.parse_args()
     try:
         if args.cmd=='case': out=validate_case(_read(Path(args.case_json),'case'))
@@ -261,6 +413,9 @@ def main():
             payload=_read(Path(args.trials_json),'trial set'); trials=payload.get('trials'); out=analyze_trials(trials)
         elif args.cmd=='suite':
             payload=_read(Path(args.suite_json),'suite'); out=build_suite_manifest(payload.get('cases'),payload.get('variants'),payload.get('experiment_config'),payload.get('experiment_id'))
+        elif args.cmd=='run':
+            if not args.fixture: raise EvaluationArenaError('strategy execution capability unavailable; --fixture is required for deterministic CLI execution')
+            executor,evaluator=fixture_callbacks(_read(Path(args.fixture),'strategy fixture')); out=run_strategy_search(_read(Path(args.suite_json),'suite'),_read(Path(args.request_json),'strategy run request'),executor,evaluator)
         else: out=compare_partitions(_read(Path(args.tune_json),'tune analysis'),_read(Path(args.holdout_json),'holdout analysis'))
         print(json.dumps({'valid':True,'result':out},indent=2)); return 0
     except EvaluationArenaError as exc:

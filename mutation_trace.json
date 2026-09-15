@@ -1,37 +1,45 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1330-human-presentation",
+  "directive_id": "DIR-2026-09-15:T-1340-bounded-strategy-runner",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add concept recognition and compact planner/suggestion continuity presentation without changing authority.",
+  "summary": "Add hard-budgeted Evaluation Arena strategy execution with blinded executor/evaluator separation and evidence-gated early stopping.",
   "candidates": [
     {
       "candidate_id": "C-001",
+      "change_kind": "MERGE",
+      "disposition": "ACCEPT",
+      "rationale": "Execute only a small declared strategy set under enforceable budgets while keeping holdout/evaluator data hidden from strategies and preserving Arena no-auto-promotion governance.",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
-        "_core/CONTEXT.md",
-        "_core/HUMAN_PRESENTATION_PROTOCOL.md",
+        "_core/EVALUATION_ARENA_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/human_presentation_policy.json",
-        "config/impact_policy.json",
-        "config/interaction_policy.json",
-        "icm",
-        "profiles/icm-system-architect/PROFILE.md",
+        "config/evaluation_arena_policy.json",
+        "mutation_trace.json",
         "tests/CONTEXT.md",
-        "tests/test_continuity_presenter.py",
-        "tests/test_impact_classifier.py",
+        "tests/test_strategy_runner.py",
         "tools/CONTEXT.md",
-        "tools/continuity_presenter.py"
-      ],
+        "tools/evaluation_arena.py"
+      ]
+    },
+    {
+      "candidate_id": "C-002",
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Make human-facing ICM continuity predictable and preserve established-concept learning without forcing analogies or relying on chat alone."
+      "rationale": "Replace live planner-state coupling in the presentation regression with an isolated deterministic planner fixture so normal task progression cannot create false failures.",
+      "target_paths": [
+        "tests/test_continuity_presenter.py"
+      ]
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added presentation protocol/policy/compiler/tests, System Architect behavior, interaction bridges, and CLI/docs/impact integration."
+      "description": "Extended the Evaluation Arena policy/protocol/tooling with bounded strategy orchestration, deterministic fixture callbacks, tests, and workspace documentation."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Made the planner-first continuity test independent of the active session plan."
     }
   ]
 }

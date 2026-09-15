@@ -56,5 +56,48 @@
   },
   "max_suite_cases": 500,
   "max_suite_variants": 128,
-  "max_experiment_config_items": 32
+  "max_experiment_config_items": 32,
+  "strategy_runner": {
+    "max_variants": 8,
+    "max_cases": 64,
+    "max_trials": 128,
+    "max_replicates": 4,
+    "allowlisted_dimensions": [
+      "model_ref",
+      "context_policy_ref",
+      "planner_enabled",
+      "verification_mode",
+      "strategy_params.context_level"
+    ],
+    "strategy_param_allowlist": {
+      "context_level": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5"
+      ]
+    },
+    "budget_maxima": {
+      "wall_time_ms": 600000.0,
+      "model_calls": 64.0,
+      "tool_calls": 256.0,
+      "input_tokens_total": 1000000.0
+    },
+    "required_budget_metrics": [
+      "wall_time_ms",
+      "model_calls",
+      "tool_calls"
+    ],
+    "optional_token_budget_metric": "input_tokens_total",
+    "early_stop": {
+      "min_trials": 1,
+      "quality_floor_failure": true,
+      "failed_or_blocked": true
+    },
+    "executor_partition_visible": false,
+    "executor_evaluator_visible": false,
+    "automatic_promotion": false
+  }
 }

@@ -24,3 +24,12 @@ A variant is quality-eligible only when every included trial meets its case qual
 A suite manifest hashes the experiment ID, full pinned revision, sorted case fingerprints, sorted variant fingerprints, and bounded experiment configuration. Its execution view contains strategy inputs and variants but omits case partitions/evaluator contracts.
 
 TUNE and HOLDOUT analyses remain separate. The comparison may report that a tune-frontier result was not reproduced on HOLDOUT or that its quality floor failed there. These are benchmark-sensitivity signals, not proof of overfitting or universal generalization. No result promotes itself into canonical configuration.
+
+## Bounded Strategy Runner
+The Arena may execute a deliberately small declared variant set through a bounded runner. A run fixes the partition, selected variant IDs, replicate count, and hard wall-time/model-call/tool-call budgets; an input-token budget may be enforced when that metric is observable. The runner has no open-ended "keep searching" mode.
+
+Strategy execution receives only the existing blinded case execution view plus the selected declarative variant and remaining budget envelope. Partition membership, evaluator contracts, and quality floors are not supplied to the strategy executor. Evaluation happens through a separate evaluator callback after execution.
+
+Runner strategy parameters are allowlisted data, never shell commands, tool invocations, or executable code. Unknown strategy parameter keys fail closed. Missing budget metrics remain unavailable rather than becoming zero; when a token budget is declared but token usage is unavailable, the run fails closed instead of pretending the budget was respected.
+
+Configured evidence rules may discard a variant early after an observed quality-floor failure or failed/blocked execution. Early-stopped variants are excluded from Pareto comparison rather than padded with fabricated trials. Completed comparable variants still flow through the normal Arena analysis and remain noncanonical evidence with no automatic promotion.

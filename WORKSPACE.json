@@ -76,6 +76,7 @@
     "evaluation_arena_protocol": "_core/EVALUATION_ARENA_PROTOCOL.md",
     "evaluation_arena_policy": "config/evaluation_arena_policy.json",
     "evaluation_arena": "tools/evaluation_arena.py",
+    "evaluation_strategy_runner": "tools/evaluation_arena.py",
     "interaction_protocol": "_core/INTERACTION_PROTOCOL.md",
     "interaction_policy": "config/interaction_policy.json",
     "interaction_contracts": "tools/interaction_contracts.py",

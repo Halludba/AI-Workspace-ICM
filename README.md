@@ -36,6 +36,8 @@ Developer observability is exposed through `icm observe ...`: local Git-ignored 
 
 Evidence-gated meta-advice is exposed through `icm advise ...`: suggestion candidates are screened for value density, compatibility and interaction risk; research escalation requires an explicit evidence deficit/current empirical need; SIMPLE/STANDARD/TECHNICAL affect presentation only.
 
+Bounded strategy execution is exposed through `icm arena run ...`: the Arena can try a small declared variant set under hard wall-time/call budgets, optional observable token budgets, allowlisted strategy parameters, blinded execution views, separate evaluation, and evidence-gated early stopping. Missing metrics never become zero, and no winner is promoted automatically.
+
 Suggestion continuity is exposed through `icm suggestions ...`: unresolved ideas can persist in a Git-ignored per-agent queue without treating silence or topic changes as rejection or authorization. Only accepted suggestions are promotion-eligible, and planner/mutation governance still applies.
 
 Human continuity presentation is exposed through `icm present ...`: substantial ICM responses can surface the active accepted next step and a compact unresolved-idea summary, while strong concept-recognition callouts name established terms without changing authority or exposing private reasoning.

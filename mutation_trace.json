@@ -1,48 +1,39 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-100-context-benchmarks",
+  "directive_id": "DIR-2026-09-15:T-110-route-context-profiler",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-100 by opening v1.0.0-dev and adding deterministic context-economics benchmark infrastructure before retrieval optimization.",
+  "summary": "Execute planner task T-110 by extending the existing token profiler with deterministic route-context footprint measurement instead of creating a second profiler.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "config/context_benchmark_policy.json",
-        "tools/context_benchmark.py",
-        "tests/test_context_benchmark.py"
+        "tools/token_profiler.py",
+        "tests/test_token_profiler.py"
       ],
-      "change_kind": "NEW",
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Add a host-neutral benchmark schema, fixed-ref baseline, on-demand scale fixtures, and observed-metric summaries without requiring a live model."
+      "rationale": "Profile only context files selected by context_resolver, separate startup orientation, and make whole-repository comparison explicitly opt-in."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "WORKSPACE.json",
-        "README.md",
-        "icm",
-        "config/impact_policy.json",
-        "tools/CONTEXT.md",
         "tools/README.md",
-        "config/CONTEXT.md",
-        "tests/CONTEXT.md",
-        "tests/test_context_routing.py",
-        "tests/test_release_policy.py",
-        "tests/test_impact_classifier.py"
+        "tools/CONTEXT.md",
+        "tools/context_benchmark.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Open v1 development and integrate the benchmark harness into entrypoints, CLI discovery, verification scope, documentation, and release assertions."
+      "rationale": "Document the route profiler and connect the benchmark baseline to the new exact route-context measurement surface without duplicating logic."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added deterministic benchmark policy/tool/tests with synthetic 1k-150k, distributed, evidence-position, one-symbol-change, and cross-file fixtures."
+      "description": "Added `token_profiler route` with exact selected-file metrics, orientation separation, optional repository comparison, and sibling-exclusion tests."
     },
     {
       "candidate_id": "C-002",
-      "description": "Opened v1.0.0-dev and integrated benchmark inspection, docs, impact classification, and exact workspace-version assertions."
+      "description": "Updated tool context/docs and benchmark guidance to reference the route profiler."
     }
   ]
 }

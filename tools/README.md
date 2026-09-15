@@ -36,3 +36,4 @@ Use `role_resolver.py` / `icm role ...` to validate a semantically declared task
 - `python tools/context_benchmark.py fixture --case <id> --output <dir>` materializes synthetic scale fixtures on demand.
 - `python tools/context_benchmark.py summarize <samples.json>` reports p50/p95 for observed metrics only.
 - Workspace surface: `icm inspect benchmark <command>`.
+- `icm inspect tokens route --route <route> [--mutation] [--include-route <route>]` profiles only the exact files selected by the context resolver; full repository comparison is opt-in.

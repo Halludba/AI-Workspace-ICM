@@ -3,9 +3,13 @@ import ast
 import json
 import math
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLS_DIR = ROOT / "tools"
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
 ORIENTATION_FILES = ("WORKSPACE.md", "CONTEXT.md")
 TEXT_SUFFIXES = {
     ".md", ".json", ".py", ".txt", ".yaml", ".yml", ".toml",
@@ -236,6 +240,78 @@ def compare(base_ref: str, current_ref: str | None = None, root: Path = ROOT) ->
         ],
     }
 
+def _empty_metric() -> dict:
+    return {key: 0 for key in ("chars", "lines", "words", "estimated_tokens", "estimate_low", "estimate_high")}
+
+
+def _subtract_metric(total: dict, part: dict) -> dict:
+    return {key: total[key] - part[key] for key in total}
+
+
+def profile_route(
+    primary: str,
+    mode: str | None = None,
+    includes: list[str] | None = None,
+    reason: str | None = None,
+    mutation: bool = False,
+    *,
+    include_repository_total: bool = False,
+    root: Path = ROOT,
+) -> dict:
+    """Profile only the files selected by the deterministic context route plan."""
+    if root.resolve() != ROOT.resolve():
+        raise TokenProfileError("route profiling currently supports the active ICM workspace root only")
+    try:
+        import context_resolver
+    except ImportError as exc:
+        raise TokenProfileError(f"cannot import context resolver: {exc}") from exc
+    try:
+        plan = context_resolver.build_plan(primary, mode, includes or [], reason, mutation)
+    except context_resolver.ContextError as exc:
+        raise TokenProfileError(f"cannot build context route plan: {exc}") from exc
+
+    total = _empty_metric()
+    orientation = _empty_metric()
+    files: list[dict] = []
+    for rel in plan["context_files"]:
+        data = _working_bytes(rel, root)
+        if data is None:
+            raise TokenProfileError(f"selected context file not found: {rel}")
+        text = _decode_text(rel, data)
+        if text is None:
+            raise TokenProfileError(f"selected context file is not supported text: {rel}")
+        metric = _metric(text)
+        _add_metric(total, metric)
+        if rel in ORIENTATION_FILES:
+            _add_metric(orientation, metric)
+        files.append({"path": rel, **metric})
+
+    repository_total: dict
+    selected_percent: float | None = None
+    if include_repository_total:
+        repository = profile(None, root, include_files=False, include_untracked=False)
+        repository_total = {"status": "LOADED", **repository["total"]}
+        repo_tokens = repository["total"]["estimated_tokens"]
+        selected_percent = round((total["estimated_tokens"] / repo_tokens) * 100.0, 2) if repo_tokens else None
+    else:
+        repository_total = {
+            "status": "NOT_LOADED",
+            "reason": "Scoped route footprint does not require reading the whole repository; opt in explicitly if comparison is needed.",
+        }
+
+    return {
+        "source": "WORKTREE",
+        "scope": "ROUTED_CONTEXT",
+        "text_normalization": "LF",
+        "route_plan": plan,
+        "selected_context": {"files": files, "total": total},
+        "startup_orientation_selected": orientation,
+        "routed_non_orientation": _subtract_metric(total, orientation),
+        "repository_total": repository_total,
+        "selected_percent_of_repository": selected_percent,
+    }
+
+
 def profile_python_symbols(path: str, ref: str | None = None, root: Path = ROOT) -> list[dict]:
     data = _working_bytes(path, root) if ref is None else _ref_bytes(ref, path, root)
     if data is None:
@@ -286,6 +362,13 @@ def main() -> int:
     symbols_cmd.add_argument("path")
     symbols_cmd.add_argument("--ref")
     symbols_cmd.add_argument("--top", type=int, default=20)
+    route_cmd = sub.add_parser("route", help="Profile the exact context selected by a deterministic ICM route")
+    route_cmd.add_argument("--route", required=True)
+    route_cmd.add_argument("--mode", choices=["DIRECT", "SCOPED", "GLOBAL"])
+    route_cmd.add_argument("--include-route", action="append", default=[])
+    route_cmd.add_argument("--reason")
+    route_cmd.add_argument("--mutation", action="store_true")
+    route_cmd.add_argument("--include-repository-total", action="store_true")
     args = parser.parse_args()
     try:
         if args.command == "profile":
@@ -294,6 +377,11 @@ def main() -> int:
                 result = _trim_files(result, args.top)
         elif args.command == "compare":
             result = compare(args.base, args.ref)
+        elif args.command == "route":
+            result = profile_route(
+                args.route, args.mode, args.include_route, args.reason, args.mutation,
+                include_repository_total=args.include_repository_total,
+            )
         else:
             symbols = profile_python_symbols(args.path, args.ref)
             result = {"source": "WORKTREE" if args.ref is None else args.ref, "path": args.path, "symbols": symbols[:args.top]}

@@ -16,7 +16,7 @@ Current generic tools:
 - `session_planner.py` -> non-authoritative per-agent continuity queue validation, deterministic selection, lifecycle transitions, and self-deletion.
 - `assurance_controller.py` -> cheap deliberation triggering, evidence-aware assurance routing, epistemic-delta validation, bounded escalation, and ephemeral cache reuse.
 - `release_validator.py` -> strict SemVer, release-policy, and annotated-tag-note validation.
-- `token_profiler.py` -> on-demand estimated token/context footprint, Git-ref comparison, growth warnings, and Python symbol profiling; diagnostics only.
+- `token_profiler.py` -> on-demand estimated token/context footprint, Git-ref comparison, growth warnings, Python symbol profiling, and exact routed-context profiling; whole-repository comparison remains opt-in for scoped route measurement.
 - `capability_resolver.py` -> exact operation/artifact routing to lazily loaded reusable skills; resolver returns paths and does not load skill contents.
 - `capsule_exporter.py` -> deterministic task-scoped ZIP packaging for upload-only model hosts, using capability routing and explicit input paths.
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.

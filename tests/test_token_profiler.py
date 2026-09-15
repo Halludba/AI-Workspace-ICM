@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -87,6 +88,43 @@ class TokenProfilerTests(unittest.TestCase):
             (root / "blob.bin").write_bytes(b"\x00\x01\x02")
             result = profiler.profile(None, root, include_files=True)
             self.assertNotIn("blob.bin", result["by_file"])
+
+    def test_route_profile_reads_only_deterministically_selected_context(self):
+        result = profiler.profile_route("tool-development", root=ROOT)
+        selected = [item["path"] for item in result["selected_context"]["files"]]
+        self.assertEqual(selected, ["WORKSPACE.md", "CONTEXT.md", "_core/AUTHORITY.md", "tools/CONTEXT.md"])
+        self.assertNotIn("profiles/CONTEXT.md", selected)
+        self.assertEqual(result["repository_total"]["status"], "NOT_LOADED")
+        self.assertIsNone(result["selected_percent_of_repository"])
+
+    def test_route_profile_does_not_scan_repository_by_default(self):
+        original = profiler.profile
+        profiler.profile = lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("whole repository profile invoked"))
+        try:
+            result = profiler.profile_route("tool-development", root=ROOT)
+            self.assertEqual(result["repository_total"]["status"], "NOT_LOADED")
+        finally:
+            profiler.profile = original
+
+    def test_route_profile_separates_orientation_and_optional_repository_total(self):
+        result = profiler.profile_route("tool-development", mutation=True, include_repository_total=True, root=ROOT)
+        self.assertEqual(result["route_plan"]["context_files"][:2], ["WORKSPACE.md", "CONTEXT.md"])
+        self.assertGreater(result["startup_orientation_selected"]["estimated_tokens"], 0)
+        self.assertGreater(result["routed_non_orientation"]["estimated_tokens"], 0)
+        self.assertEqual(result["repository_total"]["status"], "LOADED")
+        self.assertGreater(result["repository_total"]["estimated_tokens"], result["selected_context"]["total"]["estimated_tokens"])
+        self.assertGreater(result["selected_percent_of_repository"], 0)
+
+    def test_route_profile_cli_excludes_sibling_context(self):
+        proc = subprocess.run(
+            [sys.executable, str(ROOT / "tools/token_profiler.py"), "route", "--route", "profile-development"],
+            cwd=ROOT, text=True, capture_output=True,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        payload = json.loads(proc.stdout)
+        paths = [item["path"] for item in payload["selected_context"]["files"]]
+        self.assertIn("profiles/CONTEXT.md", paths)
+        self.assertNotIn("tools/CONTEXT.md", paths)
 
     def test_python_symbol_profile_orders_largest_first(self):
         temp, root = self.make_repo()

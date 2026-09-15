@@ -118,7 +118,7 @@ def baseline(ref: str, root: Path = ROOT) -> dict:
         "startup_orientation": profile["orientation"],
         "repository_scope": profile["scope"],
         "text_normalization": profile["text_normalization"],
-        "routed_context": {"status": "UNAVAILABLE", "reason": "Route-aware profiling is a separate benchmark layer."},
+        "routed_context": {"status": "UNAVAILABLE", "reason": "No route was requested for this repository-only baseline; use `icm inspect tokens route` for exact routed context."},
         "observed_metrics": values,
         "metric_availability": availability,
         "metric_groups": policy["metric_groups"],

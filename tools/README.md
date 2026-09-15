@@ -37,3 +37,9 @@ Use `role_resolver.py` / `icm role ...` to validate a semantically declared task
 - `python tools/context_benchmark.py summarize <samples.json>` reports p50/p95 for observed metrics only.
 - Workspace surface: `icm inspect benchmark <command>`.
 - `icm inspect tokens route --route <route> [--mutation] [--include-route <route>]` profiles only the exact files selected by the context resolver; full repository comparison is opt-in.
+
+### Source navigator
+- `icm inspect source map <path> [--ref <git-ref>]` returns a derived, content-addressed Python symbol map with exact source provenance.
+- `icm inspect source symbol <path> <symbol> [--context-lines N]` returns only the exact symbol slice plus bounded surrounding lines.
+- `icm inspect source region <path> --start N --end N` returns only the requested bounded exact-source region.
+- Derived maps live under `.session/source-index/`, are noncanonical, and are invalidated by source-byte identity. Unsupported/malformed sources explicitly fall back to exact-file access.

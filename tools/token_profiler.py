@@ -1,5 +1,4 @@
 import argparse
-import ast
 import json
 import math
 import subprocess
@@ -10,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS_DIR = ROOT / "tools"
 if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
+import python_source_map
+
 ORIENTATION_FILES = ("WORKSPACE.md", "CONTEXT.md")
 TEXT_SUFFIXES = {
     ".md", ".json", ".py", ".txt", ".yaml", ".yml", ".toml",
@@ -320,25 +321,14 @@ def profile_python_symbols(path: str, ref: str | None = None, root: Path = ROOT)
     if text is None or Path(path).suffix.lower() != ".py":
         raise TokenProfileError("symbol profiling currently supports UTF-8 Python files only")
     try:
-        tree = ast.parse(text)
-    except SyntaxError as exc:
-        raise TokenProfileError(f"cannot parse Python source: {exc}") from exc
+        mapping = python_source_map.build_python_source_map(text)
+    except python_source_map.SourceMapError as exc:
+        raise TokenProfileError(str(exc)) from exc
     lines = text.splitlines(keepends=True)
     results = []
-    for node in ast.walk(tree):
-        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            continue
-        if not hasattr(node, "end_lineno") or node.end_lineno is None:
-            continue
-        segment = "".join(lines[node.lineno - 1:node.end_lineno])
-        kind = "class" if isinstance(node, ast.ClassDef) else "function"
-        results.append({
-            "name": node.name,
-            "kind": kind,
-            "line_start": node.lineno,
-            "line_end": node.end_lineno,
-            **_metric(segment),
-        })
+    for symbol in mapping["symbols"]:
+        segment = "".join(lines[symbol["line_start"] - 1:symbol["line_end"]])
+        results.append({**symbol, **_metric(segment)})
     return sorted(results, key=lambda item: item["estimated_tokens"], reverse=True)
 
 def _trim_files(result: dict, top: int) -> dict:

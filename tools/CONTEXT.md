@@ -28,3 +28,4 @@ Current generic tools:
 
 Tools enforce mechanical invariants; they do not decide semantic policy. Structured policy/core contracts define intent and authority. Tool output is evidence or derived state unless a governing contract explicitly promotes it.
 - `context_benchmark.py` -> deterministic context-economics benchmark catalog, synthetic scale fixtures, fixed-ref baselines, and p50/p95 summaries; unavailable provider metrics remain explicit.
+- `source_navigator.py` -> content-addressed noncanonical Python source maps plus exact symbol/region slices with Git/hash provenance and bounded fallback.

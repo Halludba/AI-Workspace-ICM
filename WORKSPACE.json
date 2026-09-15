@@ -51,7 +51,8 @@
     "role_protocol": "_core/ROLE_PROTOCOL.md",
     "role_policy": "config/role_policy.json",
     "role_resolver": "tools/role_resolver.py",
-    "context_benchmark": "tools/context_benchmark.py"
+    "context_benchmark": "tools/context_benchmark.py",
+    "source_navigator": "tools/source_navigator.py"
   },
   "roots": {
     "core": "_core",

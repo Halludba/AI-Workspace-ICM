@@ -3,6 +3,7 @@
 Machine-verifiable invariants live here. During iteration run the narrowest relevant tests; broaden before release closure.
 
 Current suites:
+- `test_source_navigator.py` -> exact-source provenance, content-addressed invalidation, symbol ambiguity, bounded region/symbol retrieval, fallback, and CLI invariants.
 - `test_context_benchmark.py` -> fixed-ref baseline reproducibility, synthetic scale/evidence/dependency fixtures, unavailable-metric semantics, summary percentiles, and CLI coverage.
 - `test_context_routing.py` -> context-routing invariants.
 - `test_profiles.py` -> installed specialist profile grammar, activation, portability, and authority-boundary invariants.

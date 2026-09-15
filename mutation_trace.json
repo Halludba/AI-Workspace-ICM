@@ -1,39 +1,58 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-110-route-context-profiler",
+  "directive_id": "DIR-2026-09-15:T-120-source-navigator",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-110 by extending the existing token profiler with deterministic route-context footprint measurement instead of creating a second profiler.",
+  "summary": "Execute planner task T-120 by extracting the existing Python AST logic into one shared source-map primitive and adding exact provenance-preserving bounded source navigation with noncanonical content-addressed caches.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "tools/token_profiler.py",
-        "tests/test_token_profiler.py"
+        "tools/python_source_map.py",
+        "tools/source_navigator.py",
+        "config/source_navigator_policy.json",
+        "tests/test_source_navigator.py"
       ],
-      "change_kind": "REWRITE",
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Profile only context files selected by context_resolver, separate startup orientation, and make whole-repository comparison explicitly opt-in."
+      "rationale": "Create one shared Python source-map primitive and a bounded exact-source navigator with hash-keyed derived cache, ambiguity handling, and exact-region fallback."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "tools/README.md",
-        "tools/CONTEXT.md",
-        "tools/context_benchmark.py"
+        "tools/token_profiler.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Document the route profiler and connect the benchmark baseline to the new exact route-context measurement surface without duplicating logic."
+      "rationale": "Reuse the extracted source-map primitive for symbol profiling instead of maintaining a competing AST parser."
+    },
+    {
+      "candidate_id": "C-003",
+      "target_paths": [
+        "WORKSPACE.json",
+        "icm",
+        "config/CONTEXT.md",
+        "config/impact_policy.json",
+        "tools/CONTEXT.md",
+        "tools/README.md",
+        "tests/CONTEXT.md"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Integrate source navigation into entrypoints, CLI discovery, policy documentation, and verification scope."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added `token_profiler route` with exact selected-file metrics, orientation separation, optional repository comparison, and sibling-exclusion tests."
+      "description": "Added shared Python source maps and source navigation with Git/hash provenance, content-addressed versioned cache, exact symbol/region selection, ambiguity detection, and fail-closed semantic mapping."
     },
     {
       "candidate_id": "C-002",
-      "description": "Updated tool context/docs and benchmark guidance to reference the route profiler."
+      "description": "Token symbol profiling now consumes the shared source-map primitive."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Integrated source navigation policy/tool into workspace, CLI, docs, and full-regression classification."
     }
   ]
 }

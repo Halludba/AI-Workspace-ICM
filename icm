@@ -16,16 +16,19 @@ def main() -> int:
         return 2
     surface = sys.argv[1]
     if surface == "inspect":
-        if len(sys.argv) < 3 or sys.argv[2] not in {"tokens", "benchmark"}:
-            print("usage: icm inspect {tokens,benchmark} <command> [args]", file=sys.stderr)
+        if len(sys.argv) < 3 or sys.argv[2] not in {"tokens", "benchmark", "source"}:
+            print("usage: icm inspect {tokens,benchmark,source} <command> [args]", file=sys.stderr)
             return 2
         inspector = sys.argv[2]
         sys.argv = [sys.argv[0], *sys.argv[3:]]
         if inspector == "tokens":
             from tools.token_profiler import main as token_main
             return token_main()
-        from tools.context_benchmark import main as benchmark_main
-        return benchmark_main()
+        if inspector == "benchmark":
+            from tools.context_benchmark import main as benchmark_main
+            return benchmark_main()
+        from tools.source_navigator import main as source_main
+        return source_main()
     if surface == "role":
         from tools.role_resolver import main as role_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]

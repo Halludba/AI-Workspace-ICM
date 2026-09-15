@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "cache_root": ".session/source-index",
+  "supported_semantic_extensions": [
+    ".py"
+  ],
+  "default_context_lines": 0,
+  "max_context_lines": 200,
+  "max_region_lines": 1000,
+  "cache_enabled": true,
+  "indexer_version": "1"
+}

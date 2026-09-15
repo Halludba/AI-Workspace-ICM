@@ -1,26 +1,26 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1230-arena-replay",
+  "directive_id": "DIR-2026-09-15:T-1240-v12-release",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add reproducible Evaluation Arena suite manifests and separate tune/holdout comparison safeguards against benchmark gaming.",
+  "summary": "Promote validated Evaluation Arena development state to immutable v1.2.0 release metadata without changing implementation semantics.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "_core/EVALUATION_ARENA_PROTOCOL.md",
-        "config/evaluation_arena_policy.json",
-        "tests/test_evaluation_arena.py",
-        "tools/evaluation_arena.py"
+        "README.md",
+        "WORKSPACE.json",
+        "tests/test_context_routing.py",
+        "tests/test_release_policy.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Implement planner-approved replay and holdout safeguards without exposing partition metadata to strategy execution or granting promotion authority."
+      "rationale": "Release closure updates only version assertions/public release description after the completed arena regression and clean context-growth check."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added suite fingerprints, blinded execution views, partition-separated analysis comparison, holdout sensitivity signals, and no-generalization/no-auto-promotion boundaries."
+      "description": "Promoted 1.2.0-dev to 1.2.0 and aligned release assertions/README."
     }
   ]
 }

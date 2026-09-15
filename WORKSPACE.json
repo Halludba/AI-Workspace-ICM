@@ -1,10 +1,10 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "1.4.0-dev",
+  "workspace_version": "1.4.0",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
-  "status": "EXECUTABLE_EFFICIENCY_DEVELOPMENT_RUNTIME",
+  "status": "FINAL_MONOLITH_RELEASE",
   "entrypoints": {
     "orientation": "WORKSPACE.md",
     "router": "CONTEXT.md",
@@ -91,7 +91,16 @@
     "evidence_reuse": "tools/evidence_reuse.py",
     "local_execution_plane_protocol": "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
     "local_execution_policy": "config/local_execution_policy.json",
-    "local_execution": "tools/local_execution.py"
+    "local_execution": "tools/local_execution.py",
+    "local_capability_broker_policy": "config/local_capability_broker_policy.json",
+    "local_capability_broker": "tools/local_capability_broker.py",
+    "local_worker_agent_policy": "config/local_worker_agent_policy.json",
+    "local_worker_agent": "tools/local_worker_agent.py",
+    "local_worker_providers": "config/local_worker_providers.json",
+    "baseline_bootstrap_policy": "config/bootstrap_policy.json",
+    "baseline_bootstrap": "tools/baseline_bootstrap.py",
+    "resume_supervisor_policy": "config/resume_supervisor_policy.json",
+    "resume_supervisor": "tools/resume_supervisor.py"
   },
   "roots": {
     "core": "_core",

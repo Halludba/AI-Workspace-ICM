@@ -37,3 +37,9 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_continuity_presenter.py` -> strong-vs-weak concept mapping, planner-first next-step compilation, and non-executable candidate presentation.
 - `test_evidence_reuse.py` -> dependency-key invalidation, repository fingerprints, volatility behavior, host-fact durability, and compact reuse invariants.
 - `test_local_execution.py` -> detached snapshot verification, isolated mutation worktrees, collision/lease safety, worker handoffs, and stale-success semantics.
+
+- `test_local_capability_broker.py` -> named broker capability, dirty-snapshot read, test-runner, and patch-scope confinement invariants.
+- `test_local_worker_agent.py` -> bounded worker discovery/tool-loop budgets, snapshot provenance, and candidate-only patch validation.
+- `test_local_worker_benchmark.py` -> scope/tool reliability gates before coding/cost comparison and no-auto-promotion invariants.
+- `test_baseline_bootstrap.py` -> unchanged baseline reuse, dirty/committed deltas, governing-source escalation, and `.session` exclusion.
+- `test_resume_supervisor.py` -> verified-prefix resume capsules, stale-state rejection, target allowlisting, and retry-budget invariants.

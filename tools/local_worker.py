@@ -47,20 +47,34 @@ def _read(path:Path,label:str)->dict:
 
 def load_policy(root:Path=ROOT)->dict:
     p=_read(root/"config/local_worker_policy.json","local worker policy")
-    required={"schema_version","provider","endpoint","model","timeout_seconds","max_packet_estimated_tokens","max_context_items","max_changed_files","max_repair_cycles","max_response_bytes","max_patch_bytes","session_state_root","require_current_base_revision","structured_output_required","capture_private_reasoning","canonical_mutation","result_statuses","test_statuses"}
-    if set(p)!=required or p.get("schema_version")!="1.0": raise LocalWorkerError("local worker policy fields must match contract")
-    if p["provider"]!="ollama" or not isinstance(p["model"],str) or not p["model"]: raise LocalWorkerError("local worker provider/model contract invalid")
-    parsed=urllib.parse.urlparse(p["endpoint"])
-    if parsed.scheme!="http" or parsed.hostname not in {"127.0.0.1","::1"} or parsed.path!="/api/chat": raise LocalWorkerError("local worker endpoint must be loopback Ollama /api/chat")
-    for key in ("timeout_seconds","max_packet_estimated_tokens","max_context_items","max_changed_files","max_response_bytes","max_patch_bytes"):
+    required={"schema_version","capability_id","provider_registry","max_packet_estimated_tokens","max_context_items","max_changed_files","max_repair_cycles","max_response_bytes","max_patch_bytes","session_state_root","require_current_base_revision","structured_output_required","capture_private_reasoning","canonical_mutation","result_statuses","test_statuses"}
+    if set(p)!=required or p.get("schema_version")!="1.0" or p.get("capability_id")!="LOCAL_CODE_WORKER": raise LocalWorkerError("local worker policy fields must match contract")
+    reg=PurePosixPath(str(p["provider_registry"]).replace("\\","/"))
+    if reg.is_absolute() or ".." in reg.parts or not reg.parts: raise LocalWorkerError("provider_registry must be confined workspace-relative path")
+    for key in ("max_packet_estimated_tokens","max_context_items","max_changed_files","max_response_bytes","max_patch_bytes"):
         if not isinstance(p[key],int) or isinstance(p[key],bool) or p[key]<1: raise LocalWorkerError(f"{key} must be a positive integer")
     if not isinstance(p["max_repair_cycles"],int) or isinstance(p["max_repair_cycles"],bool) or p["max_repair_cycles"]<0: raise LocalWorkerError("max_repair_cycles must be non-negative integer")
     state=PurePosixPath(str(p["session_state_root"]).replace("\\","/"))
     if state.is_absolute() or ".." in state.parts or not state.parts or state.parts[0]!=".session": raise LocalWorkerError("session_state_root must be confined under .session/")
     if p["require_current_base_revision"] is not True or p["structured_output_required"] is not True or p["capture_private_reasoning"] is not False or p["canonical_mutation"] is not False: raise LocalWorkerError("local worker safety flags must match contract")
     if p["result_statuses"]!=["SUCCESS","NEEDS_REPAIR","BLOCKED"] or p["test_statuses"]!=["PROPOSED","NOT_RUN"]: raise LocalWorkerError("local worker result status vocabulary must match contract")
+    load_provider(root,p)
     return p
 
+
+def load_provider(root:Path=ROOT,policy:dict|None=None)->dict:
+    p=policy or _read(root/"config/local_worker_policy.json","local worker policy")
+    reg=_read(root/Path(*PurePosixPath(str(p["provider_registry"]).replace("\\","/")).parts),"local worker provider registry")
+    if set(reg)!={"schema_version","capability_id","active_provider_id","providers"} or reg.get("schema_version")!="1.0" or reg.get("capability_id")!="LOCAL_CODE_WORKER": raise LocalWorkerError("local worker provider registry invalid")
+    providers=reg["providers"]; active=reg["active_provider_id"]
+    if not isinstance(providers,dict) or active not in providers: raise LocalWorkerError("active local worker provider missing")
+    value=providers[active]
+    if not isinstance(value,dict) or set(value)!={"adapter","endpoint","model","timeout_seconds"}: raise LocalWorkerError("local worker provider fields invalid")
+    if value["adapter"]!="OLLAMA" or not isinstance(value["model"],str) or not value["model"]: raise LocalWorkerError("unsupported local worker provider adapter")
+    parsed=urllib.parse.urlparse(value["endpoint"])
+    if parsed.scheme!="http" or parsed.hostname not in {"127.0.0.1","::1"} or parsed.path!="/api/chat": raise LocalWorkerError("local worker endpoint must be loopback Ollama /api/chat")
+    if not isinstance(value["timeout_seconds"],int) or isinstance(value["timeout_seconds"],bool) or value["timeout_seconds"]<1: raise LocalWorkerError("provider timeout_seconds invalid")
+    return {"provider_id":active,"capability_id":"LOCAL_CODE_WORKER",**value}
 
 def _head(root:Path)->str:
     proc=subprocess.run(["git","rev-parse","HEAD"],cwd=root,text=True,capture_output=True,check=False)
@@ -346,15 +360,15 @@ def _attempt_prompt_plan(packet:dict,repair_feedback:str|None,root:Path)->dict:
     return context_runtime.build_prompt_plan({"schema_version":"1.0","blocks":blocks},root)
 
 
-def _payload(packet:dict,policy:dict,repair_feedback:str|None)->dict:
+def _payload(packet:dict,policy:dict,provider:dict,repair_feedback:str|None)->dict:
     user_content={"packet":packet}
     if repair_feedback: user_content["architect_repair_feedback"]=repair_feedback.strip()
-    return {"model":policy["model"],"messages":[{"role":"system","content":SYSTEM_CONTRACT},{"role":"user","content":json.dumps(user_content,ensure_ascii=False)}],"stream":False,"think":False,"format":_result_schema(policy),"options":{"temperature":0}}
+    return {"model":provider["model"],"messages":[{"role":"system","content":SYSTEM_CONTRACT},{"role":"user","content":json.dumps(user_content,ensure_ascii=False)}],"stream":False,"think":False,"format":_result_schema(policy),"options":{"temperature":0}}
 
 
 def _telemetry(packet:dict,response:dict,wall_ms:float,root:Path,prompt_plan:dict)->dict:
     sources=[{"source_ref":i["source_ref"],"sha256":i["content_sha256"],"estimated_tokens":i["estimated_tokens"],"block_class":"STABLE_ROUTED_CONTEXT"} for i in packet["context_items"]]
-    rec=context_runtime.telemetry_template(packet["job_id"],sources,root); rec["provider"]="ollama"; rec["model"]=load_policy(root)["model"]; rec["prompt_plan_fingerprint"]=prompt_plan["plan_fingerprint"]
+    rec=context_runtime.telemetry_template(packet["job_id"],sources,root); provider=load_provider(root); rec["provider"]=provider["provider_id"]; rec["model"]=provider["model"]; rec["prompt_plan_fingerprint"]=prompt_plan["plan_fingerprint"]
     def observed(name,value):
         if isinstance(value,bool) or not isinstance(value,(int,float)) or value<0: return
         if name in {"input_tokens_total","output_tokens","model_calls","tool_calls"}: value=int(value)
@@ -367,7 +381,7 @@ def _telemetry(packet:dict,response:dict,wall_ms:float,root:Path,prompt_plan:dic
 
 def execute_packet(packet:dict,*,user_authorized:bool,root:Path=ROOT,transport=None,observation:dict|None=None,state_root:Path|None=None,repair_feedback:str|None=None)->dict:
     if user_authorized is not True: raise LocalWorkerError("worker execution requires explicit current user authorization assertion")
-    packet=validate_packet(packet,root); policy=load_policy(root)
+    packet=validate_packet(packet,root); policy=load_policy(root); provider=load_provider(root,policy)
     if policy["require_current_base_revision"] and packet["base_revision"]!=_head(root): raise LocalWorkerError("worker packet became stale before execution")
     readiness=preflight(observation,root)
     if readiness["status"]!="READY": raise LocalWorkerError("LOCAL_OLLAMA_WORKER is unavailable: "+json.dumps(readiness["readiness"]["missing"],separators=(",",":")))
@@ -377,17 +391,17 @@ def execute_packet(packet:dict,*,user_authorized:bool,root:Path=ROOT,transport=N
         attempt_plan=_attempt_prompt_plan(packet,repair_feedback,root)
         start=time.perf_counter()
         try:
-            payload=_payload(packet,policy,repair_feedback)
-            response=transport(policy["endpoint"],payload,policy["timeout_seconds"]) if transport is not None else _http_transport(policy["endpoint"],payload,policy["timeout_seconds"],policy["max_response_bytes"])
+            payload=_payload(packet,policy,provider,repair_feedback)
+            response=transport(provider["endpoint"],payload,provider["timeout_seconds"]) if transport is not None else _http_transport(provider["endpoint"],payload,provider["timeout_seconds"],policy["max_response_bytes"])
             wall=(time.perf_counter()-start)*1000.0
             if not isinstance(response,dict) or not isinstance(response.get("message"),dict) or not isinstance(response["message"].get("content"),str): raise LocalWorkerError("local worker response missing structured message content")
-            if response.get("model") not in {None,policy["model"]}: raise LocalWorkerError("local worker response model does not match configured worker")
+            if response.get("model") not in {None,provider["model"]}: raise LocalWorkerError("local worker response model does not match configured worker")
             try: result=json.loads(response["message"]["content"])
             except json.JSONDecodeError as exc: raise LocalWorkerError("local worker message content is not valid JSON") from exc
             validated=validate_result(packet,result,root)
             telemetry=_telemetry(packet,response,wall,root,attempt_plan)
             _finish_attempt(path,state,validated["status"])
-            return {"schema_version":"1.0","attempt":attempt,"result":validated,"telemetry":telemetry,"raw_provider_response_persisted":False,"private_reasoning_persisted":False,"authority":"CANDIDATE_ONLY"}
+            return {"schema_version":"1.0","attempt":attempt,"provider_id":provider["provider_id"],"capability_id":"LOCAL_CODE_WORKER","result":validated,"telemetry":telemetry,"raw_provider_response_persisted":False,"private_reasoning_persisted":False,"authority":"CANDIDATE_ONLY"}
         except Exception as exc:
             _finish_attempt(path,state,"FAILED_VALIDATION_OR_TRANSPORT")
             if isinstance(exc,LocalWorkerError): raise

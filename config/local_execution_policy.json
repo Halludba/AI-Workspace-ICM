@@ -38,5 +38,7 @@
   "worktree_layout": "SIBLING_DERIVED",
   "automatic_merge": false,
   "shared_mutable_worktree": false,
-  "execution_authority": "NONE"
+  "execution_authority": "NONE",
+  "snapshot_root": ".session/local-execution/live-snapshots",
+  "max_snapshot_untracked_paths": 64
 }

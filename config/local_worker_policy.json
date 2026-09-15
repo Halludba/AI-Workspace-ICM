@@ -1,9 +1,5 @@
 {
   "schema_version": "1.0",
-  "provider": "ollama",
-  "endpoint": "http://127.0.0.1:11434/api/chat",
-  "model": "ornith-1.5:35b",
-  "timeout_seconds": 600,
   "max_packet_estimated_tokens": 20000,
   "max_context_items": 32,
   "max_changed_files": 20,
@@ -23,5 +19,7 @@
     "NOT_RUN"
   ],
   "max_response_bytes": 4194304,
-  "max_patch_bytes": 2097152
+  "max_patch_bytes": 2097152,
+  "capability_id": "LOCAL_CODE_WORKER",
+  "provider_registry": "config/local_worker_providers.json"
 }

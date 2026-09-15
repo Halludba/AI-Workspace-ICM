@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Revision-bound local execution plane with isolated Git worktrees."""
 from __future__ import annotations
-import argparse,hashlib,json,os,platform,re,subprocess,sys,tempfile,time
+import argparse,hashlib,io,json,os,platform,re,subprocess,sys,tarfile,tempfile,time
 from pathlib import Path,PurePosixPath
 ROOT=Path(__file__).resolve().parents[1]
 SHA40=re.compile(r'^[0-9a-f]{40}$')
@@ -16,10 +16,13 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
  p=_read(root/'config/local_execution_policy.json','local execution policy')
- req={'schema_version','state_root','modes','job_statuses','verification_statuses','evidence_currency','verify_suites','max_jobs','max_scopes','worktree_layout','automatic_merge','shared_mutable_worktree','execution_authority'}
+ req={'schema_version','state_root','snapshot_root','max_snapshot_untracked_paths','modes','job_statuses','verification_statuses','evidence_currency','verify_suites','max_jobs','max_scopes','worktree_layout','automatic_merge','shared_mutable_worktree','execution_authority'}
  if set(p)!=req or p['schema_version']!='1.0' or p['automatic_merge'] is not False or p['shared_mutable_worktree'] is not False or p['execution_authority']!='NONE': raise LocalExecutionError('local execution safety contract invalid')
  rel=PurePosixPath(p['state_root'])
  if rel.is_absolute() or '..' in rel.parts or not rel.parts or rel.parts[0]!='.session': raise LocalExecutionError('state_root must remain under .session')
+ snap=PurePosixPath(p['snapshot_root'])
+ if snap.is_absolute() or '..' in snap.parts or not snap.parts or snap.parts[0]!='.session': raise LocalExecutionError('snapshot_root must remain under .session')
+ if not isinstance(p['max_snapshot_untracked_paths'],int) or isinstance(p['max_snapshot_untracked_paths'],bool) or p['max_snapshot_untracked_paths']<0: raise LocalExecutionError('max_snapshot_untracked_paths invalid')
  if p['worktree_layout']!='SIBLING_DERIVED': raise LocalExecutionError('unsupported worktree layout')
  return p
 
@@ -66,6 +69,93 @@ def scopes_overlap(a:list[str],b:list[str]):
   for y in bb:
    if one(x,y): hits.append([x,y])
  return {'overlap':bool(hits),'pairs':hits}
+
+
+
+
+def _canonical_status(root:Path)->str:
+ lines=_git(root,'status','--porcelain=v1','--untracked-files=all').splitlines(); kept=[]
+ for line in lines:
+  path=line[3:].replace('\\','/') if len(line)>=4 else ''
+  if path=='.session' or path.startswith('.session/'): continue
+  kept.append(line)
+ return '\n'.join(kept)+('\n' if kept else '')
+
+def _confined_rel(value:str,label:str='path')->str:
+ if not isinstance(value,str) or not value.strip(): raise LocalExecutionError(f'{label} must be non-empty')
+ rel=PurePosixPath(value.strip().replace('\\','/'))
+ if rel.is_absolute() or '..' in rel.parts or not rel.parts or rel.as_posix() in {'','.'}: raise LocalExecutionError(f'{label} must be workspace-relative and confined')
+ return rel.as_posix()
+
+def _git_env(root:Path,index_file:Path,*args:str,text=True,check=True):
+ env=os.environ.copy(); env['GIT_INDEX_FILE']=str(index_file)
+ pr=subprocess.run(['git',*args],cwd=root,capture_output=True,text=text,check=False,env=env)
+ if check and pr.returncode!=0:
+  err=pr.stderr if text else pr.stderr.decode(errors='replace')
+  raise LocalExecutionError(err.strip() or 'git snapshot plumbing failed')
+ return pr.stdout
+
+def _snapshot_alias_path(root:Path,p:dict,snapshot_id:str)->Path:
+ return _state_dir(root,p)/'snapshot-aliases'/(hashlib.sha256(snapshot_id.encode()).hexdigest()+'.json')
+
+def _snapshot_base(root:Path,p:dict)->Path:
+ return root/Path(*PurePosixPath(p['snapshot_root']).parts)
+
+def create_live_snapshot(snapshot_id:str,include_untracked:list[str]|None=None,root:Path=ROOT):
+ p=load_policy(root)
+ if not isinstance(snapshot_id,str) or not JOB.fullmatch(snapshot_id): raise LocalExecutionError('snapshot_id invalid')
+ paths=include_untracked or []
+ if not isinstance(paths,list) or len(paths)>p['max_snapshot_untracked_paths']: raise LocalExecutionError('include_untracked invalid or exceeds bound')
+ paths=[_confined_rel(v,'snapshot untracked path') for v in paths]
+ if len(paths)!=len(set(paths)): raise LocalExecutionError('snapshot untracked paths must be unique')
+ before_status=_canonical_status(root)
+ base=_commit(root,'HEAD'); base_tree=_tree(root,base); index_tree=_git(root,'write-tree').strip()
+ tmp_parent=_state_dir(root,p).parent; tmp_parent.mkdir(parents=True,exist_ok=True); fd,name=tempfile.mkstemp(prefix='icm-snapshot-index-',dir=str(tmp_parent)); os.close(fd); idx=Path(name); idx.unlink(missing_ok=True)
+ try:
+  _git_env(root,idx,'read-tree',base)
+  _git_env(root,idx,'add','-u','--','.')
+  for rel in paths:
+   full=(root/Path(*PurePosixPath(rel).parts)).resolve()
+   try: full.relative_to(root.resolve())
+   except ValueError as exc: raise LocalExecutionError('snapshot path escapes workspace') from exc
+   if not full.exists(): raise LocalExecutionError(f'snapshot untracked path missing: {rel}')
+   ign=subprocess.run(['git','check-ignore','-q','--',rel],cwd=root,check=False)
+   if ign.returncode==0: raise LocalExecutionError(f'ignored path cannot enter live snapshot: {rel}')
+   _git_env(root,idx,'add','--',rel)
+  snap_tree=_git_env(root,idx,'write-tree').strip()
+  delta=_git_env(root,idx,'diff','--cached','--name-status',base).splitlines()
+  payload={'schema_version':'1.0','snapshot_id':snapshot_id,'base_revision':base,'base_tree':base_tree,'index_tree':index_tree,'snapshot_tree':snap_tree,'included_untracked':paths,'worktree_status':before_status.splitlines()}
+  fingerprint=hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+  snap_dir=_snapshot_base(root,p)/fingerprint; workspace=snap_dir/'workspace'; manifest=snap_dir/'manifest.json'
+  if not manifest.exists():
+   archive=subprocess.run(['git','archive','--format=tar',snap_tree],cwd=root,capture_output=True,check=False)
+   if archive.returncode!=0: raise LocalExecutionError(archive.stderr.decode(errors='replace').strip() or 'cannot archive live snapshot tree')
+   workspace.mkdir(parents=True,exist_ok=True)
+   with tarfile.open(fileobj=io.BytesIO(archive.stdout),mode='r:') as tf:
+    for member in tf.getmembers():
+     target=(workspace/member.name).resolve()
+     try: target.relative_to(workspace.resolve())
+     except ValueError as exc: raise LocalExecutionError('snapshot archive path escapes destination') from exc
+    tf.extractall(workspace,filter='data')
+   record={**payload,'snapshot_fingerprint':fingerprint,'changed_paths':[line.split('\t')[-1] for line in delta if line],'workspace_path':str(workspace),'authority':'DERIVED_IMMUTABLE_LIVE_SNAPSHOT','canonical_mutation':False}
+   _atomic(manifest,record)
+  else: record=_read(manifest,'live snapshot manifest')
+  alias={'schema_version':'1.0','snapshot_id':snapshot_id,'snapshot_fingerprint':fingerprint,'manifest_path':str(manifest),'authority':'NONCANONICAL_SNAPSHOT_ALIAS'}; _atomic(_snapshot_alias_path(root,p,snapshot_id),alias)
+  after_status=_canonical_status(root)
+  if after_status!=before_status or _commit(root,'HEAD')!=base or _git(root,'write-tree').strip()!=index_tree: raise LocalExecutionError('live snapshot unexpectedly changed canonical Git/worktree state')
+  return record
+ finally: idx.unlink(missing_ok=True)
+
+def live_snapshot(snapshot_id:str,root:Path=ROOT):
+ p=load_policy(root); alias=_read(_snapshot_alias_path(root,p,snapshot_id),'snapshot alias'); return _read(Path(alias['manifest_path']),'live snapshot manifest')
+
+def verify_live_snapshot(snapshot_id:str,suite:str='FULL_REGRESSION',root:Path=ROOT):
+ p=load_policy(root); snap=live_snapshot(snapshot_id,root)
+ if suite not in p['verify_suites']: raise LocalExecutionError('unknown verification suite')
+ workspace=Path(snap['workspace_path']); start=time.perf_counter(); proc=subprocess.run([sys.executable,*p['verify_suites'][suite]],cwd=workspace,text=True,capture_output=True,check=False); wall=(time.perf_counter()-start)*1000.0
+ log=_state_dir(root,p)/'logs'/('snapshot-'+snap['snapshot_fingerprint'][:24]+'.log'); log.parent.mkdir(parents=True,exist_ok=True); log.write_text((proc.stdout or '')+(proc.stderr or ''),encoding='utf-8')
+ env=_env(); ev={'schema_version':'1.0','snapshot_id':snapshot_id,'tested_snapshot_fingerprint':snap['snapshot_fingerprint'],'tested_snapshot_tree':snap['snapshot_tree'],'base_revision':snap['base_revision'],'suite':suite,'outcome':'PASS' if proc.returncode==0 else 'FAIL','returncode':proc.returncode,'wall_time_ms':round(wall,3),'environment_fingerprint':env['fingerprint'],'log_ref':log.relative_to(root).as_posix(),'authority':'DERIVED_SNAPSHOT_VERIFICATION_EVIDENCE','execution_authority':'NONE'}
+ return ev
 
 def _suite_fingerprint(root,rev,suite):
  p=load_policy(root)
@@ -172,10 +262,12 @@ def cleanup(job_id:str,root:Path=ROOT):
 
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument('--root',default=str(ROOT)); sub=ap.add_subparsers(dest='cmd',required=True)
- c=sub.add_parser('create'); c.add_argument('request'); l=sub.add_parser('launch'); l.add_argument('job_id'); r=sub.add_parser('run'); r.add_argument('job_id'); s=sub.add_parser('status'); s.add_argument('job_id'); x=sub.add_parser('cleanup'); x.add_argument('job_id'); wh=sub.add_parser('worker-handoff'); wh.add_argument('job_id'); co=sub.add_parser('collision'); co.add_argument('a'); co.add_argument('b'); internal=sub.add_parser('_run-snapshot'); internal.add_argument('job_id')
+ sc=sub.add_parser('snapshot-create'); sc.add_argument('snapshot_id'); sc.add_argument('--include-untracked',action='append',default=[]); sv=sub.add_parser('snapshot-verify'); sv.add_argument('snapshot_id'); sv.add_argument('--suite',default='FULL_REGRESSION'); c=sub.add_parser('create'); c.add_argument('request'); l=sub.add_parser('launch'); l.add_argument('job_id'); r=sub.add_parser('run'); r.add_argument('job_id'); s=sub.add_parser('status'); s.add_argument('job_id'); x=sub.add_parser('cleanup'); x.add_argument('job_id'); wh=sub.add_parser('worker-handoff'); wh.add_argument('job_id'); co=sub.add_parser('collision'); co.add_argument('a'); co.add_argument('b'); internal=sub.add_parser('_run-snapshot'); internal.add_argument('job_id')
  a=ap.parse_args(); root=Path(a.root).resolve()
  try:
-  if a.cmd=='create': out=create_job(_read(Path(a.request),'job request'),root)
+  if a.cmd=='snapshot-create': out=create_live_snapshot(a.snapshot_id,a.include_untracked,root)
+  elif a.cmd=='snapshot-verify': out=verify_live_snapshot(a.snapshot_id,a.suite,root)
+  elif a.cmd=='create': out=create_job(_read(Path(a.request),'job request'),root)
   elif a.cmd=='launch': out=launch_snapshot(a.job_id,root)
   elif a.cmd in {'run','_run-snapshot'}: out=run_snapshot(a.job_id,root)
   elif a.cmd=='status': out=status(a.job_id,root)

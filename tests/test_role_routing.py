@@ -126,5 +126,25 @@ class RoleRoutingTests(unittest.TestCase):
         self.assertEqual(json.loads(proc.stdout)["default_role"], "icm-system-architect")
 
 
+
+    def test_turn_directive_expires_without_sticky_future_constraint(self):
+        out=role_resolver.resolve_directive_lifetime({"scope":None,"explicit_persistence_language":False,"event":"TURN_COMPLETE"},ROOT)
+        self.assertEqual(out["scope"],"TURN")
+        self.assertTrue(out["expired"])
+        self.assertFalse(out["constrains_future_routing"])
+
+    def test_persistent_directive_requires_explicit_persistence_language(self):
+        with self.assertRaises(role_resolver.RolePolicyError):
+            role_resolver.resolve_directive_lifetime({"scope":"UNTIL_REVOKED","explicit_persistence_language":False,"event":"OTHER"},ROOT)
+
+    def test_primary_controller_transition_consumes_existing_authority_only(self):
+        out=role_resolver.resolve_controller_transition({"task_class":"RUNTIME_IMPLEMENTATION","current_role":"icm-system-architect","existing_user_authorization":True,"requested_paths":["tools/example.py"]},ROOT)
+        self.assertEqual(out["target_role"],"icm-runtime-architect")
+        self.assertTrue(out["transition_required"])
+        self.assertTrue(out["mutation_permitted"])
+        self.assertFalse(out["role_transition_grants_authority"])
+        noauth=role_resolver.resolve_controller_transition({"task_class":"RUNTIME_IMPLEMENTATION","current_role":"icm-system-architect","existing_user_authorization":False,"requested_paths":["tools/example.py"]},ROOT)
+        self.assertFalse(noauth["mutation_permitted"])
+
 if __name__ == "__main__":
     unittest.main()

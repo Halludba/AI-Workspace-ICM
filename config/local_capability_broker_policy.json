@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "capabilities": [
+    "SOURCE_SEARCH",
+    "SOURCE_READ",
+    "GIT_STATUS",
+    "GIT_DIFF",
+    "TEST_SUITE",
+    "PATCH_VALIDATE"
+  ],
+  "target_kinds": [
+    "LIVE_SNAPSHOT",
+    "ISOLATED_JOB"
+  ],
+  "max_search_results": 40,
+  "max_search_file_bytes": 524288,
+  "max_read_bytes": 262144,
+  "max_diff_bytes": 1048576,
+  "max_test_seconds": 180,
+  "arbitrary_shell": false,
+  "canonical_mutation": false,
+  "execution_authority": "NONE",
+  "mutation_authority": "NONE"
+}

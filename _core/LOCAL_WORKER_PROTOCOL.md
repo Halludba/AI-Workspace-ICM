@@ -26,3 +26,6 @@ Missing Ollama returns an explicit blocked preflight and does not consume an att
 
 ## Non-guarantees
 Structured output does not prove semantic correctness. SHA-256 is integrity/provenance evidence, not authenticity. A READY local-compute observation grants no execution or mutation authority. The v1 release can verify the adapter deterministically without requiring Ollama or the model to be installed; live model throughput/quality remain separate host evidence when available.
+
+## Generic worker capability
+`LOCAL_CODE_WORKER` is the stable capability; model/provider identity is adapter configuration. Worker selection should gate first on scope compliance, valid structured tool use, and verified task success before comparing coding quality, latency, tokens, repair cost, or hardware cost. No benchmark winner auto-promotes itself.

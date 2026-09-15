@@ -14,3 +14,6 @@ Local intelligent workers may share repository history but not an uncontrolled w
 
 ## Execution split
 Deterministic runners should execute regression, static checks and other mechanical verification. Ornith/Qwen is invoked only for bounded reasoning or mutation work that needs a model. The local execution plane grants neither model nor mutation authority by itself.
+
+## Live-state snapshots and broker access
+A worker needing the freshest local development state receives an immutable fingerprinted snapshot containing committed/staged/unstaged content plus only explicitly scoped untracked files. The canonical mutable worktree is never shared as an uncontrolled mutation surface. Named broker capabilities replace arbitrary shell access.

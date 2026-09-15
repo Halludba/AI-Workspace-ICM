@@ -18,3 +18,6 @@ Execution-window hosts may start best-effort Git-ignored Observatory capture whe
 
 ## Authority
 Planner state remains Git-ignored, noncanonical intent. The gate and reconciler make no model calls, grant no mutation/execution authority, and do not replace current user authorization or live repository verification.
+
+## External resume coordination
+Execution-window checkpoints may be summarized into a revision/fingerprint-bound resume capsule for an external host supervisor. Stale base revision, planner fingerprint, or window identity blocks dispatch. Resume coordination never grants canonical mutation or publication authority.

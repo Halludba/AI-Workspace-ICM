@@ -24,4 +24,29 @@ class ContinuityPresenterTests(unittest.TestCase):
     if src.exists(): (root/'config'/f).write_text(src.read_text(encoding='utf-8'),encoding='utf-8')
    q={'schema_version':'1.0','agent_id':'a','updated_utc':'2026-01-01T00:00:00Z','suggestions':[{'suggestion_id':'S1','title':'Idea','reason':'r','status':'UNOPPOSED','bundle_id':'B','evidence_refs':[],'compatibility_state':'VERIFIED','last_reviewed_revision':'x','created_utc':'2026-01-01T00:00:00Z','updated_utc':'2026-01-01T00:00:00Z'}]}; (root/'.session/suggestions/a.json').write_text(json.dumps(q),encoding='utf-8')
    r=m.compile_footer('a',root); self.assertEqual(r['next_step']['kind'],'CANDIDATE'); self.assertEqual(r['next_step']['execution_authority'],'NONE')
+
+ def test_substantial_response_requires_next_optimal_step_footer(self):
+  with tempfile.TemporaryDirectory() as td:
+   root=Path(td); (root/'config').mkdir(); (root/'.session/plans').mkdir(parents=True)
+   for f in ('human_presentation_policy.json','session_policy.json','role_policy.json','routes.json'):
+    (root/'config'/f).write_text((ROOT/'config'/f).read_text(encoding='utf-8'),encoding='utf-8')
+   task={'task_id':'T-test-footer','route_id':'workspace-architecture','stage_id':'test','title':'Do next thing','status':'PENDING','depends_on':[],'user_order':1,'user_directive_ref':'TEST','priority_class':'NORMAL','declared_scope':'SCOPED'}
+   plan={'schema_version':'1.0','session_id':'test-session','agent_id':'a','agent_role':'icm-runtime-architect','created_utc':'2026-01-01T00:00:00Z','updated_utc':'2026-01-01T00:00:00Z','authority_disclaimer':'NON_AUTHORITATIVE_INTENT_QUEUE','active_run_id':None,'auto_delete_on_empty':True,'tasks':[task]}
+   (root/'.session/plans/a.json').write_text(json.dumps(plan),encoding='utf-8')
+   with self.assertRaisesRegex(m.PresentationError,'omitted required Next optimal step'):
+    m.validate_response_contract('a',{'substantial_icm':True,'footer_heading':'','footer_text':''},root)
+   ok=m.validate_response_contract('a',{'substantial_icm':True,'footer_heading':'Next optimal step','footer_text':'Do next thing.'},root)
+   self.assertTrue(ok['footer_required']); self.assertTrue(ok['footer_present'])
+
+ def test_non_substantial_response_does_not_require_footer(self):
+  with tempfile.TemporaryDirectory() as td:
+   root=Path(td); (root/'config').mkdir(); (root/'.session/plans').mkdir(parents=True)
+   for f in ('human_presentation_policy.json','session_policy.json','role_policy.json','routes.json'):
+    (root/'config'/f).write_text((ROOT/'config'/f).read_text(encoding='utf-8'),encoding='utf-8')
+   task={'task_id':'T-test-footer','route_id':'workspace-architecture','stage_id':'test','title':'Do next thing','status':'PENDING','depends_on':[],'user_order':1,'user_directive_ref':'TEST','priority_class':'NORMAL','declared_scope':'SCOPED'}
+   plan={'schema_version':'1.0','session_id':'test-session','agent_id':'a','agent_role':'icm-runtime-architect','created_utc':'2026-01-01T00:00:00Z','updated_utc':'2026-01-01T00:00:00Z','authority_disclaimer':'NON_AUTHORITATIVE_INTENT_QUEUE','active_run_id':None,'auto_delete_on_empty':True,'tasks':[task]}
+   (root/'.session/plans/a.json').write_text(json.dumps(plan),encoding='utf-8')
+   out=m.validate_response_contract('a',{'substantial_icm':False,'footer_heading':'','footer_text':''},root)
+   self.assertFalse(out['footer_required'])
+
 if __name__=='__main__': unittest.main()

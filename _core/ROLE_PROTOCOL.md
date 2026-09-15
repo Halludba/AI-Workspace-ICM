@@ -34,3 +34,9 @@ Planner tasks may record optional `target_role`, `context_refs`, and `acceptance
 
 ## Role transition invariant
 Role transitions preserve decisions, constraints, provenance references, and acceptance criteria rather than the entire prior context window. Canonical repository evidence wins over stale handoff or chat context.
+
+## Primary controller transitions
+The designated main ICM chat may automatically select the narrowest role required by already-authorized work. A role transition consumes existing authorization; it never creates authority, enlarges scope, or authorizes publication. Material architecture questions return to System Architect; implementation/release work routes to Runtime Architect.
+
+## Directive lifetime
+User directives are scoped to the narrowest explicitly supported lifetime. Without explicit persistence language, a role/profile constraint defaults to the current turn. Supported lifetimes are TURN, TASK, EXECUTION_WINDOW, SESSION, and UNTIL_REVOKED. Persistent scopes require explicit persistence wording; expired directives do not constrain later role routing.

@@ -43,3 +43,8 @@ Do not load unrelated config files.
 - `interaction_policy.json` maintenance -> cheap structural validation triggers and evidence-gated semantic dedup review cadence.
 - `evidence_reuse_policy.json` -> validated-state dependency envelopes, volatility classes, host-fact durability, and Git-ignored evidence stores.
 - `local_execution_policy.json` -> snapshot verification, isolated mutation, exclusive leases, and revision-bound verification evidence.
+
+- `local_capability_broker_policy.json` -> named broker capability allowlist and scope limits; no arbitrary shell surface.
+- `local_worker_agent_policy.json`, `local_worker_providers.json` -> bounded agent tool loop and interchangeable `LOCAL_CODE_WORKER` provider configuration.
+- `bootstrap_policy.json` -> baseline/delta orientation identities and governing-file escalation.
+- `resume_supervisor_policy.json` -> bounded external resume coordination with no mutation/publication authority.

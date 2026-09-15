@@ -1,44 +1,73 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-16:T-1440-1470-evidence-reuse-local-execution",
+  "directive_id": "DIR-2026-09-16:T-1480-1550-final-monolith",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add content-addressed validated-state evidence reuse, reproducible host capability facts, and revision-bound isolated local execution so unchanged evidence can be reused safely and deterministic long-tail work can run against exact snapshots.",
+  "summary": "Complete the final monolithic ICM with live-state snapshots, host-neutral local capability brokering, bounded local worker tool use and benchmarking, controller/directive lifetime semantics, mechanical next-step presentation enforcement, baseline/delta bootstrap, external resume coordination, and the v1.4.0 final local release seal.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
-        "_core/EVIDENCE_REUSE_PROTOCOL.md",
+        "_core/CONTEXT_PROTOCOL.md",
+        "_core/HUMAN_PRESENTATION_PROTOCOL.md",
         "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
         "_core/LOCAL_WORKER_PROTOCOL.md",
+        "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+        "_core/ROLE_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/evidence_reuse_policy.json",
-        "config/impact_policy.json",
-        "config/interaction_policy.json",
+        "config/bootstrap_policy.json",
+        "config/evaluation_arena_policy.json",
+        "config/human_presentation_policy.json",
+        "config/local_capability_broker_policy.json",
         "config/local_execution_policy.json",
+        "config/local_worker_agent_policy.json",
+        "config/local_worker_policy.json",
+        "config/local_worker_providers.json",
+        "config/resume_supervisor_policy.json",
+        "config/role_policy.json",
         "icm",
+        "mutation_trace.json",
         "tests/CONTEXT.md",
-        "tests/test_evidence_reuse.py",
+        "tests/test_baseline_bootstrap.py",
+        "tests/test_context_routing.py",
+        "tests/test_continuity_presenter.py",
+        "tests/test_local_capability_broker.py",
         "tests/test_local_execution.py",
+        "tests/test_local_worker_agent.py",
+        "tests/test_local_worker_benchmark.py",
+        "tests/test_release_policy.py",
+        "tests/test_resume_supervisor.py",
+        "tests/test_role_routing.py",
         "tools/CONTEXT.md",
-        "tools/evidence_reuse.py",
-        "tools/local_execution.py"
+        "tools/baseline_bootstrap.py",
+        "tools/continuity_presenter.py",
+        "tools/evaluation_arena.py",
+        "tools/local_capability_broker.py",
+        "tools/local_execution.py",
+        "tools/local_worker.py",
+        "tools/local_worker_agent.py",
+        "tools/resume_supervisor.py",
+        "tools/role_resolver.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "User authorized the validated-state fingerprint and Ornith/local-execution architecture. The implementation reuses Git/content identity, keeps volatile evidence nonreusable, binds verification to exact tested revisions, isolates mutation workers, and preserves no-auto-merge/no-authority boundaries."
+      "rationale": "The user explicitly authorized continuing all accepted monolith-scoped suggestions and requested a permanent fix for omitted next-action presentation. The implementation preserves explicit-user publication, no-auto-promotion, no-shared-mutable-worker-state, and existing mutation governance while finishing the monolith as a benchmark/test subject."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added Evidence Reuse and Local Execution Plane protocols/policies/tools/tests, local host-fact persistence, snapshot regression jobs, stale-success classification, isolated worker handoffs, exclusive-scope collision protection, interaction bridges, and routed documentation.",
+      "description": "Added immutable live worktree snapshots, named local capability broker, bounded worker tool loop, generic provider-backed LOCAL_CODE_WORKER benchmarking, controller/directive lifetime rules, deterministic Next optimal step response validation, baseline/delta bootstrap, resume supervisor, final documentation/context routing, and v1.4.0 release metadata.",
       "evidence_refs": [
-        "focused-regression:100/100",
-        "interaction-contracts:14-valid",
-        "interaction-maintenance:semantic-review-no-safe-deletion",
-        "host-probe:powershell-5.1-utf8NoBOM-unsupported"
+        "focused-integration:176/176",
+        "role-presentation:24/24",
+        "local-worker-arena:60/60",
+        "baseline-bootstrap:5/5",
+        "resume-supervisor:4/4",
+        "release-policy-routing:27/27",
+        "context-growth:19.85%-tracked,0%-orientation",
+        "full-regression:565/565-PASS-67.612s"
       ]
     }
   ]

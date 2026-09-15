@@ -14,7 +14,7 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
     p=_read(root/'config/evaluation_arena_policy.json','evaluation arena policy')
-    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items','strategy_runner','ablation'}
+    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items','strategy_runner','ablation','local_worker_benchmark'}
     if set(p)!=required or p.get('schema_version')!='1.0' or p.get('experiment_outputs_canonical') is not False or p.get('execution_authority')!='NONE' or p.get('automatic_promotion') is not False or p.get('quality_floor_required') is not True: raise EvaluationArenaError('evaluation arena policy safety contract invalid')
     for key in ('partitions','task_kinds','evaluator_kinds','forbidden_keys'):
         if not isinstance(p[key],list) or not p[key] or len(p[key])!=len(set(p[key])) or any(not isinstance(v,str) or not v for v in p[key]): raise EvaluationArenaError(f'{key} must be unique non-empty strings')
@@ -49,6 +49,12 @@ def load_policy(root:Path=ROOT):
     if not isinstance(ab['cost_metrics'],list) or not ab['cost_metrics'] or len(ab['cost_metrics'])!=len(set(ab['cost_metrics'])) or any(x not in all_frontier for x in ab['cost_metrics']): raise EvaluationArenaError('ablation cost_metrics invalid')
     if isinstance(ab['minimum_relative_improvement'],bool) or not isinstance(ab['minimum_relative_improvement'],(int,float)) or not 0<ab['minimum_relative_improvement']<1: raise EvaluationArenaError('ablation minimum_relative_improvement invalid')
     if isinstance(ab['maximum_quality_regression'],bool) or not isinstance(ab['maximum_quality_regression'],(int,float)) or not 0<=ab['maximum_quality_regression']<1: raise EvaluationArenaError('ablation maximum_quality_regression invalid')
+    wb=p['local_worker_benchmark']; wb_req={'capability_id','minimum_valid_tool_call_rate','minimum_scope_compliance_rate','minimum_verified_success_rate','maximum_unnecessary_tool_call_rate','frontier_metrics','automatic_promotion'}
+    if not isinstance(wb,dict) or set(wb)!=wb_req or wb['capability_id']!='LOCAL_CODE_WORKER' or wb['automatic_promotion'] is not False: raise EvaluationArenaError('local worker benchmark policy invalid')
+    for key in ('minimum_valid_tool_call_rate','minimum_scope_compliance_rate','minimum_verified_success_rate','maximum_unnecessary_tool_call_rate'):
+        v=wb[key]
+        if isinstance(v,bool) or not isinstance(v,(int,float)) or not 0<=v<=1: raise EvaluationArenaError(f'local worker benchmark {key} invalid')
+    if not isinstance(wb['frontier_metrics'],dict) or not wb['frontier_metrics'] or any(v not in {'MAXIMIZE','MINIMIZE'} for v in wb['frontier_metrics'].values()): raise EvaluationArenaError('local worker benchmark frontier metrics invalid')
     rel=PurePosixPath(str(p['state_root']).replace('\\','/'))
     if rel.is_absolute() or '..' in rel.parts or not rel.parts or rel.parts[0]!='.session': raise EvaluationArenaError('state_root must remain under .session')
     return p
@@ -438,6 +444,64 @@ def compare_ablation(request:dict,root:Path=ROOT):
     else: verdict='NO_MATERIAL_GAIN'
     return {'schema_version':'1.0','experiment_id':request['experiment_id'],'mechanism':mechanism,'quality_floor':float(floor),'quality_delta':quality_delta,'baseline_meets_quality_floor':base_floor,'ablated_meets_quality_floor':ab_floor,'quality_preserved':quality_preserved,'cost_deltas':deltas,'materially_improved_metrics':improved,'regressed_cost_metrics':regressed,'verdict':verdict,'candidate_for_removal_review':verdict=='ABLATION_FAVORABLE','automatic_removal':False,'automatic_promotion':False,'missing_metrics_treated_as_zero':False,'authority':'ADVISORY_ABLATION_EVIDENCE'}
 
+
+def compare_local_workers(request:dict,root:Path=ROOT):
+    p=load_policy(root); cfg=p['local_worker_benchmark']; required={'schema_version','benchmark_id','providers'}
+    if not isinstance(request,dict) or set(request)!=required or request.get('schema_version')!='1.0': raise EvaluationArenaError('local worker benchmark request fields invalid')
+    _nonempty(request['benchmark_id'],'benchmark_id'); providers=request['providers']
+    if not isinstance(providers,list) or not providers: raise EvaluationArenaError('local worker benchmark requires providers')
+    seen=set(); scorecards=[]
+    numeric_optional=('wall_time_ms','input_tokens_total','repair_count','vram_peak_mib','coding_quality_score')
+    def med(vals): return None if not vals else float(statistics.median(vals))
+    for item in providers:
+        if not isinstance(item,dict) or set(item)!={'provider_id','capability_id','trials'}: raise EvaluationArenaError('worker provider fields invalid')
+        pid=_nonempty(item['provider_id'],'provider_id')
+        if pid in seen: raise EvaluationArenaError('duplicate worker provider_id')
+        seen.add(pid)
+        if item['capability_id']!=cfg['capability_id']: raise EvaluationArenaError('worker capability_id mismatch')
+        trials=item['trials']
+        if not isinstance(trials,list) or not trials: raise EvaluationArenaError('worker provider requires trials')
+        tool=valid=unnecessary=scope_ok=success=patch_total=patch_correct=0; optional={k:[] for k in numeric_optional}
+        for tr in trials:
+            required_trial={'tool_calls','valid_tool_calls','unnecessary_tool_calls','scope_violations','verified_success','patch_correct','wall_time_ms','input_tokens_total','repair_count','vram_peak_mib','coding_quality_score'}
+            if not isinstance(tr,dict) or set(tr)!=required_trial: raise EvaluationArenaError('worker trial fields invalid')
+            for key in ('tool_calls','valid_tool_calls','unnecessary_tool_calls','scope_violations'):
+                v=tr[key]
+                if isinstance(v,bool) or not isinstance(v,int) or v<0: raise EvaluationArenaError(f'worker trial {key} invalid')
+            if tr['valid_tool_calls']>tr['tool_calls'] or tr['unnecessary_tool_calls']>tr['tool_calls']: raise EvaluationArenaError('worker trial tool counts inconsistent')
+            if not isinstance(tr['verified_success'],bool) or tr['patch_correct'] not in {True,False,None}: raise EvaluationArenaError('worker trial outcome fields invalid')
+            tool+=tr['tool_calls']; valid+=tr['valid_tool_calls']; unnecessary+=tr['unnecessary_tool_calls']; scope_ok+=1 if tr['scope_violations']==0 else 0; success+=1 if tr['verified_success'] else 0
+            if tr['patch_correct'] is not None: patch_total+=1; patch_correct+=1 if tr['patch_correct'] else 0
+            for key in numeric_optional:
+                v=tr[key]
+                if v is None: continue
+                if isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) or v<0: raise EvaluationArenaError(f'worker trial {key} invalid')
+                optional[key].append(float(v))
+        n=len(trials); valid_rate=1.0 if tool==0 else valid/tool; unnecessary_rate=0.0 if tool==0 else unnecessary/tool; scope_rate=scope_ok/n; success_rate=success/n; patch_rate=None if patch_total==0 else patch_correct/patch_total
+        gates={'valid_tool_call_rate':valid_rate>=cfg['minimum_valid_tool_call_rate'],'scope_compliance_rate':scope_rate>=cfg['minimum_scope_compliance_rate'],'verified_success_rate':success_rate>=cfg['minimum_verified_success_rate'],'unnecessary_tool_call_rate':unnecessary_rate<=cfg['maximum_unnecessary_tool_call_rate']}
+        eligible=all(gates.values())
+        metrics={'verified_success_rate':success_rate,'patch_correctness_rate':patch_rate,'unnecessary_tool_call_rate':unnecessary_rate,'wall_time_ms_median':med(optional['wall_time_ms']),'input_tokens_total_median':med(optional['input_tokens_total']),'repair_count_median':med(optional['repair_count']),'vram_peak_mib_median':med(optional['vram_peak_mib']),'coding_quality_score_median':med(optional['coding_quality_score'])}
+        scorecards.append({'provider_id':pid,'capability_id':cfg['capability_id'],'trial_count':n,'quality_gates':gates,'eligible':eligible,'metrics':metrics})
+    eligible=[x for x in scorecards if x['eligible']]
+    dirs=cfg['frontier_metrics']
+    def dominates(a,b):
+        common=[k for k in dirs if a['metrics'].get(k) is not None and b['metrics'].get(k) is not None]
+        if not common: return False
+        no_worse=True; strict=False
+        for k in common:
+            av=a['metrics'][k]; bv=b['metrics'][k]; direction=dirs[k]
+            if direction=='MAXIMIZE':
+                if av<bv: no_worse=False
+                if av>bv: strict=True
+            else:
+                if av>bv: no_worse=False
+                if av<bv: strict=True
+        return no_worse and strict
+    frontier=[]
+    for candidate in eligible:
+        if not any(other is not candidate and dominates(other,candidate) for other in eligible): frontier.append(candidate['provider_id'])
+    return {'schema_version':'1.0','benchmark_id':request['benchmark_id'],'capability_id':cfg['capability_id'],'scorecards':scorecards,'eligible_provider_ids':[x['provider_id'] for x in eligible],'pareto_frontier_provider_ids':sorted(frontier),'tool_reliability_is_quality_gate':True,'generic_coding_score_cannot_override_failed_tool_or_scope_gate':True,'missing_metrics_treated_as_zero':False,'automatic_promotion':False,'authority':'ADVISORY_LOCAL_WORKER_BENCHMARK'}
+
 def main():
     ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True)
     c=sub.add_parser('case'); c.add_argument('case_json')
@@ -448,7 +512,7 @@ def main():
     sm=sub.add_parser('suite'); sm.add_argument('suite_json')
     cp=sub.add_parser('compare-partitions'); cp.add_argument('tune_json'); cp.add_argument('holdout_json')
     r=sub.add_parser('run'); r.add_argument('suite_json'); r.add_argument('request_json'); r.add_argument('--fixture')
-    ab=sub.add_parser('ablation'); ab.add_argument('request_json')
+    ab=sub.add_parser('ablation'); ab.add_argument('request_json'); wb=sub.add_parser('worker-benchmark'); wb.add_argument('request_json')
     args=ap.parse_args()
     try:
         if args.cmd=='case': out=validate_case(_read(Path(args.case_json),'case'))
@@ -463,6 +527,7 @@ def main():
             if not args.fixture: raise EvaluationArenaError('strategy execution capability unavailable; --fixture is required for deterministic CLI execution')
             executor,evaluator=fixture_callbacks(_read(Path(args.fixture),'strategy fixture')); out=run_strategy_search(_read(Path(args.suite_json),'suite'),_read(Path(args.request_json),'strategy run request'),executor,evaluator)
         elif args.cmd=='ablation': out=compare_ablation(_read(Path(args.request_json),'ablation request'))
+        elif args.cmd=='worker-benchmark': out=compare_local_workers(_read(Path(args.request_json),'local worker benchmark request'))
         else: out=compare_partitions(_read(Path(args.tune_json),'tune analysis'),_read(Path(args.holdout_json),'holdout analysis'))
         print(json.dumps({'valid':True,'result':out},indent=2)); return 0
     except EvaluationArenaError as exc:

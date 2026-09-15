@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/resume-supervisor",
+  "authority": "NONCANONICAL_RESUME_COORDINATION",
+  "max_dispatch_attempts": 2,
+  "allowed_targets": [
+    "LOCAL_CODE_WORKER",
+    "DETERMINISTIC_RUNNER"
+  ],
+  "automatic_canonical_mutation": false,
+  "automatic_publication": false,
+  "require_window_fingerprint_match": true,
+  "require_base_revision_match": true
+}

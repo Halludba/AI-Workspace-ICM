@@ -40,6 +40,15 @@ class LocalExecutionTests(unittest.TestCase):
    if state['job']['status'] in {'COMPLETE','FAILED'}: break
    time.sleep(.1)
   self.assertEqual(state['job']['status'],'COMPLETE'); self.assertEqual(state['evidence']['outcome'],'PASS')
+ def test_live_snapshot_captures_dirty_tracked_without_mutating_worktree(self):
+  (self.root/'a.py').write_text('VALUE=9\n',encoding='utf-8'); before=m._canonical_status(self.root); snap=m.create_live_snapshot('S-1',[],self.root); after=m._canonical_status(self.root); self.assertEqual(before,after); self.assertEqual((Path(snap['workspace_path'])/'a.py').read_text(encoding='utf-8'),'VALUE=9\n'); self.assertEqual(snap['base_revision'],self.head); self.assertNotEqual(snap['snapshot_tree'],snap['base_tree'])
+ def test_live_snapshot_includes_only_explicit_untracked(self):
+  (self.root/'keep.txt').write_text('keep\n'); (self.root/'skip.txt').write_text('skip\n'); snap=m.create_live_snapshot('S-2',['keep.txt'],self.root); w=Path(snap['workspace_path']); self.assertTrue((w/'keep.txt').exists()); self.assertFalse((w/'skip.txt').exists()); self.assertEqual(snap['included_untracked'],['keep.txt'])
+ def test_live_snapshot_rejects_ignored_untracked(self):
+  (self.root/'.gitignore').write_text('secret.txt\n'); subprocess.run(['git','add','.gitignore'],cwd=self.root,check=True); subprocess.run(['git','commit','-qm','ignore'],cwd=self.root,check=True); (self.root/'secret.txt').write_text('x');
+  with self.assertRaisesRegex(m.LocalExecutionError,'ignored path'): m.create_live_snapshot('S-3',['secret.txt'],self.root)
+ def test_live_snapshot_verification_binds_snapshot_fingerprint(self):
+  snap=m.create_live_snapshot('S-4',[],self.root); ev=m.verify_live_snapshot('S-4','FULL_REGRESSION',self.root); self.assertEqual(ev['outcome'],'PASS'); self.assertEqual(ev['tested_snapshot_fingerprint'],snap['snapshot_fingerprint']); self.assertEqual(ev['tested_snapshot_tree'],snap['snapshot_tree'])
  def test_cli_exposes_local_execution_surface(self):
   p=subprocess.run([__import__('sys').executable,str(ROOT/'icm'),'local-exec','collision','["tools/**"]','["tools/a.py"]'],cwd=ROOT,text=True,capture_output=True); self.assertEqual(p.returncode,0,p.stderr); self.assertIn('"overlap": true',p.stdout.lower())
 if __name__=='__main__': unittest.main()

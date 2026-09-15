@@ -153,5 +153,33 @@
     "resolved_deferred_work": "RECORD_IN_SESSION_PLANNER",
     "speculative_work": "CHAT_ONLY",
     "authority": "NON_AUTHORITATIVE_INTENT_QUEUE"
+  },
+  "primary_controller": {
+    "kind": "MAIN_ICM_CHAT",
+    "automatic_role_transition": true,
+    "selection_rule": "NARROWEST_APPLICABLE_ROLE",
+    "consumes_existing_user_authorization": true,
+    "role_transition_grants_authority": false,
+    "publication_requires_explicit_user_request": true,
+    "return_conditions": [
+      "IMPLEMENTATION_COMPLETE",
+      "ARCHITECTURE_DECISION_REQUIRED"
+    ]
+  },
+  "directive_lifetime": {
+    "scopes": [
+      "TURN",
+      "TASK",
+      "EXECUTION_WINDOW",
+      "SESSION",
+      "UNTIL_REVOKED"
+    ],
+    "default_scope": "TURN",
+    "persistent_scopes": [
+      "SESSION",
+      "UNTIL_REVOKED"
+    ],
+    "persistence_requires_explicit_user_language": true,
+    "expired_directives_constrain_future_routing": false
   }
 }

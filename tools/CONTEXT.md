@@ -45,3 +45,8 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `continuity_presenter.py` -> compiles the next accepted planner step plus compact unresolved suggestion titles and validates evidence-bounded concept callouts.
 - `evidence_reuse.py` -> content-addressed validation evidence, Git/worktree fingerprints, and reproducible local host-capability facts.
 - `local_execution.py` -> detached snapshot regression, isolated mutation worktrees, scope collision checks, worker handoffs, and current/stale verification classification.
+
+- `local_capability_broker.py` -> allowlisted host-neutral source/Git/test/patch-validation broker; no arbitrary shell or canonical patch application.
+- `local_worker_agent.py` -> bounded tool-loop adapter over broker capabilities with hard call/time/scope budgets.
+- `baseline_bootstrap.py` -> Git-backed validated baseline/delta session orientation with governing-source escalation.
+- `resume_supervisor.py` -> revision/window-bound resume capsules and bounded allowlisted dispatch preparation.

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/bootstrap-baselines",
+  "authority": "DERIVED_NONCANONICAL_BOOTSTRAP",
+  "orientation_paths": [
+    "WORKSPACE.md",
+    "CONTEXT.md",
+    "WORKSPACE.json",
+    "config/routes.json",
+    "config/role_policy.json"
+  ],
+  "max_changed_paths": 500,
+  "include_untracked": true,
+  "reuse_when_unchanged": true,
+  "exact_source_escalation_on_governing_change": true
+}

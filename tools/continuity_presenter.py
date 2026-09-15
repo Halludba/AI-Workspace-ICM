@@ -20,6 +20,7 @@ def policy(root:Path=ROOT):
  c=p['concept_recognition']; f=p['continuity_footer']
  if c.get('private_reasoning_allowed') is not False or c.get('force_single_name_when_ambiguous') is not False: raise PresentationError('concept recognition boundary invalid')
  if f.get('candidate_is_executable') is not False or f.get('repeat_full_suggestion_body') is not False: raise PresentationError('continuity footer boundary invalid')
+ if f.get('enforcement')!='DETERMINISTIC_VALIDATE_WHEN_SUBSTANTIAL' or f.get('required_heading')!='Next optimal step' or f.get('missing_executable_next_step_is_error') is not True: raise PresentationError('continuity footer enforcement invalid')
  return p
 
 def validate_concept_callout(value:dict,root:Path=ROOT):
@@ -54,11 +55,24 @@ def compile_footer(agent:str,root:Path=ROOT):
   lines.append('Unopposed / unresolved ideas: '+' · '.join(titles)+suffix)
  return {'next_step':nxt,'unresolved_titles':titles,'unresolved_count':compact['unresolved_count'],'text':'\n'.join(lines),'authority':'PRESENTATION_ONLY','changes_rigor':False,'changes_authority':False}
 
+def validate_response_contract(agent:str,value:dict,root:Path=ROOT):
+ p=policy(root); required={'substantial_icm','footer_heading','footer_text'}
+ if not isinstance(value,dict) or set(value)!=required: raise PresentationError('response contract fields invalid')
+ if not isinstance(value['substantial_icm'],bool): raise PresentationError('substantial_icm must be boolean')
+ for k in ('footer_heading','footer_text'):
+  if not isinstance(value[k],str): raise PresentationError(f'{k} must be string')
+ nxt=_planner_next(agent,root); required_footer=value['substantial_icm'] and nxt is not None and nxt.get('kind')=='EXECUTABLE'
+ present=value['footer_heading'].strip()==p['continuity_footer']['required_heading'] and bool(value['footer_text'].strip())
+ if required_footer and not present and p['continuity_footer']['missing_executable_next_step_is_error']:
+  raise PresentationError('substantial ICM response omitted required Next optimal step footer')
+ return {'valid':True,'footer_required':required_footer,'footer_present':present,'next_step':nxt,'authority':'PRESENTATION_ONLY'}
+
+
 def main():
- ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True); f=sub.add_parser('footer'); f.add_argument('agent'); c=sub.add_parser('concept'); c.add_argument('file')
+ ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True); f=sub.add_parser('footer'); f.add_argument('agent'); c=sub.add_parser('concept'); c.add_argument('file'); v=sub.add_parser('validate-response'); v.add_argument('agent'); v.add_argument('file')
  a=ap.parse_args()
  try:
-  out=compile_footer(a.agent) if a.cmd=='footer' else validate_concept_callout(_read(Path(a.file),'concept callout'))
+  out=compile_footer(a.agent) if a.cmd=='footer' else (validate_concept_callout(_read(Path(a.file),'concept callout')) if a.cmd=='concept' else validate_response_contract(a.agent,_read(Path(a.file),'response contract')))
   print(json.dumps({'valid':True,'result':out},indent=2)); return 0
  except PresentationError as exc: print(json.dumps({'valid':False,'error':str(exc)},indent=2)); return 2
 if __name__=='__main__': raise SystemExit(main())

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "LOCAL_CODE_WORKER",
+  "active_provider_id": "ornith-local",
+  "providers": {
+    "ornith-local": {
+      "adapter": "OLLAMA",
+      "endpoint": "http://127.0.0.1:11434/api/chat",
+      "model": "ornith-1.5:35b",
+      "timeout_seconds": 600
+    }
+  }
+}

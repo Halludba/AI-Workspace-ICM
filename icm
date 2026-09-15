@@ -11,8 +11,8 @@ if str(ROOT) not in sys.path:
 
 
 def _dispatch() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "advise", "arena", "interaction", "suggestions", "present", "evidence", "local-exec", "export"}:
-        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,advise,arena,interaction,suggestions,present,evidence,local-exec,export <command> [args]", file=sys.stderr)
+    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "advise", "arena", "interaction", "suggestions", "present", "evidence", "local-exec", "broker", "export"}:
+        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,advise,arena,interaction,suggestions,present,evidence,local-exec,broker,export <command> [args]", file=sys.stderr)
         return 2
     surface = sys.argv[1]
     if surface == "inspect":
@@ -78,6 +78,18 @@ def _dispatch() -> int:
         from tools.local_execution import main as local_exec_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return local_exec_main()
+    if surface == "bootstrap":
+        from tools.baseline_bootstrap import main as bootstrap_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return bootstrap_main()
+    if surface == "resume":
+        from tools.resume_supervisor import main as resume_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return resume_main()
+    if surface == "broker":
+        from tools.local_capability_broker import main as broker_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return broker_main()
     if surface == "plan":
         command = sys.argv[2] if len(sys.argv) > 2 else None
         sys.argv = [sys.argv[0], *sys.argv[2:]]
@@ -87,6 +99,10 @@ def _dispatch() -> int:
         from tools.plan_intelligence import main as plan_main
         return plan_main()
     if surface == "worker":
+        if len(sys.argv)>2 and sys.argv[2]=="agent":
+            from tools.local_worker_agent import main as worker_agent_main
+            sys.argv = [sys.argv[0], *sys.argv[3:]]
+            return worker_agent_main()
         from tools.local_worker import main as worker_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return worker_main()

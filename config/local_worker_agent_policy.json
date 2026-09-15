@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "max_tool_calls": 8,
+  "max_wall_time_ms": 120000,
+  "max_history_items": 20,
+  "allowed_capabilities": [
+    "SOURCE_SEARCH",
+    "SOURCE_READ",
+    "GIT_STATUS",
+    "GIT_DIFF",
+    "TEST_SUITE"
+  ],
+  "final_statuses": [
+    "SUCCESS",
+    "BLOCKED"
+  ],
+  "automatic_patch_apply": false,
+  "canonical_mutation": false,
+  "execution_authority": "NONE"
+}

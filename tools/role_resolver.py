@@ -63,7 +63,7 @@ def load_policy(root: Path = ROOT) -> dict:
     policy = _read_object(root / "config" / "role_policy.json", "role policy")
     required = {
         "schema_version", "protocol", "default_role", "mutation_modes", "task_classes",
-        "roles", "handoff", "planner_continuity",
+        "roles", "handoff", "planner_continuity", "primary_controller", "directive_lifetime",
     }
     if set(policy) != required or policy["schema_version"] != "1.0":
         raise RolePolicyError("role policy top-level fields/schema must match contract")
@@ -124,7 +124,45 @@ def load_policy(root: Path = ROOT) -> dict:
         "authority": "NON_AUTHORITATIVE_INTENT_QUEUE",
     }:
         raise RolePolicyError("planner_continuity must preserve the v0.9 contract")
+    controller=policy["primary_controller"]
+    expected_controller={"kind","automatic_role_transition","selection_rule","consumes_existing_user_authorization","role_transition_grants_authority","publication_requires_explicit_user_request","return_conditions"}
+    if not isinstance(controller,dict) or set(controller)!=expected_controller or controller["kind"]!="MAIN_ICM_CHAT" or controller["automatic_role_transition"] is not True or controller["selection_rule"]!="NARROWEST_APPLICABLE_ROLE" or controller["consumes_existing_user_authorization"] is not True or controller["role_transition_grants_authority"] is not False or controller["publication_requires_explicit_user_request"] is not True:
+        raise RolePolicyError("primary_controller safety contract invalid")
+    lifetime=policy["directive_lifetime"]
+    expected_lifetime={"scopes","default_scope","persistent_scopes","persistence_requires_explicit_user_language","expired_directives_constrain_future_routing"}
+    if not isinstance(lifetime,dict) or set(lifetime)!=expected_lifetime or lifetime["default_scope"]!="TURN" or lifetime["persistence_requires_explicit_user_language"] is not True or lifetime["expired_directives_constrain_future_routing"] is not False:
+        raise RolePolicyError("directive_lifetime safety contract invalid")
+    if not isinstance(lifetime["scopes"],list) or set(lifetime["persistent_scopes"])-set(lifetime["scopes"]): raise RolePolicyError("directive lifetime scopes invalid")
     return policy
+
+
+def resolve_directive_lifetime(request:dict,root:Path=ROOT,policy:dict|None=None)->dict:
+    pol=policy or load_policy(root); cfg=pol["directive_lifetime"]
+    required={"scope","explicit_persistence_language","event"}
+    if not isinstance(request,dict) or set(request)!=required: raise RolePolicyError("directive lifetime request fields invalid")
+    scope=request["scope"] or cfg["default_scope"]
+    if scope not in cfg["scopes"]: raise RolePolicyError("directive scope invalid")
+    if not isinstance(request["explicit_persistence_language"],bool): raise RolePolicyError("explicit_persistence_language must be boolean")
+    if scope in cfg["persistent_scopes"] and not request["explicit_persistence_language"]: raise RolePolicyError("persistent directive scope requires explicit persistence language")
+    event=request["event"]
+    expiry={"TURN":"TURN_COMPLETE","TASK":"TASK_COMPLETE","EXECUTION_WINDOW":"WINDOW_CLOSE","SESSION":"SESSION_END","UNTIL_REVOKED":"REVOKED"}[scope]
+    return {"scope":scope,"expiry_event":expiry,"current_event":event,"expired":event==expiry,"constrains_future_routing":False if event==expiry else True,"authority":"DIRECTIVE_SCOPE_METADATA"}
+
+
+def resolve_controller_transition(request:dict,root:Path=ROOT,policy:dict|None=None)->dict:
+    pol=policy or load_policy(root); cfg=pol["primary_controller"]
+    required={"task_class","current_role","existing_user_authorization","requested_paths"}
+    if not isinstance(request,dict) or set(request)!=required: raise RolePolicyError("controller transition request fields invalid")
+    tc=_nonempty(request["task_class"],"task_class"); current=_nonempty(request["current_role"],"current_role")
+    if tc not in pol["task_classes"] or current not in pol["roles"]: raise RolePolicyError("controller transition role/task invalid")
+    if not isinstance(request["existing_user_authorization"],bool): raise RolePolicyError("existing_user_authorization must be boolean")
+    target=pol["task_classes"][tc]; paths=[_relative_path(x,"requested_paths") for x in request["requested_paths"]]
+    role=pol["roles"][target]; mutation=bool(paths)
+    if mutation and role["mutation_mode"]=="READ_ONLY": raise RolePolicyError("selected controller role cannot mutate requested paths")
+    outside=[x for x in paths if not _role_allows_path(role,x)] if mutation else []
+    if outside: raise RolePolicyError("controller transition requested path outside target role envelope: "+", ".join(outside))
+    permitted=mutation and request["existing_user_authorization"] and role["mutation_mode"]!="READ_ONLY"
+    return {"current_role":current,"target_role":target,"transition_required":current!=target,"automatic_transition_allowed":cfg["automatic_role_transition"],"existing_user_authorization_consumed":permitted,"mutation_permitted":permitted,"role_transition_grants_authority":False,"publication_requires_explicit_user_request":cfg["publication_requires_explicit_user_request"],"authority":"ROLE_ROUTING_ONLY"}
 
 
 def validate_mutation_scope(role_id: str, paths: list[str], root: Path = ROOT, policy: dict | None = None) -> dict:
@@ -271,6 +309,8 @@ def main() -> int:
     p_resolve.add_argument("request", type=Path)
     p_handoff = sub.add_parser("validate-handoff")
     p_handoff.add_argument("handoff", type=Path)
+    p_dir = sub.add_parser("directive-lifetime"); p_dir.add_argument("request", type=Path)
+    p_ctrl = sub.add_parser("controller-transition"); p_ctrl.add_argument("request", type=Path)
     args = parser.parse_args()
     root = Path(args.root).resolve()
     try:
@@ -279,8 +319,12 @@ def main() -> int:
             result = {"valid": True, "default_role": policy["default_role"], "role_count": len(policy["roles"])}
         elif args.command == "resolve":
             result = resolve(_read_object(args.request, "role request"), root, policy)
-        else:
+        elif args.command == "validate-handoff":
             result = validate_handoff(_read_object(args.handoff, "handoff"), root, policy)
+        elif args.command == "directive-lifetime":
+            result = resolve_directive_lifetime(_read_object(args.request, "directive lifetime request"), root, policy)
+        else:
+            result = resolve_controller_transition(_read_object(args.request, "controller transition request"), root, policy)
     except RolePolicyError as exc:
         print(json.dumps({"valid": False, "error": str(exc)}, indent=2))
         return 1

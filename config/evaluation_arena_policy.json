@@ -112,5 +112,23 @@
     "maximum_quality_regression": 0.01,
     "automatic_removal": false,
     "quality_floor_required": true
+  },
+  "local_worker_benchmark": {
+    "capability_id": "LOCAL_CODE_WORKER",
+    "minimum_valid_tool_call_rate": 0.98,
+    "minimum_scope_compliance_rate": 1.0,
+    "minimum_verified_success_rate": 0.8,
+    "maximum_unnecessary_tool_call_rate": 0.25,
+    "frontier_metrics": {
+      "verified_success_rate": "MAXIMIZE",
+      "patch_correctness_rate": "MAXIMIZE",
+      "unnecessary_tool_call_rate": "MINIMIZE",
+      "wall_time_ms_median": "MINIMIZE",
+      "input_tokens_total_median": "MINIMIZE",
+      "repair_count_median": "MINIMIZE",
+      "vram_peak_mib_median": "MINIMIZE",
+      "coding_quality_score_median": "MAXIMIZE"
+    },
+    "automatic_promotion": false
   }
 }

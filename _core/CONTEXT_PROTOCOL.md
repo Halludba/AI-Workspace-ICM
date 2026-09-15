@@ -47,3 +47,6 @@ Every escalation record must preserve exact-source provenance, record a positive
 
 The escalation validator checks record structure and provenance fields; it does not independently prove that caller-supplied hashes match current bytes. Use Source Navigator retrieval evidence when loaded-byte verification is required.
 Prompt-block caching hints and host-observed runtime telemetry are governed separately by `_core/CONTEXT_RUNTIME_PROTOCOL.md`; they do not change context authority or escalation semantics.
+
+## Baseline/delta bootstrap
+A validated orientation baseline may be reused when its Git/tree/orientation fingerprints remain unchanged. When state differs, bootstrap should surface the bounded delta and escalate to exact governing source only for invalidated regions rather than rereading unchanged material.

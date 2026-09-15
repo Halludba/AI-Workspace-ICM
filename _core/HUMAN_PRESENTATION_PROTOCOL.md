@@ -25,3 +25,5 @@ Live Git/run state is canonical truth. The planner carries accepted execution in
 
 ## Authority
 SIMPLE/STANDARD/TECHNICAL density, concept callouts, next-step summaries, and suggestion summaries change communication only. They never grant execution or mutation authority.
+## Mechanical continuity enforcement
+For a substantial ICM response, when the active planner exposes an executable next action, the response contract requires a non-empty `Next optimal step` footer. `tools/continuity_presenter.py validate-response` enforces this mechanically. Candidate suggestions remain non-executable and presentation never changes rigor or authority.

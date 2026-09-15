@@ -27,7 +27,7 @@ def assess_task(task:dict,root:Path=ROOT)->dict:
     if execution:
         for key in p['required_execution_task_fields']:
             if key not in task: missing.append(key)
-        for key in ('title','route_id','declared_scope','target_role'):
+        for key in ('objective','title','route_id','declared_scope','target_role'):
             if key in task and (not isinstance(task[key],str) or not task[key].strip()): invalid.append(key)
         for key in ('context_refs','acceptance_criteria','verification'):
             if key in task and (not isinstance(task[key],list) or not task[key] or any(not isinstance(x,str) or not x.strip() for x in task[key])): invalid.append(key)
@@ -41,6 +41,8 @@ def reconcile(plan:dict,change:dict,root:Path=ROOT)->dict:
     changed_ids=set(change.get('changed_task_ids',[])); changed_refs=set(change.get('changed_context_refs',[]))
     if any(not isinstance(x,str) or not x for x in changed_ids|changed_refs): raise PlanIntelligenceError('change identifiers must be non-empty strings')
     tasks={t.get('task_id'):t for t in plan['tasks'] if isinstance(t,dict) and isinstance(t.get('task_id'),str)}
+    unknown=sorted(changed_ids-set(tasks))
+    if unknown: raise PlanIntelligenceError('unknown changed_task_ids: '+','.join(unknown))
     affected=set(); frontier=set(changed_ids)
     while frontier:
         source=frontier.pop()

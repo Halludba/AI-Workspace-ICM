@@ -1,25 +1,20 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1110-plan-intelligence",
+  "directive_id": "DIR-2026-09-15:T-1110-plan-intelligence-corrective-followup",
   "actor_role": "icm-runtime-architect",
-  "summary": "Open v1.1 development line and add deterministic plan sufficiency/reconciliation without model calls or plan authority.",
+  "summary": "Finalize v1.1 plan intelligence with explicit objectives, fail-closed reconciliation inputs, and complete CLI/session metadata integration.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
-        "WORKSPACE.json",
         "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/impact_policy.json",
         "config/plan_intelligence_policy.json",
         "config/session_policy.json",
         "icm",
         "tests/CONTEXT.md",
-        "tests/test_context_routing.py",
-        "tests/test_impact_classifier.py",
         "tests/test_plan_intelligence.py",
-        "tests/test_release_policy.py",
         "tests/test_session_planner.py",
         "tools/CONTEXT.md",
         "tools/plan_intelligence.py",
@@ -27,13 +22,13 @@
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Extend existing planner/runtime surfaces with bounded plan intelligence and required tests/docs."
+      "rationale": "Close plan-sufficiency integration gaps found immediately after the initial local milestone commit."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added plan sufficiency/reconciliation policy, protocol, tool, CLI integration, verification metadata, and development-line assertions."
+      "description": "Added objective metadata validation, unknown changed-task rejection, CLI surface coverage, and aligned docs/tests."
     }
   ]
 }

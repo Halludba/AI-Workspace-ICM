@@ -255,6 +255,8 @@ def validate_plan(plan: dict, policy: dict | None = None, *, root: Path = ROOT) 
             _nonempty(task.get("status_reason"), f"{tid}.status_reason")
         elif "status_reason" in task:
             raise SessionPlanError(f"{tid}.status_reason is only valid for BLOCKED tasks")
+        if "objective" in task:
+            _nonempty(task["objective"], f"{tid}.objective")
         if "target_role" in task:
             target_role = _nonempty(task["target_role"], f"{tid}.target_role")
             if target_role not in role_ids:

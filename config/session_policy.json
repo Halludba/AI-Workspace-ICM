@@ -86,6 +86,7 @@
     "priority_class",
     "declared_scope",
     "status_reason",
+    "objective",
     "target_role",
     "context_refs",
     "acceptance_criteria",

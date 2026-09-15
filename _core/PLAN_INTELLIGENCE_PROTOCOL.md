@@ -4,7 +4,7 @@
 Check whether an execution-class planner task is sufficiently specified before work begins, and identify downstream tasks whose recorded dependencies or context assumptions should be reconsidered after a material change.
 
 ## Sufficiency gate
-The gate is deterministic and cheap. It validates explicit planner fields; it does not ask a model whether a plan ?feels complete.? Execution-class tasks require a bounded route/scope, target role, context references, acceptance criteria, and at least one verification instruction. Read-only architectural discussion may remain outside the planner.
+The gate is deterministic and cheap. It validates explicit planner fields; it does not ask a model whether a plan feels complete. Execution-class tasks require an explicit objective, bounded route/scope, target role, context references, acceptance criteria, and at least one verification instruction. Read-only architectural discussion may remain outside the planner.
 
 A `SUFFICIENT` result means the declared minimum fields are present and structurally usable. It does not prove the plan is semantically correct or that execution is authorized.
 

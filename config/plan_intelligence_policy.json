@@ -7,6 +7,7 @@
     "skill-architect"
   ],
   "required_execution_task_fields": [
+    "objective",
     "title",
     "route_id",
     "declared_scope",

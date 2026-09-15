@@ -261,6 +261,12 @@ class SessionPlannerTests(unittest.TestCase):
         result = session_planner.validate_plan(self.plan([task]), self.policy, root=self.root)
         self.assertTrue(result["valid"])
 
+    def test_optional_objective_metadata_is_valid(self):
+        task = self.task("T-01")
+        task["objective"] = "Produce a bounded verified change."
+        result = session_planner.validate_plan(self.plan([task]), self.policy, root=self.root)
+        self.assertTrue(result["valid"])
+
     def test_optional_verification_metadata_is_valid(self):
         task = self.task("T-01")
         task["verification"] = ["Run targeted tests."]

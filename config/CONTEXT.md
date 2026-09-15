@@ -26,4 +26,4 @@ Do not load unrelated config files.
 - `context_runtime_policy.json` -> stable/dynamic prompt-block ordering, padding prohibition, cache-hint authority, telemetry availability/cache states, and shared benchmark metric schema reference.
 - `local_compute_policy.json` -> fixed read-only probe allowlist, generic host feature definitions, and named workload prerequisites; it contains no observed machine state.
 - `local_worker_policy.json` -> bounded Ollama/Ornith worker packet, result, attempt, response-size, and repair-cycle limits; it grants no mutation authority.
-- `plan_intelligence_policy.json` -> deterministic plan-sufficiency requirements and non-mutating reconciliation policy.
+- `plan_intelligence_policy.json` -> execution-task sufficiency requirements and targeted reconciliation policy; advisory and model-free.

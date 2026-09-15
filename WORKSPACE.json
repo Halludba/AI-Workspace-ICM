@@ -44,7 +44,8 @@
     "assurance_protocol": "_core/ASSURANCE_PROTOCOL.md",
     "assurance_policy": "config/assurance_policy.json",
     "assurance_controller": "tools/assurance_controller.py",
-    "token_profiler": "tools/token_profiler.py"
+    "token_profiler": "tools/token_profiler.py",
+    "capability_resolver": "tools/capability_resolver.py"
   },
   "roots": {
     "core": "_core",

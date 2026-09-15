@@ -21,7 +21,8 @@
     "_core/CONTEXT_PROTOCOL.md",
     "_core/EXECUTION_KERNEL.md",
     "_core/STATE_MODEL.md",
-    "config/routes.json"
+    "config/routes.json",
+    "skills/registry.json"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -43,7 +44,8 @@
     "tools/session_planner.py",
     "tools/release_validator.py",
     "tools/assurance_controller.py",
-    "tools/token_profiler.py"
+    "tools/token_profiler.py",
+    "tools/capability_resolver.py"
   ],
   "semantic_diff_tokens": [
     "authority",

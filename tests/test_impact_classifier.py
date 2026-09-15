@@ -138,6 +138,14 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/token_profiler.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_capability_resolver_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/capability_resolver.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
+    def test_capability_registry_change_requires_full_regression(self):
+        result = self.classify(paths=["skills/registry.json"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
     def test_malformed_policy_fails_cleanly(self):
         (self.repo / "config/impact_policy.json").write_text("{}\n", encoding="utf-8")
         with self.assertRaises(impact_classifier.PolicyError):

@@ -29,3 +29,4 @@ Route each request to the smallest context that can complete it correctly. Machi
 7. Unknown routes fail closed; classify before proceeding.
 8. `GLOBAL` requires a reason and explicit roots; it never means 'load everything'.
 9. The checked-out working tree is current authority. Git history and release tags are historical evidence and are inspected only for explicit history, compatibility, rollback, or migration work.
+10. For artifact creation or material artifact editing/styling, classify operation + artifact type and resolve reusable capabilities before loading skill contents; load only the contexts returned by the capability resolver.

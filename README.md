@@ -22,6 +22,8 @@ Adaptive assurance is exposed through `icm assurance ...` / `tools/assurance_con
 
 Token/context diagnostics are exposed through `icm inspect tokens ...`; the deterministic profiler is loaded only when invoked and can trigger the routed `context-optimizer` skill for semantic redundancy/value review.
 
+Artifact capability routing is exposed through `icm capability ...`; operation + artifact type selects only matching skill context. `CREATE`/`EDIT`/`STYLE` + `PDF` routes to the shared `pdf-styler`, while ordinary PDF reading does not.
+
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.
@@ -30,3 +32,5 @@ v0.6.1 adds release/version governance without changing runtime semantics: stric
 
 
 v0.7.0 introduces adaptive assurance as a bounded governance layer: a cheap pre-trigger avoids unnecessary work, evidence-backed assurance states replace raw model confidence as authority, deterministic verification is preferred when available, epistemic increases require recorded evidence deltas, escalation is budgeted, and matching evidence-backed results may be reused through an ephemeral cache.
+
+v0.8.0-dev adds context economics and lazy shared capabilities: release token-growth profiling can route a context-optimizer only when review thresholds fire, while artifact-producing work resolves operation + artifact type through a small registry and loads only the selected skill. The first shared capability is `pdf-styler`; it is inherited by clones that carry the base workspace but remains outside default context.

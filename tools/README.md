@@ -20,6 +20,8 @@ Use `assurance_controller.py` for the adaptive-assurance boundary. Run its cheap
 
 Use `token_profiler.py` / `icm inspect tokens ...` only for diagnostics and release context-economics checks. Estimates are explicitly heuristic; a growth warning requests review and never proves redundancy or authorizes deletion.
 
+Use `capability_resolver.py` / `icm capability ...` to select reusable skills from declared operation + artifact type. The resolver reads registry/manifest metadata only and returns context paths; it never loads all skill instructions or grants capabilities the host does not possess.
+
 The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
 
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

@@ -68,6 +68,23 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("token footprint", result.stdout.lower())
 
+    def test_python_trampoline_dispatches_capability_help(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "icm"), "capability", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("artifact intent", result.stdout.lower())
+
+    @unittest.skipUnless(os.name == "nt", "Windows wrapper test")
+    def test_windows_cmd_trampoline_dispatches_capability_help(self):
+        result = subprocess.run(
+            ["cmd.exe", "/d", "/c", "icm.cmd", "capability", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("artifact intent", result.stdout.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

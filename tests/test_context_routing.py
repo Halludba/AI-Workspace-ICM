@@ -28,6 +28,12 @@ class ContextRoutingTests(unittest.TestCase):
         self.assertIn("profiles/CONTEXT.md", plan["context_files"])
         self.assertNotIn("skills/CONTEXT.md", plan["context_files"])
 
+    def test_skill_route_does_not_auto_load_registry_or_skill_contents(self):
+        plan = resolver.build_plan("skill-development")
+        self.assertIn("skills/CONTEXT.md", plan["context_files"])
+        self.assertNotIn("skills/registry.json", plan["context_files"])
+        self.assertFalse(any("pdf-styler" in path for path in plan["context_files"]))
+
     def test_direct_rejects_sibling_route(self):
         with self.assertRaises(resolver.ContextError):
             resolver.build_plan(

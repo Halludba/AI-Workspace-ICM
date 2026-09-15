@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Reusable PDF Style Preset",
+  "type": "object",
+  "required": ["id", "type", "version", "page", "palette", "typography", "spacing", "components", "pagination", "fidelity"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^style\\.pdf\\.[a-z0-9_.-]+$"},
+    "type": {"const": "pdf_style"},
+    "version": {"type": "string", "minLength": 1},
+    "source_reference": {"type": ["string", "null"]},
+    "scope": {"type": "array", "items": {"type": "string"}},
+    "page": {
+      "type": "object",
+      "required": ["size", "orientation", "margins"],
+      "properties": {
+        "size": {"enum": ["A4", "LETTER"]},
+        "orientation": {"enum": ["portrait", "landscape"]},
+        "margins": {"type": "object", "required": ["left", "right", "top", "bottom"]}
+      }
+    },
+    "palette": {"type": "object", "required": ["background", "text", "muted", "line"]},
+    "typography": {"type": "object", "required": ["title", "subtitle", "heading_1", "heading_2", "heading_3", "body", "small", "code"]},
+    "spacing": {"type": "object"},
+    "components": {"type": "object"},
+    "pagination": {"type": "object"},
+    "assets": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
+    "adaptation": {"type": "object"},
+    "fidelity": {
+      "type": "object",
+      "required": ["missing_font_policy", "missing_asset_policy", "claim_rule"],
+      "properties": {
+        "missing_font_policy": {"type": "string"},
+        "missing_asset_policy": {"type": "string"},
+        "claim_rule": {"type": "string"}
+      }
+    }
+  },
+  "$defs": {
+    "textStyle": {
+      "type": "object",
+      "required": ["font", "size", "leading"],
+      "properties": {
+        "font": {"type": "string"}, "size": {"type": "number", "exclusiveMinimum": 0},
+        "leading": {"type": "number", "exclusiveMinimum": 0}, "color": {"type": "string"},
+        "align": {"enum": ["left", "center", "right"]}, "left_indent": {"type": "number"},
+        "right_indent": {"type": "number"}, "background": {"type": ["string", "null"]},
+        "border_color": {"type": ["string", "null"]}, "border_width": {"type": "number"}, "padding": {"type": "number"}
+      }
+    }
+  }
+}

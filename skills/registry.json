@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "routing": "EXACT_ARTIFACT_INTENT",
+  "default_context_loading": "EXCLUDE",
+  "skills": [
+    {
+      "id": "context-optimizer",
+      "context": "skills/context-optimizer/SKILL.md",
+      "manifest": null,
+      "operations": ["OPTIMIZE", "REVIEW"],
+      "artifact_types": ["CONTEXT"],
+      "extensions": []
+    },
+    {
+      "id": "pdf-styler",
+      "context": "skills/pdf-styler/SKILL.md",
+      "manifest": "skills/pdf-styler/manifest.json",
+      "operations": ["CREATE", "EDIT", "STYLE"],
+      "artifact_types": ["PDF"],
+      "extensions": [".pdf"]
+    }
+  ]
+}

@@ -1,97 +1,92 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v080-context-economics-foundation",
-  "summary": "Start v0.8.0 Shared Capabilities & Context Economics with deterministic token profiling, release growth warnings, and a lazily routed context-optimizer skill.",
+  "directive_id": "DIR-2026-09-15:v080-lazy-shared-capabilities",
+  "summary": "Add exact artifact-intent capability routing and the shared lazy-loaded PDF Styler reference capability without creating a plugins root.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "tools/token_profiler.py",
-        "tests/test_token_profiler.py"
+        "skills/registry.json",
+        "tools/capability_resolver.py",
+        "tests/test_capability_resolver.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add deterministic on-demand repository/context token estimation, Git-ref comparison, skill/file/root breakdown, and Python symbol profiling with executable tests."
+      "rationale": "Add a small deterministic registry/resolver that selects skill context from operation + artifact type without loading skill contents."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "icm",
-        "tests/test_cli.py",
-        "tools/CONTEXT.md",
-        "tools/README.md",
-        "config/impact_policy.json",
-        "tests/test_impact_classifier.py"
+        "skills/pdf-styler/SKILL.md",
+        "skills/pdf-styler/manifest.json",
+        "skills/pdf-styler/pdf_style_schema.json",
+        "skills/pdf-styler/pdf_styles/style.pdf.formats.json",
+        "skills/pdf-styler/tools/pdf_styler.py",
+        "tests/test_pdf_styler_skill.py"
       ],
-      "change_kind": "MERGE",
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Expose diagnostics through icm inspect tokens and classify the release-sensitive profiler for full regression without granting mutation authority."
+      "rationale": "Promote the existing Design Workspace PDF Styler into a self-contained shared ICM skill with local manifest/style resolution and executable regression coverage."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
-        "config/release_policy.json",
-        "tools/release_validator.py",
-        "tests/test_release_policy.py"
+        "CONTEXT.md",
+        "WORKSPACE.json",
+        "config/impact_policy.json",
+        "icm",
+        "skills/CONTEXT.md",
+        "skills/README.md",
+        "tests/test_cli.py",
+        "tests/test_context_routing.py",
+        "tests/test_impact_classifier.py",
+        "tools/CONTEXT.md",
+        "tools/README.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Add 25% tracked-text and 15% orientation-context release warning thresholds plus an exact lazy review-skill route, validated fail-closed."
+      "rationale": "Integrate lazy capability routing into the root router, CLI, workspace metadata, impact classification, documentation, and locality tests while retaining existing authority boundaries."
     },
     {
       "candidate_id": "C-004",
       "target_paths": [
-        "skills/context-optimizer/SKILL.md"
+        "tools/token_profiler.py",
+        "tests/test_token_profiler.py"
       ],
-      "change_kind": "NEW",
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Add a small advisory skill for essentiality, functionality, redundancy, and context-locality review only when explicitly requested or a deterministic growth warning fires."
+      "rationale": "Correct skill token accounting so skills-root metadata is not mislabeled as a skill and add PDF Styler context-economics coverage."
     },
     {
       "candidate_id": "C-005",
       "target_paths": [
-        "skills/README.md"
+        "README.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Document the routed context-optimizer skill without promoting it to default context."
-    },
-    {
-      "candidate_id": "C-006",
-      "target_paths": [
-        "README.md",
-        "WORKSPACE.json",
-        "tests/test_context_routing.py"
-      ],
-      "change_kind": "REWRITE",
-      "disposition": "ACCEPT",
-      "rationale": "Open the v0.8.0-dev development line and register the token-profiler entrypoint while retaining v0.7.0 as current stable release."
+      "rationale": "Document the v0.8 lazy shared-capability behavior and PDF routing semantics."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added token profiler and focused regression tests."
+      "description": "Added exact artifact-intent capability registry/resolver with composition, explicit selection, extension fallback, confinement, and fail-closed validation."
     },
     {
       "candidate_id": "C-002",
-      "description": "Added inspect CLI dispatch, tool documentation, and impact-classifier integration."
+      "description": "Added shared PDF Styler skill derived from Design Workspace v0.24.0, preserving style schema/preset and adapting default style resolution to the local manifest."
     },
     {
       "candidate_id": "C-003",
-      "description": "Added validated release context-growth warning policy and lazy review-skill route."
+      "description": "Wired capability routing into root context, CLI, workspace metadata, impact policy, docs, and regression tests."
     },
     {
       "candidate_id": "C-004",
-      "description": "Added lazily loaded context-optimizer skill."
+      "description": "Fixed token-profiler skill grouping and measured PDF Styler separately from skills-root metadata."
     },
     {
       "candidate_id": "C-005",
-      "description": "Documented the new routed skill."
-    },
-    {
-      "candidate_id": "C-006",
-      "description": "Opened v0.8.0-dev metadata and README development identity."
+      "description": "Updated v0.8 development documentation for lazy shared capabilities."
     }
   ]
 }

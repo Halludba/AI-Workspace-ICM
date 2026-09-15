@@ -1,0 +1,61 @@
+{
+  "id": "style.pdf.formats",
+  "type": "pdf_style",
+  "version": "1.0",
+  "source_reference": "Formats.pdf",
+  "scope": ["self_revising_rulebook", "general_pdf_when_selected"],
+  "page": {
+    "size": "A4",
+    "orientation": "portrait",
+    "margins": {"left": 64, "right": 64, "top": 64, "bottom": 64}
+  },
+  "palette": {
+    "background": "#FFFFFF",
+    "text": "#171717",
+    "muted": "#5E5E5E",
+    "line": "#D7D7D7",
+    "code_text": "#333333",
+    "code_background": "#F6F6F6",
+    "code_border": "#E6E6E6",
+    "footer": "#777777"
+  },
+  "typography": {
+    "title": {"font": "Helvetica-Bold", "size": 28, "leading": 32, "align": "center", "color": "#171717"},
+    "subtitle": {"font": "Helvetica", "size": 13, "leading": 16, "align": "center", "color": "#5E5E5E"},
+    "heading_1": {"font": "Helvetica-Bold", "size": 18, "leading": 22, "color": "#171717"},
+    "heading_2": {"font": "Helvetica-Bold", "size": 15, "leading": 19, "color": "#171717"},
+    "heading_3": {"font": "Helvetica-Bold", "size": 13, "leading": 17, "color": "#171717"},
+    "body": {"font": "Helvetica", "size": 10.4, "leading": 14.2, "color": "#171717"},
+    "small": {"font": "Helvetica", "size": 9.1, "leading": 12.2, "color": "#5E5E5E"},
+    "code": {"font": "Courier", "size": 7.35, "leading": 9.2, "color": "#333333", "left_indent": 11, "right_indent": 8, "background": "#F6F6F6", "border_color": "#E6E6E6", "border_width": 0.5, "padding": 7}
+  },
+  "spacing": {
+    "base_gap": 12,
+    "minimum_section_gap": 18,
+    "semantic_spacing_over_space_filling": true
+  },
+  "components": {
+    "footer": {"enabled": true, "divider_y": 48, "text_y": 34, "font": "Helvetica", "size": 7.8, "line_width": 0.5},
+    "tables": {"grid_width": 0.5, "cell_padding": 7},
+    "code_blocks": {"background": "#F6F6F6", "border": "#E6E6E6", "border_width": 0.5, "padding": 7},
+    "callouts": {"inherit_body_typography": true}
+  },
+  "pagination": {
+    "keep_section_together": true,
+    "fresh_page_singleton_top_anchor": true,
+    "single_remaining_block_vertical_balance": true,
+    "multi_block_equal_gap_distribution": true,
+    "orphan_heading_forbidden": true
+  },
+  "assets": {},
+  "adaptation": {
+    "document_specific_overrides_allowed": ["document_title", "footer_label", "component_visibility"],
+    "semantic_content_may_not_be_rewritten_for_style_fit": true,
+    "style_may_yield_to_readability_or_layout_integrity": true
+  },
+  "fidelity": {
+    "missing_font_policy": "Use a declared compatible fallback only when available; otherwise report PARTIAL fidelity.",
+    "missing_asset_policy": "Do not silently invent or substitute identity-bearing assets; report PARTIAL fidelity when material.",
+    "claim_rule": "Claim exact style fidelity only when required visual tokens, fonts and assets are faithfully available and rendered."
+  }
+}

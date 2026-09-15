@@ -116,6 +116,17 @@ class TokenProfilerTests(unittest.TestCase):
         self.assertIn("context-optimizer", result["by_skill"])
         self.assertGreater(result["by_skill"]["context-optimizer"]["estimated_tokens"], 0)
 
+    def test_working_tree_profiles_pdf_styler_separately(self):
+        result = profiler.profile(None)
+        self.assertIn("pdf-styler", result["by_skill"])
+        self.assertGreater(result["by_skill"]["pdf-styler"]["estimated_tokens"], 0)
+        self.assertLess(result["orientation"]["estimated_tokens"], result["by_skill"]["pdf-styler"]["estimated_tokens"] + 3000)
+
+    def test_skills_root_metadata_is_not_reported_as_skill(self):
+        result = profiler.profile(None)
+        self.assertNotIn("registry.json", result["by_skill"])
+        self.assertNotIn("CONTEXT.md", result["by_skill"])
+
 
 if __name__ == "__main__":
     unittest.main()

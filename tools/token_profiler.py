@@ -107,7 +107,7 @@ def profile(ref: str | None = None, root: Path = ROOT, include_files: bool = Fal
         bucket = by_root.setdefault(_root_name(path), {})
         _add_metric(bucket, metric)
         parts = Path(path).parts
-        if len(parts) > 1 and parts[0] == "skills":
+        if len(parts) > 2 and parts[0] == "skills":
             _add_metric(by_skill.setdefault(parts[1], {}), metric)
         if path in ORIENTATION_FILES:
             _add_metric(orientation, metric)

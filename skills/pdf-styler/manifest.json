@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "id": "pdf-styler",
+  "version": "1.0.0",
+  "status": "ACTIVE",
+  "default_style_id": "style.pdf.formats",
+  "context": "skills/pdf-styler/SKILL.md",
+  "entrypoint": "skills/pdf-styler/tools/pdf_styler.py",
+  "operations": [
+    "CREATE",
+    "EDIT",
+    "STYLE"
+  ],
+  "artifact_types": [
+    "PDF"
+  ],
+  "extensions": [
+    ".pdf"
+  ],
+  "dependencies": {
+    "python_packages": [
+      "reportlab",
+      "jsonschema"
+    ],
+    "host_capabilities": [
+      "filesystem_write"
+    ]
+  },
+  "context_loading": {
+    "default": "EXCLUDE",
+    "load_on_selection": [
+      "skills/pdf-styler/SKILL.md",
+      "skills/pdf-styler/manifest.json"
+    ],
+    "renderer_source_default": "EXCLUDE"
+  },
+  "provenance": {
+    "source_family": "Design Workspace PDF Styler",
+    "source_workspace_version": "0.24.0",
+    "adaptation": "Self-contained ICM skill; default style resolves from local manifest.",
+    "source_sha256": {
+      "pdf_styler.py": "8d028abec5170eaff2184d72736315aca7b3d78e43b89f192baf52fd298914a5",
+      "pdf_style_schema.json": "0b982c1c89e8c0c1ed850bec903bb76161864625df384bd0e410b70a10120a1a",
+      "style.pdf.formats.json": "45ef3677a218ef40e07286d51d64779c4e3030c820bb058fbfb279946fd26c3f"
+    }
+  }
+}

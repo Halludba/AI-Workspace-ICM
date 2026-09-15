@@ -1,55 +1,59 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step3",
-  "summary": "Add a domain-neutral Git-aware verification impact classifier without coupling verification scope to SemVer.",
+  "directive_id": "DIR-2026-09-15:v06-step4",
+  "summary": "Add append-only privacy-safe decision records as non-authoritative audit evidence.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": ["_core/CONVENTIONS.md"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add the universal rule separating iteration blast-radius classification from mandatory pre-commit full regression."
+      "rationale": "Add the universal privacy and append-only decision-rationale invariant."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": ["config/impact_policy.json"],
+      "target_paths": ["config/decision_policy.json"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Define domain-neutral sensitive paths, prefixes, and verification scopes in inspectable machine policy."
+      "rationale": "Define the machine-readable decision-record contract without third-party schema dependencies."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": ["tools/impact_classifier.py"],
+      "target_paths": ["tools/record_decision.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Implement deterministic Git change discovery and SCOPED_VALIDATION versus FULL_REGRESSION classification."
+      "rationale": "Add standard-library validation and append-only decision-record writing."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": ["tests/test_impact_classifier.py"],
+      "target_paths": ["tests/test_decision_records.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add adversarial coverage for staged, unstaged, untracked, sensitive, and scoped change classification."
+      "rationale": "Add adversarial privacy, supersession, path, and append-only tests."
     },
     {
       "candidate_id": "C-005",
       "target_paths": [
+        "archive/CONTEXT.md",
+        "archive/decisions/.gitkeep",
         "WORKSPACE.json",
         "config/CONTEXT.md",
+        "config/impact_policy.json",
         "tools/CONTEXT.md",
         "tools/README.md",
         "tests/CONTEXT.md",
         "tests/README.md"
       ],
       "change_kind": "MERGE",
-      "disposition": "ACCEPT",      "rationale": "Integrate Step 3 into existing routed metadata and capability indexes without creating a competing route."
+      "disposition": "ACCEPT",
+      "rationale": "Integrate decision audit evidence into the existing archive route and workspace indexes without creating new authority."
     }
   ],
   "applied_changes": [
-    {"candidate_id": "C-001", "description": "Added Convention 28 for verification-scope blast radius."},
-    {"candidate_id": "C-002", "description": "Added machine-readable impact policy."},
-    {"candidate_id": "C-003", "description": "Added Git-aware impact classifier."},
-    {"candidate_id": "C-004", "description": "Added adversarial impact-classifier tests."},
-    {"candidate_id": "C-005", "description": "Integrated Step 3 into routed workspace metadata and indexes."}
+    {"candidate_id": "C-001", "description": "Added Convention 29 for privacy-safe append-only decision evidence."},
+    {"candidate_id": "C-002", "description": "Added machine-readable decision-record policy."},
+    {"candidate_id": "C-003", "description": "Added standard-library decision-record validator and append-only writer."},
+    {"candidate_id": "C-004", "description": "Added adversarial decision-record tests."},
+    {"candidate_id": "C-005", "description": "Integrated decision records into archive routing, indexes, workspace metadata, and impact policy."}
   ]
 }

@@ -33,7 +33,9 @@
     "mutation_policy": "config/mutation_policy.json",
     "mutation_checker": "tools/check_mutation.py",
     "impact_policy": "config/impact_policy.json",
-    "impact_classifier": "tools/impact_classifier.py"
+    "impact_classifier": "tools/impact_classifier.py",
+    "decision_policy": "config/decision_policy.json",
+    "decision_recorder": "tools/record_decision.py"
   },
   "roots": {
     "core": "_core",

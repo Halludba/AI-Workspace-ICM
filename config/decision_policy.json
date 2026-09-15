@@ -1,0 +1,63 @@
+{
+  "policy_schema": "1.0",
+  "record_schema": "1.0",
+  "record_root": "archive/decisions",
+  "privacy_attestation": "NO_PRIVATE_CHAIN_OF_THOUGHT_OR_HIDDEN_SCRATCHPAD_STORED",
+  "forbidden_keys": [
+    "chain_of_thought",
+    "private_reasoning",
+    "hidden_reasoning",
+    "scratchpad",
+    "cot"
+  ],
+  "record_id_pattern": "^D-[A-Za-z0-9._-]{6,120}$",
+  "actor_id_pattern": "^[A-Za-z0-9._-]{1,120}$",
+  "directive_id_pattern": "^[A-Za-z0-9._:-]{1,200}$",
+  "required_record_fields": [
+    "record_version",
+    "record_id",
+    "recorded_utc",
+    "directive_id",
+    "actor_id",
+    "objective",
+    "constraints",
+    "claims",
+    "evidence",
+    "assumptions",
+    "alternatives",
+    "decision",
+    "unknowns",
+    "verification",
+    "links",
+    "privacy_attestation"
+  ],  "allowed_record_fields": [
+    "record_version",
+    "record_id",
+    "recorded_utc",
+    "directive_id",
+    "actor_id",
+    "supersedes_record_id",
+    "objective",
+    "constraints",
+    "claims",
+    "evidence",
+    "assumptions",
+    "alternatives",
+    "decision",
+    "unknowns",
+    "verification",
+    "links",
+    "privacy_attestation"
+  ],
+  "item_array_fields": [
+    "constraints",
+    "claims",
+    "assumptions",
+    "unknowns"
+  ],
+  "evidence_availability": ["AVAILABLE", "PARTIAL", "MISSING"],
+  "alternative_dispositions": ["SELECTED", "REJECTED", "DEFERRED", "NO_CHANGE"],
+  "verification_statuses": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"],
+  "link_kinds": ["artifact", "source", "commit", "prompt", "audit", "plan_part", "other"],
+  "sha256_pattern": "^[0-9a-f]{64}$"
+}

@@ -11,6 +11,7 @@ Current generic tools:
 - `check_invariants.py` -> deterministic parser for universal BIOS response declarations and terminal closure.
 - `check_mutation.py` -> deterministic two-axis mutation-trace validation and commit-readiness checks.
 - `impact_classifier.py` -> Git-aware SCOPED_VALIDATION versus FULL_REGRESSION blast-radius classification; SemVer remains out of scope.
+- `record_decision.py` -> privacy-safe append-only decision-record validation, supersession, and archival write support.
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.
 - `kernel/events.py` -> event envelope, taxonomy, and kernel error contracts.
 - `kernel/reducer.py` -> pure event fold/state-machine enforcement.

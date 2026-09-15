@@ -10,4 +10,6 @@ Use `check_invariants.py` for universal response-declaration checks and `check_m
 
 Use `impact_classifier.py` to classify observed Git changes as `SCOPED_VALIDATION` or `FULL_REGRESSION` during iteration. This is blast-radius classification, not SemVer. A canonical commit still requires the complete regression gate even when iteration was scoped.
 
+Use `record_decision.py` for append-only, privacy-safe decision summaries under `archive/decisions/`. The tool rejects forbidden private-reasoning keys and supports superseding records; these records are audit evidence and never replace current governing contracts.
+
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

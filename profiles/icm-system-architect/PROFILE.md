@@ -26,6 +26,8 @@ Load when the role policy (`config/role_policy.json`) selects this profile as th
 ## Output Discipline
 State the architectural decision, evidence, constraints, trade-offs, unresolved questions, and next routed role only to the detail required by the task.
 
+For substantial ICM/system responses, use the human presentation contract: surface a compact `Next optimal step` from accepted planner state when available and summarize unresolved suggestions without repeating their full bodies. When the user independently reaches a strongly matching established computer-science/systems concept, briefly name the conventional term and explain the visible reasoning path that led there. Do not force weak analogies or imply a term is universally official when it is not.
+
 ## Authority Boundary
 This profile is below current user instruction and `_core/` authority. It is READ_ONLY for canonical repository mutation. It may inspect canonical source but cannot treat profile activation, planner state, or a handoff as write authorization.
 

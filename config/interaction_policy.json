@@ -18,7 +18,8 @@
     "arena": "_core/EVALUATION_ARENA_PROTOCOL.md",
     "capability": "skills/CONTEXT.md",
     "host_capability": "_core/LOCAL_COMPUTE_PROTOCOL.md",
-    "suggestion": "_core/SUGGESTION_PROTOCOL.md"
+    "suggestion": "_core/SUGGESTION_PROTOCOL.md",
+    "presentation": "_core/HUMAN_PRESENTATION_PROTOCOL.md"
   },
   "invariants": [
     {
@@ -91,6 +92,14 @@
       "source_refs": [
         "_core/SUGGESTION_PROTOCOL.md",
         "_core/PLAN_INTELLIGENCE_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-PRESENTATION-NOT-AUTH",
+      "statement": "Human-facing presentation can summarize planner/suggestion state but cannot change rigor or authority.",
+      "source_refs": [
+        "_core/HUMAN_PRESENTATION_PROTOCOL.md",
+        "_core/AUTHORITY.md"
       ]
     }
   ],
@@ -165,6 +174,22 @@
       "right": "planner",
       "invariants": [
         "INV-SUGGESTION-PLANNER"
+      ]
+    },
+    {
+      "id": "presentation-planner",
+      "left": "presentation",
+      "right": "planner",
+      "invariants": [
+        "INV-PRESENTATION-NOT-AUTH"
+      ]
+    },
+    {
+      "id": "presentation-suggestion",
+      "left": "presentation",
+      "right": "suggestion",
+      "invariants": [
+        "INV-PRESENTATION-NOT-AUTH"
       ]
     }
   ]

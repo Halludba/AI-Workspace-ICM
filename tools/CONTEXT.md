@@ -41,3 +41,5 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `interaction_contracts.py` -> validates shared subsystem bridges and conservative rule-deduplication coverage; it never proves semantic equivalence or deletes rules.
 
 - `suggestion_queue.py` -> noncanonical per-agent suggestion continuity, compact unresolved summaries, exact approval-scope resolution, and accepted-only promotion eligibility.
+
+- `continuity_presenter.py` -> compiles the next accepted planner step plus compact unresolved suggestion titles and validates evidence-bounded concept callouts.

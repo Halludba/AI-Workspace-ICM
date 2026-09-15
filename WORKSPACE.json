@@ -81,7 +81,10 @@
     "interaction_contracts": "tools/interaction_contracts.py",
     "suggestion_protocol": "_core/SUGGESTION_PROTOCOL.md",
     "suggestion_policy": "config/suggestion_policy.json",
-    "suggestion_queue": "tools/suggestion_queue.py"
+    "suggestion_queue": "tools/suggestion_queue.py",
+    "human_presentation_protocol": "_core/HUMAN_PRESENTATION_PROTOCOL.md",
+    "human_presentation_policy": "config/human_presentation_policy.json",
+    "continuity_presenter": "tools/continuity_presenter.py"
   },
   "roots": {
     "core": "_core",

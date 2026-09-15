@@ -19,6 +19,7 @@ Use this root only for the workstation's constitutional architecture.
 - Role selection, mutation envelopes, and bounded role handoff -> `ROLE_PROTOCOL.md`
 - Cross-system shared invariants / compatibility bridges -> `INTERACTION_PROTOCOL.md`
 - Suggestion lifecycle, silence/topic-change neutrality, and approval scopes -> `SUGGESTION_PROTOCOL.md`
+- Human concept recognition / continuity footer -> `HUMAN_PRESENTATION_PROTOCOL.md`
 
 Do not load every core contract for an unrelated task.
 Core rules outrank lower local contracts according to `AUTHORITY.md`.

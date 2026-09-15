@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "authority": "PRESENTATION_ONLY",
+  "concept_recognition": {
+    "enabled": true,
+    "default_surface_strength": "HIGH",
+    "mapping_strengths": ["LOW","MEDIUM","HIGH"],
+    "term_statuses": ["ESTABLISHED_TERM","RELATED_CONCEPT","ANALOGY"],
+    "max_path_steps": 5,
+    "private_reasoning_allowed": false,
+    "force_single_name_when_ambiguous": false
+  },
+  "continuity_footer": {
+    "substantial_icm_only": true,
+    "next_step_source_priority": ["ACTIVE_PLANNER","ELIGIBLE_PLANNER","UNRESOLVED_SUGGESTION"],
+    "max_suggestion_titles": 5,
+    "candidate_is_executable": false,
+    "repeat_full_suggestion_body": false
+  },
+  "changes_rigor": false,
+  "changes_authority": false
+}

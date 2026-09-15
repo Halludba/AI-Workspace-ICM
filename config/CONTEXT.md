@@ -34,3 +34,5 @@ Do not load unrelated config files.
 - `interaction_policy.json` -> shared cross-system invariants and bridge ownership; subordinate to source protocols and never grants authority.
 
 - `suggestion_policy.json` -> Git-ignored suggestion lifecycle, compact summaries, and exact approval-scope semantics; no automatic execution/planner mutation.
+
+- `human_presentation_policy.json` -> strong-mapping concept callouts and compact planner/suggestion continuity presentation; presentation only.

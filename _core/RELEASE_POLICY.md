@@ -19,3 +19,6 @@ Historical source trees are not duplicated into the checked-out workspace. Norma
 ## Annotated tag notes
 Use only relevant sections and omit empty ones: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`, `Breaking`, `Verification`.
 The note begins with `ICM v<version> - <title>` and `Previous: v<version>`. `Verification` is mandatory.
+
+## Local development and publication
+Development commits are the normal local recovery/history unit. A local annotated release seal is optional and is reserved for meaningful milestones or publication preparation; it is not required after every task batch. Remote publication requires an explicit current user request and may batch multiple already-verified local releases. When an immutable local tag still points to the exact commit that passed its release gate, publication reuses that verification instead of rerunning full regression solely because time passed. Remote refs must still be verified after push.

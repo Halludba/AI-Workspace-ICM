@@ -192,5 +192,18 @@
         "INV-PRESENTATION-NOT-AUTH"
       ]
     }
-  ]
+  ],
+  "maintenance": {
+    "events": [
+      "COMPONENT_CHANGE",
+      "LOCAL_SEAL",
+      "PUBLICATION"
+    ],
+    "structural_validation_on_component_change": true,
+    "structural_validation_on_local_seal": true,
+    "structural_validation_on_publication": true,
+    "semantic_review_on_multi_component_change": true,
+    "semantic_review_publication_commit_interval": 5,
+    "automatic_rule_deletion": false
+  }
 }

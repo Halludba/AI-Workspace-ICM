@@ -1,26 +1,46 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1350-v13-release",
+  "directive_id": "DIR-2026-09-15:T-1400-execution-efficiency",
   "actor_role": "icm-runtime-architect",
-  "summary": "Promote the verified v1.3 interaction, continuity, and bounded-strategy development state to a locally sealed v1.3.0 release without remote publication.",
+  "summary": "Reduce repeated planner, verification, maintenance, release, and publication overhead with bounded execution windows and evidence-triggered review while preserving canonical batch verification.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
+        "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
+        "_core/INTERACTION_PROTOCOL.md",
+        "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+        "_core/RELEASE_POLICY.md",
+        "_core/SUGGESTION_PROTOCOL.md",
+        "config/CONTEXT.md",
+        "config/developer_observatory_policy.json",
+        "config/interaction_policy.json",
+        "config/release_policy.json",
+        "config/session_policy.json",
+        "icm",
+        "tests/CONTEXT.md",
         "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_developer_observatory.py",
+        "tests/test_interaction_contracts.py",
+        "tests/test_release_policy.py",
+        "tests/test_session_planner.py",
+        "tools/CONTEXT.md",
+        "tools/developer_observatory.py",
+        "tools/interaction_contracts.py",
+        "tools/release_validator.py",
+        "tools/session_planner.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Release closure changes only local release/version assertions after full implementation regression and context-growth review; remote publication remains explicitly deferred by current user instruction."
+      "rationale": "Batch compatible task work behind cheap checkpoints, measure unusually slow sessions from observable evidence, trigger interaction maintenance only when useful, and separate local development/sealing from explicit remote publication."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted 1.3.0-dev to local 1.3.0 release metadata and made the unpublished remote state explicit in README."
+      "description": "Added planner execution windows/lazy task access, slow-run efficiency review, interaction maintenance triggers, explicit-user publication policy, optional local sealing, conditional-continuation rule, development metadata, and focused regression coverage."
     }
   ]
 }

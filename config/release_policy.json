@@ -8,7 +8,8 @@
   "development": {
     "public_tag_each_commit": false,
     "local_commits_allowed": true,
-    "push_policy": "VERIFIED_RELEASE_MILESTONES"
+    "push_policy": "EXPLICIT_USER_REQUEST",
+    "local_release_seal_policy": "OPTIONAL_MILESTONE_OR_PUBLICATION_PREP"
   },
   "release": {
     "annotated_tags_required": true,
@@ -32,6 +33,13 @@
       "tracked_text_growth_warning_percent": 25.0,
       "orientation_growth_warning_percent": 15.0,
       "growth_review_skill": "skills/context-optimizer/SKILL.md"
+    },
+    "local_seal_required_each_batch": false,
+    "publication": {
+      "explicit_user_request_required": true,
+      "batch_verified_local_releases": true,
+      "rerun_full_regression_when_tag_commit_unchanged": false,
+      "remote_ref_verification_required": true
     }
   },
   "history": {

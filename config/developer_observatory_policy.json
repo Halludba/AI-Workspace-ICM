@@ -43,5 +43,12 @@
   "execution_authority": "NONE",
   "max_context_refs": 64,
   "max_directive_refs": 64,
-  "max_causal_refs": 64
+  "max_causal_refs": 64,
+  "efficiency_review": {
+    "absolute_slow_session_ms": 900000,
+    "relative_to_median_multiplier": 1.5,
+    "minimum_baseline_sessions": 3,
+    "top_mechanisms": 5,
+    "private_reasoning_source_allowed": false
+  }
 }

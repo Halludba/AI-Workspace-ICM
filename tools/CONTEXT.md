@@ -13,7 +13,7 @@ Current generic tools:
 - `check_mutation.py` -> deterministic two-axis mutation-trace validation and commit-readiness checks.
 - `impact_classifier.py` -> Git-aware SCOPED_VALIDATION versus FULL_REGRESSION blast-radius classification; SemVer remains out of scope.
 - `record_decision.py` -> privacy-safe append-only decision-record validation, supersession, and archival write support.
-- `session_planner.py` -> non-authoritative per-agent continuity queue validation, deterministic selection, lifecycle transitions, and self-deletion.
+- `session_planner.py` -> non-authoritative per-agent continuity queue plus bounded execution windows: one planner snapshot, lazy task detail, cheap checkpoints, batch reconciliation, lifecycle transitions, and self-deletion.
 - `assurance_controller.py` -> cheap deliberation triggering, evidence-aware assurance routing, epistemic-delta validation, bounded escalation, and ephemeral cache reuse.
 - `release_validator.py` -> strict SemVer, release-policy, and annotated-tag-note validation.
 - `token_profiler.py` -> on-demand estimated token/context footprint, Git-ref comparison, growth warnings, Python symbol profiling, and exact routed-context profiling; whole-repository comparison remains opt-in for scoped route measurement.
@@ -34,11 +34,11 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `local_compute.py` -> read-only host CPU/GPU/executable discovery and named workload readiness; observations are noncanonical and grant no execution or mutation authority.
 - `local_worker.py` -> builds base-revision-verified bounded worker packets, validates candidate Git patches, enforces bounded attempts, and optionally calls loopback Ollama without applying changes.
 - `plan_intelligence.py` -> deterministic plan sufficiency checks and downstream affected-task reconciliation; advisory only, no model calls or plan mutation.
-- `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry and explicit audit deltas; never private reasoning or authority.
+- `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry, explicit audit deltas, and slow-session efficiency ranking from observable events; never private reasoning or authority.
 - `meta_advisor.py` -> suggestion eligibility/value-density review, research escalation/prompt compilation, and presentation-only SIMPLE/STANDARD/TECHNICAL rendering.
 - `evaluation_arena.py` -> content-addressed case/variant contracts, blinded execution views, typed quality evidence, replay manifests, and a hard-budgeted strategy runner with separate execution/evaluation callbacks.
 
-- `interaction_contracts.py` -> validates shared subsystem bridges and conservative rule-deduplication coverage; it never proves semantic equivalence or deletes rules.
+- `interaction_contracts.py` -> validates shared subsystem bridges, conservative rule-deduplication coverage, and cheap maintenance triggers; it never proves semantic equivalence or deletes rules.
 
 - `suggestion_queue.py` -> noncanonical per-agent suggestion continuity, compact unresolved summaries, exact approval-scope resolution, and accepted-only promotion eligibility.
 

@@ -58,6 +58,14 @@ class SessionPlannerTests(unittest.TestCase):
             "auto_delete_on_empty": True,
         }
 
+    def init_git(self):
+        subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
+        subprocess.run(["git", "config", "user.email", "tests@example.invalid"], cwd=self.root, check=True)
+        subprocess.run(["git", "config", "user.name", "ICM Tests"], cwd=self.root, check=True)
+        (self.root / "marker.txt").write_text("baseline\n", encoding="utf-8")
+        subprocess.run(["git", "add", "."], cwd=self.root, check=True)
+        subprocess.run(["git", "commit", "-qm", "baseline"], cwd=self.root, check=True)
+
     def test_valid_plan_passes(self):
         result = session_planner.validate_plan(self.plan(), self.policy, root=self.root)
         self.assertTrue(result["valid"])
@@ -244,6 +252,40 @@ class SessionPlannerTests(unittest.TestCase):
         payload = json.loads(proc.stdout)
         self.assertEqual(payload["next_task"]["task_id"], "T-01")
         self.assertIn("derived_unlock_count", payload["next_task"])
+
+    def test_execution_window_batches_planner_selection_and_lazy_task_detail(self):
+        self.init_git()
+        tasks=[self.task("T-01"),self.task("T-02",depends=["T-01"]),self.task("T-03",depends=["T-02"])]
+        tasks[1]["objective"]="Second task detail"
+        session_planner.install_plan(self.plan(tasks), self.root, self.policy)
+        window=session_planner.open_execution_window("chatgpt56",3,self.root,self.policy)
+        self.assertEqual([x["task_id"] for x in window["tasks"]],["T-01","T-02","T-03"])
+        self.assertNotIn("objective",window["tasks"][1])
+        detail=session_planner.execution_window_task("chatgpt56","T-02",self.root,self.policy)
+        self.assertEqual(detail["task"]["objective"],"Second task detail")
+
+    def test_execution_window_checkpoints_do_not_read_or_mutate_planner(self):
+        self.init_git(); path=session_planner.install_plan(self.plan([self.task("T-01"),self.task("T-02",depends=["T-01"])]),self.root,self.policy)
+        before=path.read_text(encoding="utf-8"); session_planner.open_execution_window("chatgpt56",2,self.root,self.policy)
+        r=session_planner.checkpoint_execution_window("chatgpt56","T-01","VERIFIED",["tests:focused"],self.root,self.policy)
+        self.assertFalse(r["planner_read_performed"]); self.assertEqual(path.read_text(encoding="utf-8"),before)
+
+    def test_execution_window_close_reconciles_verified_prefix_once(self):
+        self.init_git(); tasks=[self.task("T-01"),self.task("T-02",depends=["T-01"]),self.task("T-03",depends=["T-02"])]
+        session_planner.install_plan(self.plan(tasks),self.root,self.policy); session_planner.open_execution_window("chatgpt56",3,self.root,self.policy)
+        session_planner.checkpoint_execution_window("chatgpt56","T-01","VERIFIED",[],self.root,self.policy); session_planner.checkpoint_execution_window("chatgpt56","T-02","VERIFIED",[],self.root,self.policy)
+        r=session_planner.close_execution_window("chatgpt56",self.root,self.policy); self.assertEqual(r["completed_task_ids"],["T-01","T-02"]); self.assertEqual(r["planner_reads"],1); self.assertEqual(r["planner_writes"],1)
+        plan=session_planner.load_plan("chatgpt56",self.root,self.policy); self.assertEqual([x["status"] for x in plan["tasks"]],["COMPLETED","COMPLETED","PENDING"])
+
+    def test_execution_window_fails_closed_if_planner_changed(self):
+        self.init_git(); path=session_planner.install_plan(self.plan(),self.root,self.policy); session_planner.open_execution_window("chatgpt56",1,self.root,self.policy); session_planner.checkpoint_execution_window("chatgpt56","T-01","VERIFIED",[],self.root,self.policy)
+        plan=json.loads(path.read_text(encoding="utf-8")); plan["updated_utc"]="2026-09-15T10:01:00+10:00"; path.write_text(json.dumps(plan),encoding="utf-8")
+        with self.assertRaisesRegex(session_planner.SessionPlanError,"planner changed"):
+            session_planner.close_execution_window("chatgpt56",self.root,self.policy)
+
+    def test_workspace_cli_exposes_execution_window_surface(self):
+        proc=subprocess.run([sys.executable,str(ROOT/'icm'),'plan','window-open','--help'],cwd=ROOT,text=True,capture_output=True)
+        self.assertEqual(proc.returncode,0,proc.stderr); self.assertIn('max-tasks',proc.stdout)
 
     def test_malformed_priority_policy_fails_cleanly(self):
         policy_path = self.root / "config/session_policy.json"

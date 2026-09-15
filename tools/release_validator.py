@@ -44,6 +44,16 @@ def load_policy(root: Path = ROOT) -> dict:
         raise ReleasePolicyError("release tag prefix must be 'v'")
     if policy["versioning"].get("development_identity") != "git_commit":
         raise ReleasePolicyError("development identity must be git_commit")
+    development = policy["development"]
+    expected_development = {"public_tag_each_commit", "local_commits_allowed", "push_policy", "local_release_seal_policy"}
+    if not isinstance(development, dict) or set(development) != expected_development:
+        raise ReleasePolicyError("development policy fields must match contract")
+    if development["public_tag_each_commit"] is not False or development["local_commits_allowed"] is not True:
+        raise ReleasePolicyError("development commit policy invalid")
+    if development["push_policy"] != "EXPLICIT_USER_REQUEST":
+        raise ReleasePolicyError("remote publication must require explicit user request")
+    if development["local_release_seal_policy"] != "OPTIONAL_MILESTONE_OR_PUBLICATION_PREP":
+        raise ReleasePolicyError("local release seal policy invalid")
     release = policy["release"]
     if not release.get("annotated_tags_required"):
         raise ReleasePolicyError("annotated release tags are required")
@@ -51,6 +61,14 @@ def load_policy(root: Path = ROOT) -> dict:
         raise ReleasePolicyError("published release tags must be immutable")
     if not release.get("full_regression_required"):
         raise ReleasePolicyError("public releases require full regression")
+    if release.get("local_seal_required_each_batch") is not False:
+        raise ReleasePolicyError("development batches must not require local release seals")
+    publication = release.get("publication")
+    publication_required = {"explicit_user_request_required", "batch_verified_local_releases", "rerun_full_regression_when_tag_commit_unchanged", "remote_ref_verification_required"}
+    if not isinstance(publication, dict) or set(publication) != publication_required:
+        raise ReleasePolicyError("release publication fields must match contract")
+    if publication["explicit_user_request_required"] is not True or publication["batch_verified_local_releases"] is not True or publication["rerun_full_regression_when_tag_commit_unchanged"] is not False or publication["remote_ref_verification_required"] is not True:
+        raise ReleasePolicyError("release publication safety/efficiency contract invalid")
     metrics = release.get("context_metrics")
     required_metrics = {"tracked_text_growth_warning_percent", "orientation_growth_warning_percent", "growth_review_skill"}
     if not isinstance(metrics, dict) or set(metrics) != required_metrics:
@@ -113,8 +131,8 @@ def validate_workspace(root: Path = ROOT) -> dict:
     development = policy["development"]
     if development.get("public_tag_each_commit") is not False:
         raise ReleasePolicyError("development commits must not require public tags")
-    if development.get("push_policy") != "VERIFIED_RELEASE_MILESTONES":
-        raise ReleasePolicyError("push policy must target verified release milestones")
+    if development.get("push_policy") != "EXPLICIT_USER_REQUEST":
+        raise ReleasePolicyError("push policy must require explicit user request")
     if policy["history"].get("retain_published_tags") is not True:
         raise ReleasePolicyError("published release tags must be retained")
     if policy["history"].get("default_context") != "EXCLUDE":

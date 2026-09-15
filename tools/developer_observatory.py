@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local noncanonical developer observability for ICM."""
 from __future__ import annotations
-import argparse, datetime, hashlib, json, math, os, re, tempfile
+import argparse, datetime, hashlib, json, math, os, re, statistics, tempfile
 from pathlib import Path, PurePosixPath
 ROOT=Path(__file__).resolve().parents[1]
 class ObservatoryError(ValueError): pass
@@ -12,11 +12,17 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
     p=_read(root/'config/developer_observatory_policy.json','observatory policy')
-    required={'schema_version','state_root','modes','phases','outcomes','rework_classes','forbidden_keys','normal_mode_model_calls','canonical','execution_authority','max_context_refs','max_directive_refs','max_causal_refs'}
+    required={'schema_version','state_root','modes','phases','outcomes','rework_classes','forbidden_keys','normal_mode_model_calls','canonical','execution_authority','max_context_refs','max_directive_refs','max_causal_refs','efficiency_review'}
     if not isinstance(p,dict) or set(p)!=required or p.get('schema_version')!='1.0' or p.get('canonical') is not False or p.get('execution_authority')!='NONE' or p.get('normal_mode_model_calls') is not False: raise ObservatoryError('observatory policy safety contract invalid')
     if not all(isinstance(p[k],list) and p[k] and len(p[k])==len(set(p[k])) for k in ('modes','phases','outcomes','rework_classes','forbidden_keys')): raise ObservatoryError('observatory policy vocabularies must be unique non-empty lists')
     for k in ('max_context_refs','max_directive_refs','max_causal_refs'):
         if isinstance(p[k],bool) or not isinstance(p[k],int) or p[k]<1: raise ObservatoryError(f'{k} must be positive integer')
+    er=p['efficiency_review']; req={'absolute_slow_session_ms','relative_to_median_multiplier','minimum_baseline_sessions','top_mechanisms','private_reasoning_source_allowed'}
+    if not isinstance(er,dict) or set(er)!=req or er['private_reasoning_source_allowed'] is not False: raise ObservatoryError('efficiency review policy invalid')
+    if isinstance(er['absolute_slow_session_ms'],bool) or not isinstance(er['absolute_slow_session_ms'],(int,float)) or er['absolute_slow_session_ms']<=0: raise ObservatoryError('absolute_slow_session_ms invalid')
+    if isinstance(er['relative_to_median_multiplier'],bool) or not isinstance(er['relative_to_median_multiplier'],(int,float)) or er['relative_to_median_multiplier']<=1: raise ObservatoryError('relative_to_median_multiplier invalid')
+    for k in ('minimum_baseline_sessions','top_mechanisms'):
+        if isinstance(er[k],bool) or not isinstance(er[k],int) or er[k]<1: raise ObservatoryError(f'{k} invalid')
     return p
 
 def _privacy(value,forbidden,path='$'):
@@ -109,6 +115,37 @@ def summarize(events:list[dict],root:Path=ROOT):
         'value_claim':'OBSERVED_USAGE_ONLY_NOT_CAUSAL_VALUE','authority':'DERIVED_NONCANONICAL'
     }
 
+def analyze_efficiency(events:list[dict],session_id:str,root:Path=ROOT):
+    p=load_policy(root); cfg=p['efficiency_review']
+    if not isinstance(events,list) or not events: raise ObservatoryError('efficiency review requires non-empty event list')
+    if not isinstance(session_id,str) or not session_id.strip(): raise ObservatoryError('session_id must be non-empty string')
+    vals=[validate_event(e,root) for e in events]
+    groups={}
+    for e in vals: groups.setdefault(e['session_id'],[]).append(e)
+    if session_id not in groups: raise ObservatoryError('session_id not present in events')
+    totals={sid:sum(e['duration_ms'] for e in es) for sid,es in groups.items()}
+    current=totals[session_id]; baseline=[v for sid,v in totals.items() if sid!=session_id]
+    baseline_median=statistics.median(baseline) if len(baseline)>=cfg['minimum_baseline_sessions'] else None
+    baseline_mean=(sum(baseline)/len(baseline)) if baseline else None
+    triggers=[]
+    if current>=cfg['absolute_slow_session_ms']: triggers.append('ABSOLUTE_SLOW_SESSION')
+    if baseline_median is not None and current>=baseline_median*cfg['relative_to_median_multiplier']: triggers.append('RELATIVE_TO_BASELINE')
+    mechanisms={}; phases={}
+    for e in groups[session_id]:
+        m=mechanisms.setdefault(e['mechanism'],{'duration_ms':0.0,'event_count':0,'model_calls':0,'tool_calls':0,'model_calls_known':True,'tool_calls_known':True})
+        m['duration_ms']+=e['duration_ms']; m['event_count']+=1
+        if e['model_calls'] is None: m['model_calls_known']=False
+        else: m['model_calls']+=e['model_calls']
+        if e['tool_calls'] is None: m['tool_calls_known']=False
+        else: m['tool_calls']+=e['tool_calls']
+        phases[e['phase']]=phases.get(e['phase'],0.0)+e['duration_ms']
+    ranked=[]
+    for name,m in mechanisms.items():
+        ranked.append({'mechanism':name,'duration_ms':round(m['duration_ms'],3),'share':(m['duration_ms']/current if current else 0.0),'event_count':m['event_count'],'model_calls':m['model_calls'] if m['model_calls_known'] else None,'tool_calls':m['tool_calls'] if m['tool_calls_known'] else None})
+    ranked.sort(key=lambda x:(-x['duration_ms'],x['mechanism']))
+    observer_ms=mechanisms.get('developer_observatory',{}).get('duration_ms')
+    return {'schema_version':'1.0','session_id':session_id,'session_duration_ms':round(current,3),'baseline_session_count':len(baseline),'baseline_mean_ms':None if baseline_mean is None else round(baseline_mean,3),'baseline_median_ms':None if baseline_median is None else round(baseline_median,3),'optimization_review_recommended':bool(triggers),'triggers':triggers,'top_mechanisms':ranked[:cfg['top_mechanisms']],'phase_duration_ms':dict(sorted((k,round(v,3)) for k,v in phases.items())),'observer_self_duration_ms':None if observer_ms is None else round(observer_ms,3),'private_reasoning_used':False,'evidence_source':'OBSERVABLE_EXECUTION_EVENTS_ONLY','authority':'DERIVED_NONCANONICAL'}
+
 def compare_audit(baseline:dict,variant:dict):
     allowed={'wall_time_ms','input_tokens_total','input_tokens_uncached','output_tokens','model_calls','tool_calls','correctness_score','context_recall','unnecessary_context_ratio'}
     out={}
@@ -122,7 +159,7 @@ def main():
     v=sub.add_parser('validate'); v.add_argument('event')
     r=sub.add_parser('record'); r.add_argument('event')
     s=sub.add_parser('summarize'); s.add_argument('events')
-    a=sub.add_parser('audit'); a.add_argument('baseline'); a.add_argument('variant')
+    a=sub.add_parser('audit'); a.add_argument('baseline'); a.add_argument('variant'); ef=sub.add_parser('efficiency'); ef.add_argument('events'); ef.add_argument('--session-id',required=True)
     args=ap.parse_args()
     try:
         if args.cmd=='validate': out=validate_event(_read(Path(args.event),'event'))
@@ -131,7 +168,9 @@ def main():
             ev=_read(Path(args.events),'events');
             if not isinstance(ev,list): raise ObservatoryError('events must be array')
             out=summarize(ev)
-        else: out=compare_audit(_read(Path(args.baseline),'baseline'),_read(Path(args.variant),'variant'))
+        elif args.cmd=='audit': out=compare_audit(_read(Path(args.baseline),'baseline'),_read(Path(args.variant),'variant'))
+        else:
+            ev=_read(Path(args.events),'events'); out=analyze_efficiency(ev,args.session_id)
         print(json.dumps({'valid':True,'result':out},indent=2)); return 0
     except ObservatoryError as exc:
         print(json.dumps({'valid':False,'error':str(exc)},indent=2)); return 2

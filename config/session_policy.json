@@ -94,5 +94,23 @@
   ],
   "auto_delete_on_empty_required": true,
   "max_in_progress": 1,
-  "role_policy": "config/role_policy.json"
+  "role_policy": "config/role_policy.json",
+  "execution_windows": {
+    "root": ".session/execution-windows",
+    "default_max_tasks": 6,
+    "hard_max_tasks": 12,
+    "plan_fingerprint": "SHA256_CANONICAL_JSON",
+    "checkpoint_states": [
+      "STARTED",
+      "VERIFIED",
+      "BLOCKED"
+    ],
+    "compact_task_fields": [
+      "task_id",
+      "title",
+      "route_id",
+      "status",
+      "target_role"
+    ]
+  }
 }

@@ -23,6 +23,15 @@ class ObservatoryTests(unittest.TestCase):
   with self.assertRaises(m.ObservatoryError): m.validate_event(self.event(context_escalation={'from_level':'C1','to_level':'C2','added_estimated_tokens':0}),ROOT)
  def test_unavailable_call_counts_do_not_erase_phase_or_mechanism_counts(self):
   r=m.summarize([self.event(model_calls=None,tool_calls=None)],ROOT); self.assertIsNone(r['observed_model_calls']); self.assertIsNone(r['observed_tool_calls']); self.assertEqual(r['phase_counts']['VERIFICATION'],1); self.assertEqual(r['mechanism_counts']['source_navigator'],1)
+ def test_efficiency_review_flags_absolute_slow_session_and_ranks_mechanisms(self):
+  events=[self.event(event_id='A1',session_id='old1',duration_ms=100000),self.event(event_id='A2',session_id='old2',duration_ms=110000),self.event(event_id='A3',session_id='old3',duration_ms=120000),self.event(event_id='C1',session_id='current',mechanism='planner',duration_ms=600000),self.event(event_id='C2',session_id='current',mechanism='verification',duration_ms=400000)]
+  r=m.analyze_efficiency(events,'current',ROOT); self.assertTrue(r['optimization_review_recommended']); self.assertIn('ABSOLUTE_SLOW_SESSION',r['triggers']); self.assertEqual(r['top_mechanisms'][0]['mechanism'],'planner'); self.assertFalse(r['private_reasoning_used'])
+ def test_efficiency_review_can_trigger_relative_to_baseline(self):
+  events=[self.event(event_id='A1',session_id='old1',duration_ms=100000),self.event(event_id='A2',session_id='old2',duration_ms=100000),self.event(event_id='A3',session_id='old3',duration_ms=100000),self.event(event_id='C1',session_id='current',duration_ms=200000)]
+  r=m.analyze_efficiency(events,'current',ROOT); self.assertIn('RELATIVE_TO_BASELINE',r['triggers']); self.assertNotIn('ABSOLUTE_SLOW_SESSION',r['triggers'])
+ def test_observatory_can_measure_its_own_recorded_tax(self):
+  events=[self.event(event_id='C1',session_id='current',mechanism='developer_observatory',duration_ms=50)]
+  r=m.analyze_efficiency(events,'current',ROOT); self.assertEqual(r['observer_self_duration_ms'],50)
  def test_audit_reports_only_observed_deltas_no_causal_percentage(self):
   r=m.compare_audit({'wall_time_ms':100,'correctness_score':0.8},{'wall_time_ms':80,'correctness_score':0.9}); self.assertEqual(r['observed_deltas']['wall_time_ms']['delta'],-20); self.assertFalse(r['causal_percentage_claimed'])
  def test_record_is_idempotent_and_local(self):

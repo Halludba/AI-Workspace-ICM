@@ -8,9 +8,11 @@ by the normal ICM kernel.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 from copy import deepcopy
@@ -45,7 +47,7 @@ def load_session_policy(root: Path = ROOT) -> dict:
         "priority_classes", "declared_scopes", "priority_class_rank", "declared_scope_rank",
         "priority_order", "max_tasks", "required_plan_fields", "allowed_plan_fields",
         "required_task_fields", "allowed_task_fields", "auto_delete_on_empty_required",
-        "max_in_progress", "role_policy",
+        "max_in_progress", "role_policy", "execution_windows",
     }
     missing = sorted(required - set(policy))
     if missing:
@@ -85,6 +87,25 @@ def load_session_policy(root: Path = ROOT) -> dict:
         raise PolicyError("max_tasks must be a positive integer")
     if policy["max_in_progress"] != 1:
         raise PolicyError("v0.6 session planner requires max_in_progress=1")
+    ew = policy["execution_windows"]
+    required_window = {"root", "default_max_tasks", "hard_max_tasks", "plan_fingerprint", "checkpoint_states", "compact_task_fields"}
+    if not isinstance(ew, dict) or set(ew) != required_window:
+        raise PolicyError("execution_windows fields must match contract")
+    if ew["plan_fingerprint"] != "SHA256_CANONICAL_JSON":
+        raise PolicyError("execution window fingerprint policy invalid")
+    for key in ("default_max_tasks", "hard_max_tasks"):
+        if isinstance(ew[key], bool) or not isinstance(ew[key], int) or ew[key] < 1:
+            raise PolicyError(f"execution window {key} must be positive integer")
+    if ew["default_max_tasks"] > ew["hard_max_tasks"]:
+        raise PolicyError("execution window default exceeds hard maximum")
+    if ew["checkpoint_states"] != ["STARTED", "VERIFIED", "BLOCKED"]:
+        raise PolicyError("execution window checkpoint states invalid")
+    allowed_compact = {"task_id", "title", "route_id", "status", "target_role"}
+    if not isinstance(ew["compact_task_fields"], list) or not ew["compact_task_fields"] or any(x not in allowed_compact for x in ew["compact_task_fields"]):
+        raise PolicyError("execution window compact_task_fields invalid")
+    rel = Path(ew["root"])
+    if rel.is_absolute() or ".." in rel.parts or not rel.parts or rel.parts[0] != ".session":
+        raise PolicyError("execution window root must remain under .session")
     return policy
 
 
@@ -369,6 +390,154 @@ def load_plan(agent_id: str, root: Path = ROOT, policy: dict | None = None) -> d
     return plan
 
 
+def plan_fingerprint(plan: dict) -> str:
+    payload = json.dumps(plan, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _git_head(root: Path) -> str:
+    proc = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(root), text=True, capture_output=True)
+    value = proc.stdout.strip()
+    if proc.returncode != 0 or not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise SessionPlanError("execution window requires a valid Git HEAD")
+    return value
+
+
+def _window_root(root: Path, policy: dict) -> Path:
+    base = root.resolve()
+    target = (base / policy["execution_windows"]["root"]).resolve()
+    try:
+        target.relative_to(base)
+    except ValueError as exc:
+        raise PolicyError("execution window root escapes workspace") from exc
+    return target
+
+
+def window_path(agent_id: str, root: Path = ROOT, policy: dict | None = None) -> Path:
+    pol = policy or load_session_policy(root)
+    if not isinstance(agent_id, str) or not re.fullmatch(pol["agent_id_pattern"], agent_id):
+        raise SessionPlanError("agent_id does not match session policy")
+    return _window_root(root, pol) / f"{agent_id}.json"
+
+
+def select_execution_window(plan: dict, max_tasks: int | None = None, policy: dict | None = None, *, root: Path = ROOT) -> list[dict]:
+    pol = policy or load_session_policy(root)
+    validate_plan(plan, pol, root=root)
+    cfg = pol["execution_windows"]
+    limit = cfg["default_max_tasks"] if max_tasks is None else max_tasks
+    if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1 or limit > cfg["hard_max_tasks"]:
+        raise SessionPlanError("execution window max_tasks out of range")
+    simulated = deepcopy(plan)
+    selected: list[dict] = []
+    for _ in range(limit):
+        nxt = select_next_task(simulated, pol, root=root)
+        if nxt is None:
+            break
+        task = deepcopy(_task(simulated, nxt["task_id"]))
+        task["selection_reason"] = nxt["selection_reason"]
+        task["derived_unlock_count"] = nxt["derived_unlock_count"]
+        selected.append(task)
+        _task(simulated, nxt["task_id"])["status"] = "COMPLETED"
+    return selected
+
+
+def _load_window(agent_id: str, root: Path, policy: dict) -> dict:
+    path = window_path(agent_id, root, policy)
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise SessionPlanError(f"no active execution window for agent: {agent_id}") from exc
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SessionPlanError(f"cannot load execution window: {exc}") from exc
+    required = {"schema_version", "agent_id", "created_utc", "updated_utc", "plan_fingerprint", "base_revision", "tasks", "checkpoints", "authority_disclaimer"}
+    if not isinstance(value, dict) or set(value) != required or value.get("schema_version") != "1.0":
+        raise SessionPlanError("execution window fields invalid")
+    if value["agent_id"] != agent_id or value["authority_disclaimer"] != policy["authority_disclaimer"]:
+        raise SessionPlanError("execution window identity/authority invalid")
+    if not re.fullmatch(r"[0-9a-f]{64}", value["plan_fingerprint"]) or not re.fullmatch(r"[0-9a-f]{40}", value["base_revision"]):
+        raise SessionPlanError("execution window provenance invalid")
+    if not isinstance(value["tasks"], list) or not value["tasks"] or not isinstance(value["checkpoints"], dict):
+        raise SessionPlanError("execution window task/checkpoint data invalid")
+    return value
+
+
+def _window_summary(value: dict, policy: dict) -> dict:
+    fields = policy["execution_windows"]["compact_task_fields"]
+    compact = []
+    for task in value["tasks"]:
+        item = {field: task.get(field) for field in fields if field in task or field == "target_role"}
+        cp = value["checkpoints"].get(task["task_id"])
+        item["checkpoint_state"] = cp["state"] if cp else None
+        compact.append(item)
+    return {"schema_version": "1.0", "agent_id": value["agent_id"], "plan_fingerprint": value["plan_fingerprint"], "base_revision": value["base_revision"], "tasks": compact, "authority": value["authority_disclaimer"]}
+
+
+def open_execution_window(agent_id: str, max_tasks: int | None = None, root: Path = ROOT, policy: dict | None = None) -> dict:
+    pol = policy or load_session_policy(root)
+    path = window_path(agent_id, root, pol)
+    if path.exists():
+        return {**_window_summary(_load_window(agent_id, root, pol), pol), "resumed_existing": True}
+    plan = load_plan(agent_id, root, pol)
+    tasks = select_execution_window(plan, max_tasks, pol, root=root)
+    if not tasks:
+        raise SessionPlanError("no eligible tasks available for execution window")
+    now = _now()
+    value = {"schema_version": "1.0", "agent_id": agent_id, "created_utc": now, "updated_utc": now, "plan_fingerprint": plan_fingerprint(plan), "base_revision": _git_head(root), "tasks": tasks, "checkpoints": {}, "authority_disclaimer": pol["authority_disclaimer"]}
+    _atomic_write(path, value)
+    return {**_window_summary(value, pol), "resumed_existing": False}
+
+
+def show_execution_window(agent_id: str, root: Path = ROOT, policy: dict | None = None) -> dict:
+    pol = policy or load_session_policy(root)
+    return _window_summary(_load_window(agent_id, root, pol), pol)
+
+
+def execution_window_task(agent_id: str, task_id: str, root: Path = ROOT, policy: dict | None = None) -> dict:
+    pol = policy or load_session_policy(root); value = _load_window(agent_id, root, pol)
+    task = next((deepcopy(x) for x in value["tasks"] if x.get("task_id") == task_id), None)
+    if task is None:
+        raise SessionPlanError("task is not in active execution window")
+    return {"task": task, "checkpoint": value["checkpoints"].get(task_id), "plan_fingerprint": value["plan_fingerprint"], "authority": pol["authority_disclaimer"]}
+
+
+def checkpoint_execution_window(agent_id: str, task_id: str, state: str, evidence_refs: list[str] | None = None, root: Path = ROOT, policy: dict | None = None) -> dict:
+    pol = policy or load_session_policy(root); cfg = pol["execution_windows"]; value = _load_window(agent_id, root, pol)
+    if state not in cfg["checkpoint_states"]:
+        raise SessionPlanError("execution window checkpoint state invalid")
+    if task_id not in {x.get("task_id") for x in value["tasks"]}:
+        raise SessionPlanError("task is not in active execution window")
+    refs = [] if evidence_refs is None else evidence_refs
+    if not isinstance(refs, list) or len(refs) > 32 or any(not isinstance(x, str) or not x.strip() for x in refs):
+        raise SessionPlanError("execution window evidence_refs invalid")
+    prior = value["checkpoints"].get(task_id)
+    if prior and prior["state"] == "VERIFIED" and state != "VERIFIED":
+        raise SessionPlanError("verified checkpoint cannot regress")
+    value["checkpoints"][task_id] = {"state": state, "updated_utc": _now(), "evidence_refs": [x.strip() for x in refs]}
+    value["updated_utc"] = _now(); _atomic_write(window_path(agent_id, root, pol), value)
+    return {"task_id": task_id, "state": state, "planner_read_performed": False, "authority": pol["authority_disclaimer"]}
+
+
+def close_execution_window(agent_id: str, root: Path = ROOT, policy: dict | None = None) -> dict:
+    pol = policy or load_session_policy(root); value = _load_window(agent_id, root, pol); plan = load_plan(agent_id, root, pol)
+    if plan_fingerprint(plan) != value["plan_fingerprint"]:
+        raise SessionPlanError("planner changed since execution window opened")
+    completed: list[str] = []
+    for task in value["tasks"]:
+        checkpoint = value["checkpoints"].get(task["task_id"])
+        if checkpoint is None or checkpoint["state"] != "VERIFIED":
+            break
+        selected = select_next_task(plan, pol, root=root)
+        if selected is None or selected["task_id"] != task["task_id"]:
+            raise SessionPlanError("execution window no longer matches deterministic planner order")
+        _task(plan, task["task_id"])["status"] = "COMPLETED"
+        completed.append(task["task_id"])
+    if not completed:
+        raise SessionPlanError("execution window has no verified prefix to close")
+    persisted = _persist(plan, root, pol)
+    window_path(agent_id, root, pol).unlink(missing_ok=True)
+    return {"completed_task_ids": completed, "planner_reads": 1, "planner_writes": 1, "window_deleted": True, **persisted}
+
+
 def install_plan(plan: dict, root: Path = ROOT, policy: dict | None = None) -> Path | None:
     pol = policy or load_session_policy(root)
     validate_plan(plan, pol, root=root)
@@ -495,6 +664,12 @@ def main() -> int:
     p_complete = sub.add_parser("complete")
     p_complete.add_argument("agent_id")
     p_complete.add_argument("task_id")
+    p_wo = sub.add_parser("window-open")
+    p_wo.add_argument("agent_id"); p_wo.add_argument("--max-tasks", type=int)
+    p_ws = sub.add_parser("window-show"); p_ws.add_argument("agent_id")
+    p_wt = sub.add_parser("window-task"); p_wt.add_argument("agent_id"); p_wt.add_argument("task_id")
+    p_wc = sub.add_parser("window-checkpoint"); p_wc.add_argument("agent_id"); p_wc.add_argument("task_id"); p_wc.add_argument("state", choices=["STARTED", "VERIFIED", "BLOCKED"]); p_wc.add_argument("--evidence", action="append", default=[])
+    p_wclose = sub.add_parser("window-close"); p_wclose.add_argument("agent_id")
     args = parser.parse_args()
     root = Path(args.root).resolve()
     try:
@@ -517,8 +692,18 @@ def main() -> int:
             result = block_task(args.agent_id, args.task_id, args.reason, root, policy)
         elif args.command == "resume":
             result = resume_task(args.agent_id, args.task_id, root, policy)
-        else:
+        elif args.command == "complete":
             result = complete_task(args.agent_id, args.task_id, root, policy)
+        elif args.command == "window-open":
+            result = open_execution_window(args.agent_id, args.max_tasks, root, policy)
+        elif args.command == "window-show":
+            result = show_execution_window(args.agent_id, root, policy)
+        elif args.command == "window-task":
+            result = execution_window_task(args.agent_id, args.task_id, root, policy)
+        elif args.command == "window-checkpoint":
+            result = checkpoint_execution_window(args.agent_id, args.task_id, args.state, args.evidence, root, policy)
+        else:
+            result = close_execution_window(args.agent_id, root, policy)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0
     except (SessionPlanError, PolicyError) as exc:

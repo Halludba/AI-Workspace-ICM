@@ -6,7 +6,7 @@ Current local release: **v1.3.0 - Interaction & Continuity**.
 
 Published remote release remains **v1.2.0 - Evaluation Arena** until an explicit user-authorized push publishes the local release.
 
-No post-v1.3 development line is declared in this local release; future work should be selected from current user direction and the active noncanonical planner rather than invented in advance.
+Development line: **v1.4.0-dev - Execution Efficiency**. Planner execution windows, evidence-triggered maintenance, slow-run observability, optional local sealing, and explicit-user publication reduce repeated orchestration without weakening canonical verification boundaries.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -35,6 +35,10 @@ Local worker delegation is exposed through `icm worker ...`: Runtime Architect m
 Plan intelligence is exposed through `icm plan ...`: execution-class planner tasks can be checked for minimum objective/context/acceptance/verification sufficiency, and material changes can identify only affected downstream tasks without rewriting the plan.
 
 Developer observability is exposed through `icm observe ...`: local Git-ignored telemetry can measure phases, mechanisms, context/directive references, tool/model-call counts, rework, escalation, and explicit audit deltas without storing prompts, responses, transcripts, or private reasoning.
+
+Planner execution windows are exposed through `icm plan window-*`: a bounded task batch is selected from one planner snapshot, task details are read lazily from the window, cheap checkpoints avoid repeated planner reads, and verified task progress is reconciled back to the planner once at window close.
+
+Slow-run efficiency review is exposed through `icm observe efficiency ...`: observable phase/mechanism timing can trigger targeted optimization review when a session is unusually slow, without scraping private reasoning.
 
 Evidence-gated meta-advice is exposed through `icm advise ...`: suggestion candidates are screened for value density, compatibility and interaction risk; research escalation requires an explicit evidence deficit/current empirical need; SIMPLE/STANDARD/TECHNICAL affect presentation only.
 

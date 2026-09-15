@@ -16,8 +16,8 @@ class ReleasePolicyTests(unittest.TestCase):
     def test_current_workspace_release_is_valid(self):
         result = release_validator.validate_workspace()
         self.assertTrue(result["valid"])
-        self.assertEqual(result["workspace_version"], "1.3.0")
-        self.assertEqual(result["expected_tag"], "v1.3.0")
+        self.assertEqual(result["workspace_version"], "1.4.0-dev")
+        self.assertEqual(result["expected_tag"], "v1.4.0-dev")
 
     def test_standard_semver_versions_pass(self):
         for version in ["0.6.1", "0.7.0", "1.0.0", "0.7.0-dev.1", "1.2.3+build.7"]:
@@ -32,7 +32,17 @@ class ReleasePolicyTests(unittest.TestCase):
         policy = release_validator.load_policy()
         self.assertEqual(policy["versioning"]["development_identity"], "git_commit")
         self.assertFalse(policy["development"]["public_tag_each_commit"])
-        self.assertEqual(policy["development"]["push_policy"], "VERIFIED_RELEASE_MILESTONES")
+        self.assertEqual(policy["development"]["push_policy"], "EXPLICIT_USER_REQUEST")
+        self.assertEqual(policy["development"]["local_release_seal_policy"], "OPTIONAL_MILESTONE_OR_PUBLICATION_PREP")
+        self.assertFalse(policy["release"]["local_seal_required_each_batch"])
+
+    def test_publication_reuses_unchanged_sealed_verification_and_requires_user_request(self):
+        policy = release_validator.load_policy()
+        publication = policy["release"]["publication"]
+        self.assertTrue(publication["explicit_user_request_required"])
+        self.assertTrue(publication["batch_verified_local_releases"])
+        self.assertFalse(publication["rerun_full_regression_when_tag_commit_unchanged"])
+        self.assertTrue(publication["remote_ref_verification_required"])
 
     def test_published_tags_are_retained_and_immutable(self):
         policy = release_validator.load_policy()

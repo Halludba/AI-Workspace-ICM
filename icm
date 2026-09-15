@@ -71,8 +71,12 @@ def main() -> int:
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return observe_main()
     if surface == "plan":
-        from tools.plan_intelligence import main as plan_main
+        command = sys.argv[2] if len(sys.argv) > 2 else None
         sys.argv = [sys.argv[0], *sys.argv[2:]]
+        if command and command.startswith("window-"):
+            from tools.session_planner import main as session_plan_main
+            return session_plan_main()
+        from tools.plan_intelligence import main as plan_main
         return plan_main()
     if surface == "worker":
         from tools.local_worker import main as worker_main

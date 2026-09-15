@@ -11,7 +11,7 @@ Current suites:
 - `test_mutation_governance.py` -> two-axis mutation governance, target linkage, and commit-readiness invariants.
 - `test_impact_classifier.py` -> Git-aware verification-scope classification, staged/unstaged discovery, and pre-commit full-regression invariants.
 - `test_decision_records.py` -> privacy-key guards, append-only writes, supersession, and decision-record schema invariants.
-- `test_session_planner.py` -> ephemeral DAG validation, priority ordering, per-agent namespacing, lifecycle transitions, and self-deletion invariants.
+- `test_session_planner.py` -> ephemeral DAG validation, priority ordering, execution-window batching/lazy detail/checkpoints, per-agent namespacing, lifecycle transitions, and self-deletion invariants.
 - `test_workflow_contracts.py` -> workflow/stage/template invariants.
 - `test_run_contracts.py` -> run creation, snapshot, projection, and artifact invariants.
 - `test_run_manager.py` -> deterministic journal lifecycle, retries, idempotency, recovery, checkpoints, limits, and confinement.
@@ -24,12 +24,12 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_local_compute.py` -> noncanonical discovery, missing dependency blocking, NVENC/Ollama workload readiness, no-authority semantics, policy privacy, and CLI coverage.
 - `test_local_worker.py` -> exact base-source packet provenance, bounded context, candidate patch scope/applicability, no-private-reasoning result schema, Ollama-unavailable preflight, attempt locking/repair budget, and telemetry invariants.
 - `test_plan_intelligence.py` -> execution-task sufficiency, objective/verification requirements, targeted downstream/context reconciliation, and fail-closed unknown-change invariants.
-- `test_developer_observatory.py` -> privacy guards, model-free NORMAL mode, idempotent local recording, rework/escalation summaries, and no-invented-contribution audit deltas.
+- `test_developer_observatory.py` -> privacy guards, model-free NORMAL mode, idempotent local recording, rework/escalation summaries, slow-session mechanism ranking, self-tax visibility, and no-invented-contribution audit deltas.
 - `test_meta_advisor.py` -> suggestion compatibility/value-density gates, evidence-derived confidence, research triggers, bounded prompt compilation, and presentation-only invariants.
 - `test_evaluation_arena.py` -> arena identity, holdout blinding, evaluator provenance, privacy, and no-auto-promotion invariants.
 - `test_strategy_runner.py` -> bounded strategy execution, allowlisted dimensions, budget enforcement, evaluator blinding, early stopping, and no-auto-promotion invariants.
 
-- `test_interaction_contracts.py` -> bridge registry/source provenance, no-authority semantics, and conservative deduplication coverage.
+- `test_interaction_contracts.py` -> bridge registry/source provenance, no-authority semantics, conservative deduplication coverage, and event-driven maintenance review triggers.
 
 - `test_suggestion_queue.py` -> neutral silence/topic changes, approval scoping, accepted-only promotion, compact summaries, and Git-ignored queue storage.
 

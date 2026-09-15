@@ -36,3 +36,8 @@ Do not load unrelated config files.
 - `suggestion_policy.json` -> Git-ignored suggestion lifecycle, compact summaries, and exact approval-scope semantics; no automatic execution/planner mutation.
 
 - `human_presentation_policy.json` -> strong-mapping concept callouts and compact planner/suggestion continuity presentation; presentation only.
+
+- `session_policy.json` execution-window fields -> bounded planner snapshots, compact orientation, cheap checkpoints, and one close-time reconciliation.
+- `developer_observatory_policy.json` efficiency review -> absolute/relative slow-session triggers using observable execution events only.
+- `release_policy.json` publication -> optional local sealing and explicit-user-request batched remote publication.
+- `interaction_policy.json` maintenance -> cheap structural validation triggers and evidence-gated semantic dedup review cadence.

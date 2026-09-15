@@ -20,3 +20,6 @@ A shared invariant may become the canonical home of repeated relationship wordin
 
 ## Interpretation
 This is design-by-contract applied between ICM subsystems. It is also an integration-contract layer: components keep their own responsibilities while the bridge owns what must remain true when they meet.
+
+## Maintenance cadence
+Structural interaction validation is cheap and should run when registered component contracts change and at local-seal/publication boundaries. Semantic rule-centralization review is more expensive and should be evidence-triggered: multi-component contract changes, an explicit deduplication candidate, or a bounded publication interval. Publication review may recommend centralization, but never automatically deletes local safety rules.

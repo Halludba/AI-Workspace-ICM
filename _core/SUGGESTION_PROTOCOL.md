@@ -17,6 +17,7 @@ Useful suggestions may outlive the conversation turn where they were proposed. I
 6. Exact approval phrases have bounded scopes: `go ahead` = current primary suggestion; `go ahead with all` = current presented bundle; `go ahead with all pending suggestions` = all unresolved pending suggestions. Other natural language must be semantically resolved before the deterministic scope is applied.
 7. `all` never silently means historical suggestions outside the stated/current scope.
 8. Revalidate compatibility before promoting an old suggestion whose reviewed revision no longer matches current canonical state.
+9. When the current user explicitly authorizes implementation conditional only on there being no material counter-suggestion or blocker, completing that review with none resolves the condition and execution may continue under normal mutation governance without asking for another confirmation. The review result does not create authority; the user instruction already supplied it.
 
 ## Authority
 Suggestion storage, approval-scope resolution, and promotion eligibility are advisory/continuity mechanics. They grant no repository mutation authority by themselves.

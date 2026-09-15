@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ICM workspace trampoline. v0.5 exposes the run lifecycle surface only."""
+"""ICM workspace trampoline for run lifecycle and assurance governance."""
 from __future__ import annotations
 
 import sys
@@ -11,12 +11,16 @@ if str(ROOT) not in sys.path:
 
 
 def main() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] != "run":
-        print("usage: icm run <command> [args]", file=sys.stderr)
+    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance"}:
+        print("usage: icm {run,assurance} <command> [args]", file=sys.stderr)
         return 2
-    from tools.run_manager import main as run_main
+    surface = sys.argv[1]
     sys.argv = [sys.argv[0], *sys.argv[2:]]
-    return run_main()
+    if surface == "run":
+        from tools.run_manager import main as run_main
+        return run_main()
+    from tools.assurance_controller import main as assurance_main
+    return assurance_main()
 
 
 if __name__ == "__main__":

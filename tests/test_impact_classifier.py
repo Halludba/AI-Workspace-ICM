@@ -130,6 +130,10 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/run_manager.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_assurance_controller_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/assurance_controller.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
     def test_malformed_policy_fails_cleanly(self):
         (self.repo / "config/impact_policy.json").write_text("{}\n", encoding="utf-8")
         with self.assertRaises(impact_classifier.PolicyError):

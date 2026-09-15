@@ -15,6 +15,7 @@ Use this root only for the workstation's constitutional architecture.
 - Run artifact integrity/provenance -> `ARTIFACT_PROTOCOL.md`
 - Release/version governance -> `RELEASE_POLICY.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
+- Adaptive deliberation / epistemic assurance -> `ASSURANCE_PROTOCOL.md`
 
 Do not load every core contract for an unrelated task.
 Core rules outrank lower local contracts according to `AUTHORITY.md`.

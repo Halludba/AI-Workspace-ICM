@@ -1,0 +1,145 @@
+{
+  "policy_schema": "1.0",
+  "assurance_states": [
+    "UNKNOWN",
+    "PLAUSIBLE",
+    "SUPPORTED",
+    "VERIFIED"
+  ],
+  "deliberation_levels": [
+    "L0_DIRECT",
+    "L1_DELIBERATE",
+    "L2_VERIFY",
+    "L3_CORROBORATE",
+    "L4_DEEP_ASSURANCE"
+  ],
+  "risk_levels": [
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL"
+  ],
+  "user_modes": [
+    "AUTO",
+    "FAST",
+    "NORMAL",
+    "DEEP"
+  ],
+  "terminal_outcomes": [
+    "ASSURED",
+    "PROCEED_WITH_UNCERTAINTY",
+    "REQUEST_HUMAN",
+    "ABSTAIN",
+    "BLOCK"
+  ],
+  "risk_policy": {
+    "LOW": {
+      "required_assurance": "PLAUSIBLE",
+      "minimum_level": "L0_DIRECT",
+      "uncertainty_outcome": "PROCEED_WITH_UNCERTAINTY"
+    },
+    "MEDIUM": {
+      "required_assurance": "SUPPORTED",
+      "minimum_level": "L1_DELIBERATE",
+      "uncertainty_outcome": "PROCEED_WITH_UNCERTAINTY"
+    },
+    "HIGH": {
+      "required_assurance": "SUPPORTED",
+      "minimum_level": "L2_VERIFY",
+      "uncertainty_outcome": "REQUEST_HUMAN"
+    },
+    "CRITICAL": {
+      "required_assurance": "VERIFIED",
+      "minimum_level": "L3_CORROBORATE",
+      "uncertainty_outcome": "BLOCK"
+    }
+  },
+  "trigger_causes": [
+    "AMBIGUITY",
+    "CONTRADICTION",
+    "CRITICAL_UNKNOWN",
+    "FAILED_VERIFICATION",
+    "LIVE_STATE_UNKNOWN",
+    "MISSING_EVIDENCE",
+    "HIGH_NOVELTY",
+    "IRREVERSIBLE",
+    "HIGH_BLAST_RADIUS",
+    "USER_DEEP"
+  ],
+  "delta_types": [
+    "NEW_PRIMARY_EVIDENCE",
+    "INDEPENDENT_CORROBORATION",
+    "DETERMINISTIC_VERIFICATION",
+    "LIVE_STATE_OBSERVED",
+    "CONTRADICTION_RESOLVED",
+    "ASSUMPTION_VERIFIED",
+    "AMBIGUITY_RESOLVED",
+    "UNKNOWN_RESOLVED",
+    "REPRODUCED_RESULT"
+  ],
+  "budgets": {
+    "max_actions": 3,
+    "max_external_actions": 2,
+    "max_deep_actions": 1,
+    "max_consecutive_no_delta": 1
+  },
+  "cache": {
+    "enabled": true,
+    "root": ".session/assurance",
+    "requires_basis_fingerprint": true,
+    "minimum_assurance": "SUPPORTED"
+  },
+  "self_confidence": {
+    "accepted_for_observation": true,
+    "authoritative_for_gate": false
+  },
+  "impact_signal": {
+    "full_regression_minimum_level": "L2_VERIFY"
+  },
+  "forbidden_record_keys": [
+    "chain_of_thought",
+    "private_reasoning",
+    "hidden_reasoning",
+    "scratchpad",
+    "cot"
+  ],
+  "actions": {
+    "DELIBERATE": "L1_DELIBERATE",
+    "RUN_DETERMINISTIC_CHECK": "L2_VERIFY",
+    "INSPECT_LIVE_STATE": "L2_VERIFY",
+    "ASK_USER": "L1_DELIBERATE",
+    "SEARCH_PRIMARY_SOURCE": "L3_CORROBORATE",
+    "SEARCH_INDEPENDENT_SOURCE": "L3_CORROBORATE",
+    "RESOLVE_CONTRADICTION": "L3_CORROBORATE",
+    "INDEPENDENT_REVIEW": "L3_CORROBORATE"
+  },
+  "external_actions": [
+    "ASK_USER",
+    "SEARCH_PRIMARY_SOURCE",
+    "SEARCH_INDEPENDENT_SOURCE",
+    "RESOLVE_CONTRADICTION",
+    "INDEPENDENT_REVIEW"
+  ],
+  "internal_only_actions": [
+    "DELIBERATE"
+  ],
+  "quick_trigger": {
+    "always_invoke_risks": [
+      "HIGH",
+      "CRITICAL"
+    ],
+    "always_invoke_impact_scopes": [
+      "FULL_REGRESSION"
+    ],
+    "known_flag_keys": [
+      "ambiguity",
+      "contradiction",
+      "critical_unknown",
+      "failed_verification",
+      "live_state_unknown",
+      "missing_evidence",
+      "high_novelty",
+      "irreversible"
+    ]
+  }
+}

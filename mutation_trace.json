@@ -1,49 +1,99 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v061-release-governance",
-  "summary": "Adopt strict SemVer release governance, local Git commits as development identities, structured annotated release tags, and correct the malformed v0.6.0.5 release identity to v0.6.1.",
+  "directive_id": "DIR-2026-09-15:v070-adaptive-assurance",
+  "summary": "Release v0.7.0 Adaptive Assurance Runtime with trigger-gated deliberation, evidence-backed assurance, bounded escalation, cache reuse, and CLI integration.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": ["WORKSPACE.json", "README.md", "tests/test_context_routing.py"],
-      "change_kind": "REWRITE",
+      "target_paths": [
+        "_core/ASSURANCE_PROTOCOL.md"
+      ],
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Correct the public release identity to strict SemVer v0.6.1 while preserving runtime semantics."
+      "rationale": "Add the constitutional adaptive-assurance contract and explicit semantic/deterministic boundary."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": ["_core/RELEASE_POLICY.md", "config/release_policy.json"],
+      "target_paths": [
+        "config/assurance_policy.json"
+      ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add human-readable and machine-readable release/version governance."
+      "rationale": "Add machine-readable assurance states, deliberation levels, risk floors, trigger policy, budgets, cache rules, actions, and privacy guard."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": ["_core/CONTEXT.md", "config/CONTEXT.md"],
-      "change_kind": "MERGE",
+      "target_paths": [
+        "tools/assurance_controller.py"
+      ],
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Route release work selectively without loading release policy during unrelated tasks."
+      "rationale": "Add deterministic trigger/evaluation, epistemic-delta validation, bounded routing, and confined ephemeral cache mechanics."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": ["tools/release_validator.py", "tests/test_release_policy.py"],
+      "target_paths": [
+        "tests/test_assurance_controller.py"
+      ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Make SemVer, release-policy, and structured annotated-tag-note rules mechanically testable."
+      "rationale": "Add executable coverage for assurance routing, evidence provenance, budgets, cache invalidation/confinement, manual modes, and Windows BOM JSON input."
     },
     {
       "candidate_id": "C-005",
-      "target_paths": ["tools/CONTEXT.md", "tools/README.md"],
+      "target_paths": [
+        "_core/AUTHORITY.md",
+        "_core/CONTEXT.md",
+        "_core/CONVENTIONS.md",
+        "config/CONTEXT.md",
+        "config/impact_policy.json",
+        "icm",
+        "tools/CONTEXT.md",
+        "tools/README.md",
+        "tests/test_cli.py",
+        "tests/test_impact_classifier.py"
+      ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Document the release validator in the deterministic tools route."
+      "rationale": "Integrate assurance into authority/routing, full-regression impact signaling, root CLI dispatch, tool documentation, and integration tests without granting run-mutation authority."
+    },
+    {
+      "candidate_id": "C-006",
+      "target_paths": [
+        "README.md",
+        "WORKSPACE.json",
+        "tests/test_context_routing.py",
+        "tests/test_release_policy.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Promote the workspace identity to v0.7.0 Adaptive Assurance Runtime and align release/context regression expectations."
     }
   ],
   "applied_changes": [
-    {"candidate_id": "C-001", "description": "Updated release metadata and regression expectation to v0.6.1."},
-    {"candidate_id": "C-002", "description": "Added release policy contracts."},
-    {"candidate_id": "C-003", "description": "Added selective release-policy routing."},
-    {"candidate_id": "C-004", "description": "Added release validator and regression tests."},
-    {"candidate_id": "C-005", "description": "Documented the release validator in tool context."}
+    {
+      "candidate_id": "C-001",
+      "description": "Added Adaptive Assurance Protocol."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Added assurance policy with explicit floors, triggers, budgets, cache, actions, and non-authoritative self-confidence."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Added assurance controller and CLI surface."
+    },
+    {
+      "candidate_id": "C-004",
+      "description": "Added adaptive assurance regression coverage."
+    },
+    {
+      "candidate_id": "C-005",
+      "description": "Integrated assurance with current authority, context routing, impact classification, CLI, and documentation."
+    },
+    {
+      "candidate_id": "C-006",
+      "description": "Promoted release metadata to v0.7.0."
+    }
   ]
 }

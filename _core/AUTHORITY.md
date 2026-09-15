@@ -19,6 +19,7 @@ When instructions or state conflict, resolve them in this order:
 - Lower layers may narrow behavior only when consistent with higher layers.
 - Current user intent may supersede stored plans; update durable state if the change matters beyond the current turn.
 - Ephemeral session plans are continuity hints only. They cannot authorize workflow transitions, firmware changes, or run mutations; normal routing, contracts, and kernel checks still apply.
+- Ephemeral assurance cache entries are performance hints only; they cannot override current policy, changed evidence/state, or any higher-authority contract.
 - Conversation history is evidence, not canonical state.
 - Archive/history never outranks current contracts unless historical behavior is explicitly requested.
 - If authority cannot be resolved without a material assumption, stop and ask rather than inventing a rule.

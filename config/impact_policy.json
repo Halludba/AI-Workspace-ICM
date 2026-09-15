@@ -22,7 +22,8 @@
     "_core/EXECUTION_KERNEL.md",
     "_core/STATE_MODEL.md",
     "config/routes.json"
-  ],  "full_regression_prefixes": [
+  ],
+  "full_regression_prefixes": [
     "config/",
     "tools/kernel/",
     "workflows/_template/",
@@ -39,7 +40,9 @@
     "tools/check_mutation.py",
     "tools/impact_classifier.py",
     "tools/record_decision.py",
-    "tools/session_planner.py"
+    "tools/session_planner.py",
+    "tools/release_validator.py",
+    "tools/assurance_controller.py"
   ],
   "semantic_diff_tokens": [
     "authority",

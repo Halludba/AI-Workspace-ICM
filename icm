@@ -46,6 +46,10 @@ def main() -> int:
         from tools.capability_resolver import main as capability_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return capability_main()
+    if surface == "plan":
+        from tools.plan_intelligence import main as plan_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return plan_main()
     if surface == "worker":
         from tools.local_worker import main as worker_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]

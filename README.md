@@ -4,6 +4,8 @@ A host-neutral, filesystem-first template for structured AI work.
 
 Current stable release: **v1.0.0 - Context-Efficient Local Worker Delegation**.
 
+Development line: **v1.1.0-dev - Adaptive Planning & Developer Observability**. Meta-functions remain lazy, deterministic where possible, and evidence-gated rather than always-on agents.
+
 No post-v1 development line is declared in this release; future work should be selected from current user direction and the active noncanonical planner rather than invented in advance.
 
 Start here:

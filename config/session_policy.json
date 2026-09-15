@@ -88,7 +88,8 @@
     "status_reason",
     "target_role",
     "context_refs",
-    "acceptance_criteria"
+    "acceptance_criteria",
+    "verification"
   ],
   "auto_delete_on_empty_required": true,
   "max_in_progress": 1,

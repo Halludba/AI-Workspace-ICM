@@ -1,0 +1,15 @@
+# Plan Intelligence Protocol
+
+## Purpose
+Check whether an execution-class planner task is sufficiently specified before work begins, and identify downstream tasks whose recorded dependencies or context assumptions should be reconsidered after a material change.
+
+## Sufficiency gate
+The gate is deterministic and cheap. It validates explicit planner fields; it does not ask a model whether a plan ?feels complete.? Execution-class tasks require a bounded route/scope, target role, context references, acceptance criteria, and at least one verification instruction. Read-only architectural discussion may remain outside the planner.
+
+A `SUFFICIENT` result means the declared minimum fields are present and structurally usable. It does not prove the plan is semantically correct or that execution is authorized.
+
+## Reconciliation
+Reconciliation consumes explicit changed task IDs and/or changed context references, walks only planner dependency edges, and reports unfinished affected tasks. It never rewrites tasks, changes authority, or starts execution. Semantic changes not represented by declared dependencies/context references require System Architect review.
+
+## Authority
+Planner state remains Git-ignored, noncanonical intent. The gate and reconciler make no model calls, grant no mutation/execution authority, and do not replace current user authorization or live repository verification.

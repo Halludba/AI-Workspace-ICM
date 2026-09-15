@@ -1,26 +1,39 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v100-release-closure",
+  "directive_id": "DIR-2026-09-15:T-1110-plan-intelligence",
   "actor_role": "icm-runtime-architect",
-  "summary": "Promote verified v1.0 development state to public v1.0.0 release metadata after completed context-growth review and fixed-ref benchmark evidence.",
+  "summary": "Open v1.1 development line and add deterministic plan sufficiency/reconciliation without model calls or plan authority.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "WORKSPACE.json",
         "README.md",
+        "WORKSPACE.json",
+        "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+        "config/CONTEXT.md",
+        "config/impact_policy.json",
+        "config/plan_intelligence_policy.json",
+        "config/session_policy.json",
+        "icm",
+        "tests/CONTEXT.md",
         "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_impact_classifier.py",
+        "tests/test_plan_intelligence.py",
+        "tests/test_release_policy.py",
+        "tests/test_session_planner.py",
+        "tools/CONTEXT.md",
+        "tools/plan_intelligence.py",
+        "tools/session_planner.py"
       ],
-      "change_kind": "REWRITE",
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Promote version/status and release-facing assertions only; implementation semantics remain unchanged."
+      "rationale": "Extend existing planner/runtime surfaces with bounded plan intelligence and required tests/docs."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted workspace metadata to 1.0.0, named the stable release, removed the development-line claim, and updated release/version assertions."
+      "description": "Added plan sufficiency/reconciliation policy, protocol, tool, CLI integration, verification metadata, and development-line assertions."
     }
   ]
 }

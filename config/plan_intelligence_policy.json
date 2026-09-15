@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "execution_target_roles": [
+    "icm-runtime-architect",
+    "workflow-architect",
+    "profile-architect",
+    "skill-architect"
+  ],
+  "required_execution_task_fields": [
+    "title",
+    "route_id",
+    "declared_scope",
+    "target_role",
+    "context_refs",
+    "acceptance_criteria",
+    "verification"
+  ],
+  "verification_min_items": 1,
+  "reconciliation_statuses": [
+    "PENDING",
+    "BLOCKED"
+  ],
+  "authority": "ADVISORY_DETERMINISTIC_GATE",
+  "mutates_plan": false,
+  "model_calls_required": false
+}

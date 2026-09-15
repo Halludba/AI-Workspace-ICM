@@ -259,7 +259,7 @@ def validate_plan(plan: dict, policy: dict | None = None, *, root: Path = ROOT) 
             target_role = _nonempty(task["target_role"], f"{tid}.target_role")
             if target_role not in role_ids:
                 raise SessionPlanError(f"{tid}: unknown target_role {target_role}")
-        for field in ("context_refs", "acceptance_criteria"):
+        for field in ("context_refs", "acceptance_criteria", "verification"):
             if field in task:
                 values = task[field]
                 if not isinstance(values, list) or not values or any(not isinstance(value, str) or not value.strip() for value in values):

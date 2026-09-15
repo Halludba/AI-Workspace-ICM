@@ -51,7 +51,7 @@ One committed immutable journal event is the transaction boundary. Event commit 
 Sequence gaps, malformed events, conflicting operation IDs, ambiguous locks, invalid projections, or definition-integrity failures fail closed.
 
 ## Termination
-Workflow validation may prove that every stage has a path to a terminal stage. This is terminal reachability only. Because loops are permitted, it does not guarantee that a particular execution will terminate. The journal event ceiling provides runaway protection, not a proof of semantic termination.
+Workflow validation may prove that every stage has a path to a terminal stage. This is terminal reachability only. Because loops are permitted, it does not guarantee that a particular execution will terminate. The event-derived convergence guard terminalizes a non-adjacent revisit of the same normalized persisted working state as `CYCLE_DETECTED`, while adjacent equality remains valid stability. The journal event ceiling remains the universal runaway bound. Neither mechanism is a formal proof of semantic termination.
 
 ## Template rule
 `work/_template/` is non-executable and domain-neutral. It demonstrates directory/projection structure only; its `journal/` contains no committed run events.

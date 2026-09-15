@@ -16,6 +16,7 @@ Current generic tools:
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.
 - `kernel/events.py` -> event envelope, taxonomy, and kernel error contracts.
 - `kernel/reducer.py` -> pure event fold/state-machine enforcement.
+- `kernel/convergence.py` -> event-derived persisted-state fingerprints and non-adjacent cycle classification.
 - `kernel/lock.py` -> platform-aware single-writer lock and explicit recovery primitives.
 - `kernel/journal.py` -> durable event commit, replay, checkpoints, projections, hashing, and confinement.
 

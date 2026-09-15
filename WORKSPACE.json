@@ -37,7 +37,8 @@
     "decision_policy": "config/decision_policy.json",
     "decision_recorder": "tools/record_decision.py",
     "session_policy": "config/session_policy.json",
-    "session_planner": "tools/session_planner.py"
+    "session_planner": "tools/session_planner.py",
+    "convergence_guard": "tools/kernel/convergence.py"
   },
   "roots": {
     "core": "_core",

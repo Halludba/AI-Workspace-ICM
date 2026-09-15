@@ -14,4 +14,6 @@ Use `record_decision.py` for append-only, privacy-safe decision summaries under 
 
 Use `session_planner.py` for Git-ignored per-agent continuity queues under `.session/plans/`. It validates DAG mechanics and deterministic task ordering, but it does not interpret authority or execute work; selected tasks must re-enter normal routing and execution boundaries.
 
+The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
+
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

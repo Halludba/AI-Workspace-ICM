@@ -1,4 +1,4 @@
-﻿"""Event contracts and kernel error types for ICM run execution."""
+"""Event contracts and kernel error types for ICM run execution."""
 from __future__ import annotations
 
 import json
@@ -53,6 +53,10 @@ class LockRecoveryRequired(LockError):
 
 
 class EventLimitExceededError(KernelError):
+    pass
+
+
+class CycleDetectedError(KernelError):
     pass
 
 

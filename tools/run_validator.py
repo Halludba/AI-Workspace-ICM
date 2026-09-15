@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -12,11 +13,13 @@ if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tools import workflow_validator
+from tools.kernel.convergence import classify_completion
 from tools.kernel.events import KernelError
 from tools.kernel.journal import (
     attempt_projection,
     canonical_sha256,
     confined,
+    load_definition,
     load_json_object,
     materialize_projections,
     read_events,
@@ -25,6 +28,7 @@ from tools.kernel.journal import (
     sha256_file,
     verify_definition_binding,
 )
+from tools.kernel.reducer import reduce_events
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "run_policy.json"
@@ -178,6 +182,49 @@ def validate_run(run_dir: Path, pol: dict | None = None) -> list[str]:
             and last.get("payload", {}).get("reason") == "EXCEEDED_MAX_JOURNAL_EVENTS"
         ):
             errors.append("reserved terminal sequence must be emergency RUN_FAILED")
+
+    convergence_policy = pol.get("convergence_guard", {})
+    cycle_prefix = convergence_policy.get("reserved_operation_prefix", "__KERNEL_CYCLE_")
+    manifest, contracts = load_definition(run_dir)
+    for index, cycle_event in enumerate(events):
+        payload = cycle_event.get("payload", {})
+        if payload.get("reason") != "CYCLE_DETECTED":
+            continue
+        trigger = payload.get("trigger_operation_id")
+        expected_op = None
+        if isinstance(trigger, str):
+            expected_op = cycle_prefix + hashlib.sha256(trigger.encode("utf-8")).hexdigest()[:24]
+        if cycle_event.get("event_type") != "RUN_FAILED" or cycle_event.get("operation_id") != expected_op:
+            errors.append("CYCLE_DETECTED must use deterministic kernel RUN_FAILED provenance")
+            continue
+        if payload.get("rejected_event_type") != "ATTEMPT_COMPLETED" or not isinstance(payload.get("rejected_payload"), dict):
+            errors.append("CYCLE_DETECTED missing rejected completion provenance")
+            continue
+        if index == 0:
+            errors.append("CYCLE_DETECTED cannot be the first journal event")
+            continue
+        try:
+            prior_events = events[:index]
+            prior_state = reduce_journal(run_dir, prior_events, use_checkpoint=False)
+            hypothetical = {
+                "schema_version": "1.0",
+                "sequence": cycle_event["sequence"],
+                "operation_id": trigger,
+                "run_id": cycle_event["run_id"],
+                "event_type": "ATTEMPT_COMPLETED",
+                "timestamp": cycle_event["timestamp"],
+                "payload": payload["rejected_payload"],
+            }
+            candidate_state = reduce_events([hypothetical], manifest, contracts, initial_state=prior_state)
+            detected = classify_completion(prior_events, candidate_state, manifest, contracts)
+            if detected.get("classification") != "CYCLE":
+                errors.append("CYCLE_DETECTED provenance does not reproduce a cycle")
+            if payload.get("repeated_state_sha256") != detected.get("sha256"):
+                errors.append("CYCLE_DETECTED repeated_state_sha256 mismatch")
+            if payload.get("first_seen_sequence") != detected.get("first_seen_sequence"):
+                errors.append("CYCLE_DETECTED first_seen_sequence mismatch")
+        except KernelError as exc:
+            errors.append(f"CYCLE_DETECTED provenance invalid: {exc}")
 
     definition = run_dir / "definition"
     workflow_id = state["workflow"]["id"]

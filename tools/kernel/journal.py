@@ -12,6 +12,7 @@ from pathlib import Path
 
 from tools.kernel.events import (
     EVENT_FILENAME_RE,
+    CycleDetectedError,
     EventLimitExceededError,
     IdempotencyConflictError,
     JournalError,
@@ -22,6 +23,7 @@ from tools.kernel.events import (
     now_utc,
     validate_event_envelope,
 )
+from tools.kernel.convergence import classify_completion
 from tools.kernel.lock import kernel_lock
 from tools.kernel.reducer import reduce_events, required_output_contracts
 
@@ -36,6 +38,7 @@ CHECKPOINT_EVENTS = {
     "RUN_FAILED",
 }
 EMERGENCY_OPERATION_ID = "__KERNEL_MAX_EVENTS__"
+KERNEL_OPERATION_PREFIX = "__KERNEL_"
 
 
 def load_json_object(path: Path, label: str) -> dict:
@@ -473,6 +476,91 @@ def _operation_event(events: list[dict], operation_id: str) -> dict | None:
     return next((event for event in events if event.get("operation_id") == operation_id), None)
 
 
+def _convergence_policy() -> dict:
+    policy = POLICY.get("convergence_guard")
+    if not isinstance(policy, dict):
+        raise KernelError("run policy missing convergence_guard object")
+    required = {
+        "enabled", "evaluate_on", "strategy", "adjacent_equal",
+        "cycle_failure_reason", "reserved_operation_prefix",
+    }
+    missing = sorted(required - set(policy))
+    if missing:
+        raise KernelError("convergence_guard missing field(s): " + ", ".join(missing))
+    if policy["enabled"] is not True:
+        return policy
+    if policy["evaluate_on"] != "ATTEMPT_COMPLETED":
+        raise KernelError("unsupported convergence evaluate_on")
+    if policy["strategy"] != "NON_ADJACENT_PERSISTED_STATE_REVISIT":
+        raise KernelError("unsupported convergence strategy")
+    if policy["adjacent_equal"] != "STABLE":
+        raise KernelError("adjacent_equal must remain STABLE")
+    prefix = policy["reserved_operation_prefix"]
+    if not isinstance(prefix, str) or not prefix.startswith(KERNEL_OPERATION_PREFIX):
+        raise KernelError("invalid convergence reserved operation prefix")
+    return policy
+
+
+def _cycle_operation_id(trigger_operation_id: str) -> str:
+    prefix = _convergence_policy()["reserved_operation_prefix"]
+    digest = hashlib.sha256(trigger_operation_id.encode("utf-8")).hexdigest()[:24]
+    return f"{prefix}{digest}"
+
+
+def _cycle_failure_for_trigger(events: list[dict], trigger_operation_id: str) -> dict | None:
+    for event in events:
+        payload = event.get("payload", {})
+        if (
+            event.get("event_type") == "RUN_FAILED"
+            and payload.get("reason") == "CYCLE_DETECTED"
+            and payload.get("trigger_operation_id") == trigger_operation_id
+        ):
+            return event
+    return None
+
+
+def _terminalize_cycle(
+    run_dir: Path,
+    events: list[dict],
+    state: dict,
+    manifest: dict,
+    contracts: dict[str, dict],
+    *,
+    trigger_operation_id: str,
+    rejected_payload: dict,
+    detection: dict,
+    timestamp: str,
+) -> dict:
+    current = state["current"]
+    internal_operation_id = _cycle_operation_id(trigger_operation_id)
+    if _operation_event(events, internal_operation_id) is not None:
+        raise JournalError("reserved convergence operation id already exists")
+    event = {
+        "schema_version": "1.0",
+        "sequence": len(events) + 1,
+        "operation_id": internal_operation_id,
+        "run_id": state["run_id"],
+        "event_type": "RUN_FAILED",
+        "timestamp": timestamp,
+        "payload": {
+            "reason": "CYCLE_DETECTED",
+            "failed_at_stage": current["stage_id"],
+            "failed_at_attempt": current.get("attempt"),
+            "trigger_operation_id": trigger_operation_id,
+            "rejected_event_type": "ATTEMPT_COMPLETED",
+            "rejected_payload": rejected_payload,
+            "repeated_state_sha256": detection["sha256"],
+            "first_seen_sequence": detection["first_seen_sequence"],
+        },
+    }
+    new_state = reduce_events([event], manifest, contracts, initial_state=state)
+    commit_event_file(run_dir, event)
+    candidate = events + [event]
+    materialize_projections(run_dir, new_state, candidate)
+    write_checkpoint(run_dir, new_state, candidate)
+    return event
+
+
 def _emergency_fail(run_dir: Path, events: list[dict], state: dict, manifest: dict, contracts: dict[str, dict]) -> None:
     if _operation_event(events, EMERGENCY_OPERATION_ID) is not None:
         raise JournalError("reserved emergency operation id already exists")
@@ -508,8 +596,8 @@ def execute_event(
 ) -> dict:
     if not isinstance(operation_id, str) or not OPERATION_RE.fullmatch(operation_id):
         raise KernelError("operation_id must match [A-Za-z0-9_-]+")
-    if operation_id == EMERGENCY_OPERATION_ID:
-        raise KernelError("operation_id is reserved by the kernel")
+    if operation_id.startswith(KERNEL_OPERATION_PREFIX):
+        raise KernelError("operation_id prefix is reserved by the kernel")
     if not isinstance(payload, dict):
         raise KernelError("event payload must be an object")
 
@@ -518,6 +606,15 @@ def execute_event(
         manifest, contracts = load_definition(run_dir)
         events = read_events(run_dir)
         state = reduce_journal(run_dir, events) if events else None
+        cycle_failure = _cycle_failure_for_trigger(events, operation_id)
+        if cycle_failure is not None:
+            if event_type == "ATTEMPT_COMPLETED":
+                raise CycleDetectedError(
+                    "CYCLE_DETECTED: completion previously terminalized this run"
+                )
+            raise IdempotencyConflictError(
+                f"operation_id previously triggered cycle terminalization: {operation_id}"
+            )
         existing = _operation_event(events, operation_id)
         if existing is not None:
             requested = (run_dir.name, event_type, json.dumps(payload, sort_keys=True, separators=(",", ":")))
@@ -556,6 +653,20 @@ def execute_event(
             verify_definition_binding(run_dir, new_state, full=True)
         if event_type == "ATTEMPT_COMPLETED":
             verify_definition_binding(run_dir, new_state, stage_id=new_state["current"]["stage_id"])
+            convergence = _convergence_policy()
+            if convergence.get("enabled") is True:
+                detection = classify_completion(events, new_state, manifest, contracts)
+                if detection["classification"] == "CYCLE":
+                    _terminalize_cycle(
+                        run_dir, events, state, manifest, contracts,
+                        trigger_operation_id=operation_id,
+                        rejected_payload=payload,
+                        detection=detection,
+                        timestamp=event["timestamp"],
+                    )
+                    raise CycleDetectedError(
+                        "CYCLE_DETECTED: non-adjacent persisted working state revisited"
+                    )
         commit_event_file(run_dir, event)
         candidate = events + [event]
         materialize_projections(run_dir, new_state, candidate)

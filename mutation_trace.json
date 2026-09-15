@@ -1,43 +1,45 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step5",
-  "summary": "Add a non-authoritative, self-deleting, agent-namespaced ephemeral session planner with deterministic DAG eligibility and ordering.",
+  "directive_id": "DIR-2026-09-15:v06-step6",
+  "summary": "Add event-derived persisted-state convergence protection without mutable tracker state.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": ["_core/AUTHORITY.md", "_core/CONTEXT_PROTOCOL.md", "_core/CONVENTIONS.md"],
-      "change_kind": "MERGE",
+      "target_paths": [
+        "tools/kernel/convergence.py"
+      ],
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Place ephemeral plans below durable run state and define their non-authoritative Continue semantics."
+      "rationale": "Add pure persisted working-state fingerprint and history classification."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": ["config/session_policy.json"],
-      "change_kind": "NEW",
+      "target_paths": [
+        "tools/kernel/events.py",
+        "tools/kernel/journal.py",
+        "tools/run_validator.py",
+        "config/run_policy.json"
+      ],
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Define the machine-readable ephemeral plan schema, transitions, and priority hierarchy."
+      "rationale": "Integrate cycle terminalization, reserved operation provenance, policy, and independent full verification into the existing kernel boundary."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": ["tools/session_planner.py"],
+      "target_paths": [
+        "tests/test_convergence_guard.py"
+      ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Implement plan validation, DAG selection, lifecycle transitions, and auto-deletion."
+      "rationale": "Add adversarial stable/cycle, retry, progress, reserved-operation, malformed-policy, and provenance tests."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": ["tests/test_session_planner.py"],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add adversarial DAG, priority, lifecycle, namespacing, and cleanup coverage."
-    },
-    {
-      "candidate_id": "C-005",
       "target_paths": [
-        ".gitignore",
+        "_core/CONVENTIONS.md",
+        "_core/EXECUTION_KERNEL.md",
+        "_core/RUN_PROTOCOL.md",
         "WORKSPACE.json",
-        "config/CONTEXT.md",
-        "config/impact_policy.json",
         "tools/CONTEXT.md",
         "tools/README.md",
         "tests/CONTEXT.md",
@@ -45,14 +47,25 @@
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate the ephemeral planner into existing policy/tool/test indexes while keeping .session non-canonical and ignored."
+      "rationale": "Document and route the convergence guard without changing the frozen event taxonomy."
     }
   ],
   "applied_changes": [
-    {"candidate_id": "C-001", "description": "Integrated non-authoritative session plans into authority, context, and conventions."},
-    {"candidate_id": "C-002", "description": "Added machine-readable session planner policy."},
-    {"candidate_id": "C-003", "description": "Added deterministic ephemeral session planner tool."},
-    {"candidate_id": "C-004", "description": "Added adversarial session planner tests."},
-    {"candidate_id": "C-005", "description": "Added Git ignore and integrated session planner into workspace/config/tool/test indexes and impact policy."}
+    {
+      "candidate_id": "C-001",
+      "description": "Added pure event-derived convergence fingerprint module."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Integrated cycle detection and reconstructible RUN_FAILED terminalization with full-validator provenance checks."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Added convergence guard adversarial tests."
+    },
+    {
+      "candidate_id": "C-004",
+      "description": "Updated constitutional, kernel, run-protocol, workspace, tool, and test documentation."
+    }
   ]
 }

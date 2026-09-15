@@ -41,6 +41,9 @@ Declared required validation checks must be `PASS` before attempt completion.
 The reducer is side-effect-free. It folds ordered journal events plus the snapshotted workflow/stage contracts into `KernelState` and enforces sequence contiguity, timestamp monotonicity, unique committed operation IDs, workflow graph legality, attempt numbering, execution-sequence monotonicity, validation gates, active-target rules, and terminal immutability.
 Graph terminal reachability does not guarantee runtime termination; loops may be legal and still execute indefinitely unless bounded by another policy.
 
+## Convergence guard
+After a hypothetical `ATTEMPT_COMPLETED` reduction, the kernel derives a normalized persisted working-state fingerprint from run-input hashes, the latest successful output/aggregate-validation state for each stage, final-artifact hashes, and the declared next-stage cursor. Attempt numbers, timestamps, and attempt-directory prefixes are excluded. Adjacent identical fingerprints are `STABLE` and are not failed. A non-adjacent revisit after an intervening different fingerprint is a cycle: the requested completion is not committed and the kernel instead commits one `RUN_FAILED` event with reason `CYCLE_DETECTED` plus reconstructible trigger provenance. Full validation independently replays that rejected completion and confirms the cycle. The guard is event-derived and stores no mutable tracker state. Hidden model/conversation state is not treated as progress because material cross-stage state must cross durable artifact boundaries.
+
 ## Idempotency
 Idempotency is resolved before commit. Re-submitting the same `operation_id` with identical event type/payload returns the already-committed event. Reusing it for different intent raises `IdempotencyConflictError`. Two committed event files containing the same operation ID are journal corruption, not a valid duplicate/no-op.
 

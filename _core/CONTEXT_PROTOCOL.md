@@ -46,3 +46,4 @@ Every escalation record must preserve exact-source provenance, record a positive
 `tools/context_escalation.py` validates declared transitions. It does not infer semantic sufficiency, retrieve source, increase assurance, or create a second context authority. `tools/source_navigator.py` owns exact source retrieval and `tools/context_resolver.py` owns route selection.
 
 The escalation validator checks record structure and provenance fields; it does not independently prove that caller-supplied hashes match current bytes. Use Source Navigator retrieval evidence when loaded-byte verification is required.
+Prompt-block caching hints and host-observed runtime telemetry are governed separately by `_core/CONTEXT_RUNTIME_PROTOCOL.md`; they do not change context authority or escalation semantics.

@@ -30,3 +30,4 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `context_benchmark.py` -> deterministic context-economics benchmark catalog, synthetic scale fixtures, fixed-ref baselines, and p50/p95 summaries; unavailable provider metrics remain explicit.
 - `source_navigator.py` -> content-addressed noncanonical Python source maps plus exact symbol/region slices with Git/hash provenance and bounded fallback.
 - `context_escalation.py` -> validates adjacent C0-C5 context escalation records, exact-source provenance, and positive context deltas; it does not retrieve source or raise assurance.
+- `context_runtime.py` -> deterministic stable/dynamic prompt planning plus validation/comparison of host-observed runtime telemetry; cache controls remain performance hints only.

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "metric_schema": "config/context_benchmark_policy.json",
+  "prompt": {
+    "block_order": [
+      "STABLE_AUTHORITY",
+      "STABLE_ROUTED_CONTEXT",
+      "DYNAMIC_TASK",
+      "DYNAMIC_STATE"
+    ],
+    "stable_classes": [
+      "STABLE_AUTHORITY",
+      "STABLE_ROUTED_CONTEXT"
+    ],
+    "dynamic_classes": [
+      "DYNAMIC_TASK",
+      "DYNAMIC_STATE"
+    ],
+    "forbid_padding_for_cache": true,
+    "cache_hint_authority": "PERFORMANCE_HINT_ONLY"
+  },
+  "telemetry": {
+    "availability_states": [
+      "OBSERVED",
+      "UNAVAILABLE"
+    ],
+    "cache_states": [
+      "COLD",
+      "WARM",
+      "UNKNOWN"
+    ],
+    "provider_fields_optional": true
+  }
+}

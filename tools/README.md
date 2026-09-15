@@ -46,3 +46,4 @@ Use `role_resolver.py` / `icm role ...` to validate a semantically declared task
 - `icm inspect escalation policy` prints the bounded context-sufficiency contract; `icm inspect escalation validate <record.json>` validates a declared transition without retrieving source or changing assurance.
 
 Escalation record validation is structural; Source Navigator retrieval evidence supplies loaded-byte/hash verification when required.
+- `icm inspect runtime plan <request.json>` builds a stable-prefix/dynamic-suffix metadata plan; `template`, `validate`, and `compare-cache` record/compare only host-observed telemetry. Provider-specific cache controls are adapter hints, never authority, and prompt padding solely for cache eligibility is forbidden.

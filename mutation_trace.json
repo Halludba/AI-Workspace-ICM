@@ -1,34 +1,24 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-130-context-escalation",
+  "directive_id": "DIR-2026-09-15:T-140-cache-telemetry",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-130 by adding a bounded provenance-preserving context-sufficiency escalation validator while preserving source navigation, route authority, and assurance separation.",
+  "summary": "Execute planner task T-140 by adding provider-neutral stable/dynamic prompt planning and host-observed runtime telemetry without making cache controls authoritative.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "config/context_escalation_policy.json",
-        "tools/context_escalation.py",
-        "tests/test_context_escalation.py"
+        "_core/CONTEXT_RUNTIME_PROTOCOL.md",
+        "config/context_runtime_policy.json",
+        "tools/context_runtime.py",
+        "tests/test_context_runtime.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add deterministic C0-C5 transition validation, approved evidence reasons, exact-source provenance, and positive context-delta requirements."
+      "rationale": "Add a single bounded context-runtime layer for stable-prefix planning, cache hints, telemetry validation, and cold/warm comparison using the existing benchmark metric schema."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "tools/source_navigator.py",
-        "tests/test_source_navigator.py"
-      ],
-      "change_kind": "REWRITE",
-      "disposition": "ACCEPT",
-      "rationale": "Expose explicit exact-file retrieval required by the C4 whole-source level without changing source authority."
-    },
-    {
-      "candidate_id": "C-003",
-      "target_paths": [
-        "_core/ASSURANCE_PROTOCOL.md",
         "_core/CONTEXT_PROTOCOL.md",
         "WORKSPACE.json",
         "config/CONTEXT.md",
@@ -41,21 +31,17 @@
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate the bounded escalation contract into canonical protocols, CLI discovery, workspace entrypoints, verification scope, and documentation."
+      "rationale": "Integrate the new context-runtime protocol into workspace entrypoints, CLI discovery, context docs, verification scope, and tests."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added adjacent C0-C5 escalation validation with approved reason codes, exact SHA-256 provenance, positive context deltas, and no automatic assurance effect."
+      "description": "Added deterministic prompt block ordering/fingerprints with no cache padding and telemetry records that preserve unavailable host metrics as null rather than invented values."
     },
     {
       "candidate_id": "C-002",
-      "description": "Added explicit exact whole-file retrieval with exact loaded-byte provenance for C4."
-    },
-    {
-      "candidate_id": "C-003",
-      "description": "Integrated the context-sufficiency ladder across protocol docs, CLI, workspace metadata, impact classification, and test/context discovery."
+      "description": "Integrated context-runtime protocol/policy/tool into ICM discovery and full-regression classification."
     }
   ]
 }

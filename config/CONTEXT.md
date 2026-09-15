@@ -23,3 +23,4 @@ Do not load unrelated config files.
 - `context_benchmark_policy.json` -> deterministic benchmark metric schema, heuristic estimator, and synthetic scale-case catalog; no live-model requirement.
 - `source_navigator_policy.json` -> bounded deterministic source-map cache, region/symbol limits, and explicit exact-file fallback for unsupported sources.
 - `context_escalation_policy.json` -> bounded C0-C5 context-sufficiency transitions, permitted evidence reasons, provenance requirements, and assurance separation.
+- `context_runtime_policy.json` -> stable/dynamic prompt-block ordering, padding prohibition, cache-hint authority, telemetry availability/cache states, and shared benchmark metric schema reference.

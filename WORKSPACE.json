@@ -54,7 +54,10 @@
     "context_benchmark": "tools/context_benchmark.py",
     "source_navigator": "tools/source_navigator.py",
     "context_escalation_policy": "config/context_escalation_policy.json",
-    "context_escalation_controller": "tools/context_escalation.py"
+    "context_escalation_controller": "tools/context_escalation.py",
+    "context_runtime_protocol": "_core/CONTEXT_RUNTIME_PROTOCOL.md",
+    "context_runtime_policy": "config/context_runtime_policy.json",
+    "context_runtime": "tools/context_runtime.py"
   },
   "roots": {
     "core": "_core",

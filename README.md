@@ -2,9 +2,11 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current stable release: **v1.2.0 - Evaluation Arena**.
+Current local release: **v1.3.0 - Interaction & Continuity**.
 
-Development line: **v1.3.0-dev - Interaction & Continuity**. Shared cross-system invariants, suggestion continuity, human-facing concept/next-step presentation, and bounded strategy execution are being added without granting new implicit authority.
+Published remote release remains **v1.2.0 - Evaluation Arena** until an explicit user-authorized push publishes the local release.
+
+No post-v1.3 development line is declared in this local release; future work should be selected from current user direction and the active noncanonical planner rather than invented in advance.
 
 Start here:
 1. `WORKSPACE.md` - orientation.

@@ -24,3 +24,4 @@ Do not load unrelated config files.
 - `source_navigator_policy.json` -> bounded deterministic source-map cache, region/symbol limits, and explicit exact-file fallback for unsupported sources.
 - `context_escalation_policy.json` -> bounded C0-C5 context-sufficiency transitions, permitted evidence reasons, provenance requirements, and assurance separation.
 - `context_runtime_policy.json` -> stable/dynamic prompt-block ordering, padding prohibition, cache-hint authority, telemetry availability/cache states, and shared benchmark metric schema reference.
+- `local_compute_policy.json` -> fixed read-only probe allowlist, generic host feature definitions, and named workload prerequisites; it contains no observed machine state.

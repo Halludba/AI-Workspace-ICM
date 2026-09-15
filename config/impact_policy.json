@@ -24,7 +24,8 @@
     "config/routes.json",
     "skills/registry.json",
     "_core/ROLE_PROTOCOL.md",
-    "_core/CONTEXT_RUNTIME_PROTOCOL.md"
+    "_core/CONTEXT_RUNTIME_PROTOCOL.md",
+    "_core/LOCAL_COMPUTE_PROTOCOL.md"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -53,7 +54,8 @@
     "tools/context_benchmark.py",
     "tools/source_navigator.py",
     "tools/context_escalation.py",
-    "tools/context_runtime.py"
+    "tools/context_runtime.py",
+    "tools/local_compute.py"
   ],
   "semantic_diff_tokens": [
     "authority",

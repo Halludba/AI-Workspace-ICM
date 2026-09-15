@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "authority": "OBSERVATIONAL_NONCANONICAL",
+  "execution_authority": "NONE",
+  "probe_allowlist": [
+    "python",
+    "ffmpeg",
+    "ffprobe",
+    "ollama",
+    "nvidia-smi"
+  ],
+  "features": {
+    "NVIDIA_GPU": {
+      "probe": "nvidia-smi"
+    },
+    "NVENC": {
+      "requires_executables": [
+        "ffmpeg"
+      ],
+      "requires_features": [
+        "NVIDIA_GPU"
+      ],
+      "encoder_markers": [
+        "h264_nvenc",
+        "hevc_nvenc",
+        "av1_nvenc"
+      ]
+    }
+  },
+  "workloads": {
+    "VIDEO_TRANSCODE_NVENC": {
+      "requires_executables": [
+        "ffmpeg"
+      ],
+      "requires_features": [
+        "NVENC"
+      ]
+    },
+    "LOCAL_OLLAMA_WORKER": {
+      "requires_executables": [
+        "ollama"
+      ],
+      "requires_features": []
+    },
+    "LOCAL_PYTHON": {
+      "requires_executables": [
+        "python"
+      ],
+      "requires_features": []
+    }
+  }
+}

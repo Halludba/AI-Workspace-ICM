@@ -47,3 +47,4 @@ Use `role_resolver.py` / `icm role ...` to validate a semantically declared task
 
 Escalation record validation is structural; Source Navigator retrieval evidence supplies loaded-byte/hash verification when required.
 - `icm inspect runtime plan <request.json>` builds a stable-prefix/dynamic-suffix metadata plan; `template`, `validate`, and `compare-cache` record/compare only host-observed telemetry. Provider-specific cache controls are adapter hints, never authority, and prompt padding solely for cache eligibility is forbidden.
+- `icm inspect compute discover` observes current CPU/GPU/executable capability using a fixed allowlist; `resolve <workload>` reports READY/BLOCKED prerequisites. Results are ephemeral and never grant execution/mutation authority. GPU workloads such as NVENC do not require a local ChatGPT model.

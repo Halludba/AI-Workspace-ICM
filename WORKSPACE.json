@@ -57,7 +57,10 @@
     "context_escalation_controller": "tools/context_escalation.py",
     "context_runtime_protocol": "_core/CONTEXT_RUNTIME_PROTOCOL.md",
     "context_runtime_policy": "config/context_runtime_policy.json",
-    "context_runtime": "tools/context_runtime.py"
+    "context_runtime": "tools/context_runtime.py",
+    "local_compute_protocol": "_core/LOCAL_COMPUTE_PROTOCOL.md",
+    "local_compute_policy": "config/local_compute_policy.json",
+    "local_compute": "tools/local_compute.py"
   },
   "roots": {
     "core": "_core",

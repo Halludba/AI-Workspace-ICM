@@ -16,8 +16,8 @@ def main() -> int:
         return 2
     surface = sys.argv[1]
     if surface == "inspect":
-        if len(sys.argv) < 3 or sys.argv[2] not in {"tokens", "benchmark", "source", "escalation", "runtime"}:
-            print("usage: icm inspect {tokens,benchmark,source,escalation,runtime} <command> [args]", file=sys.stderr)
+        if len(sys.argv) < 3 or sys.argv[2] not in {"tokens", "benchmark", "source", "escalation", "runtime", "compute"}:
+            print("usage: icm inspect {tokens,benchmark,source,escalation,runtime,compute} <command> [args]", file=sys.stderr)
             return 2
         inspector = sys.argv[2]
         sys.argv = [sys.argv[0], *sys.argv[3:]]
@@ -33,8 +33,11 @@ def main() -> int:
         if inspector == "escalation":
             from tools.context_escalation import main as escalation_main
             return escalation_main()
-        from tools.context_runtime import main as runtime_main
-        return runtime_main()
+        if inspector == "runtime":
+            from tools.context_runtime import main as runtime_main
+            return runtime_main()
+        from tools.local_compute import main as compute_main
+        return compute_main()
     if surface == "role":
         from tools.role_resolver import main as role_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]

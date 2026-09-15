@@ -1,25 +1,24 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-140-cache-telemetry",
+  "directive_id": "DIR-2026-09-15:T-150-local-compute",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-140 by adding provider-neutral stable/dynamic prompt planning and host-observed runtime telemetry without making cache controls authoritative.",
+  "summary": "Execute planner task T-150 by adding read-only local compute/software capability discovery and workload readiness separate from model reasoning and repository authority.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "_core/CONTEXT_RUNTIME_PROTOCOL.md",
-        "config/context_runtime_policy.json",
-        "tools/context_runtime.py",
-        "tests/test_context_runtime.py"
+        "_core/LOCAL_COMPUTE_PROTOCOL.md",
+        "config/local_compute_policy.json",
+        "tools/local_compute.py",
+        "tests/test_local_compute.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add a single bounded context-runtime layer for stable-prefix planning, cache hints, telemetry validation, and cold/warm comparison using the existing benchmark metric schema."
+      "rationale": "Add a fixed allowlisted discovery boundary and named workload prerequisite resolver for CPU/GPU/software capability without arbitrary command execution."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "_core/CONTEXT_PROTOCOL.md",
         "WORKSPACE.json",
         "config/CONTEXT.md",
         "config/impact_policy.json",
@@ -31,17 +30,17 @@
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate the new context-runtime protocol into workspace entrypoints, CLI discovery, context docs, verification scope, and tests."
+      "rationale": "Integrate local compute discovery into workspace/CLI/docs and full-regression scope without writing host observations into canonical policy."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added deterministic prompt block ordering/fingerprints with no cache padding and telemetry records that preserve unavailable host metrics as null rather than invented values."
+      "description": "Added noncanonical host discovery plus READY/BLOCKED workload resolution for NVENC, Ollama, and Python with no execution/mutation authority."
     },
     {
       "candidate_id": "C-002",
-      "description": "Integrated context-runtime protocol/policy/tool into ICM discovery and full-regression classification."
+      "description": "Integrated local compute protocol/policy/tool into ICM discovery, documentation, and impact classification."
     }
   ]
 }

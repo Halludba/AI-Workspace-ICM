@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "directive_id": "DIR-2026-09-15:v06-step2",
+  "summary": "Add two-axis mutation governance with separate execution evidence and commit-readiness validation.",
+  "candidates": [
+    {
+      "candidate_id": "C-001",
+      "target_paths": [
+        "_core/CONVENTIONS.md"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Replace the flat mutation taxonomy with orthogonal change-kind and disposition semantics."
+    },
+    {
+      "candidate_id": "C-002",
+      "target_paths": [
+        "config/mutation_policy.json"
+      ],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Provide the normative machine-readable mutation governance contract."
+    },
+    {
+      "candidate_id": "C-003",
+      "target_paths": [
+        "tools/check_mutation.py"
+      ],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Provide deterministic trace validation, target linkage, rendering, and commit-readiness checks."
+    },
+    {
+      "candidate_id": "C-004",
+      "target_paths": [
+        "tests/test_mutation_governance.py"
+      ],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Add adversarial coverage for the governance matrix, target linkage, and commit lifecycle."
+    },
+    {
+      "candidate_id": "C-005",
+      "target_paths": [
+        "WORKSPACE.json",
+        "config/CONTEXT.md",
+        "tools/CONTEXT.md",
+        "tools/README.md",
+        "tests/CONTEXT.md",
+        "tests/README.md"
+      ],
+      "change_kind": "MERGE",
+      "disposition": "ACCEPT",
+      "rationale": "Integrate the new governance contract and checker into existing routed workspace metadata without adding a competing route."
+    }
+  ],
+  "applied_changes": [
+    {
+      "candidate_id": "C-001",
+      "description": "Rewrote Convention 15."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Added mutation policy."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Added deterministic mutation checker."
+    },
+    {
+      "candidate_id": "C-004",
+      "description": "Added mutation governance tests."
+    },
+    {
+      "candidate_id": "C-005",
+      "description": "Updated workspace and route-local indexes."
+    }
+  ]
+}

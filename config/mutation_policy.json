@@ -1,0 +1,24 @@
+{
+  "policy_schema": "1.0",
+  "trace_schema": "1.0",
+  "trace_file": "mutation_trace.json",
+  "human_trace_file": "MUTATION_TRACE.md",
+  "change_kinds": ["NEW", "MERGE", "REWRITE", "DELETE", "NO_OP"],
+  "dispositions": ["ACCEPT", "REJECT", "DEFER"],
+  "valid_pairs": {
+    "NEW": ["ACCEPT", "REJECT", "DEFER"],
+    "MERGE": ["ACCEPT", "REJECT", "DEFER"],
+    "REWRITE": ["ACCEPT", "REJECT", "DEFER"],
+    "DELETE": ["ACCEPT", "REJECT", "DEFER"],
+    "NO_OP": ["ACCEPT", "REJECT", "DEFER"]
+  },
+  "candidate_id_pattern": "^C-[0-9]{3,}$",
+  "directive_id_pattern": "^[A-Za-z0-9._:-]{1,200}$",
+  "required_trace_fields": ["schema_version", "directive_id", "summary", "candidates", "applied_changes"],
+  "allowed_trace_fields": ["schema_version", "directive_id", "summary", "candidates", "applied_changes"],
+  "required_candidate_fields": ["candidate_id", "target_paths", "change_kind", "disposition", "rationale"],
+  "allowed_candidate_fields": ["candidate_id", "target_paths", "change_kind", "disposition", "rationale"],
+  "required_applied_fields": ["candidate_id"],
+  "allowed_applied_fields": ["candidate_id", "description", "evidence_refs"],
+  "commit_ready_requires_applied_accepts": true
+}

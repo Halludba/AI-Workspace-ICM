@@ -1,4 +1,4 @@
-﻿# Tools Context
+# Tools Context
 
 Deterministic software lives here. Load only the tool/module relevant to the selected operation plus its governing contracts/tests.
 
@@ -9,6 +9,7 @@ Current generic tools:
 - `run_validator.py` -> full journal/projection/artifact/definition validation.
 - `run_manager.py` -> the single run lifecycle CLI/mutation authority, including run initialization.
 - `check_invariants.py` -> deterministic parser for universal BIOS response declarations and terminal closure.
+- `check_mutation.py` -> deterministic two-axis mutation-trace validation and commit-readiness checks.
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.
 - `kernel/events.py` -> event envelope, taxonomy, and kernel error contracts.
 - `kernel/reducer.py` -> pure event fold/state-machine enforcement.

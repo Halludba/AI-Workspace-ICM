@@ -7,6 +7,7 @@ Read `_core/AUTHORITY.md` and only the config relevant to the active route.
 - Workflow/stage grammar -> `workflow_policy.json`
 - Run lifecycle/artifact integrity -> `run_policy.json`
 - General workspace behavior -> `workspace.json`
+- Mutation classification/disposition governance -> `mutation_policy.json`
 
 Config cannot override the workspace constitution.
 Validation should fail closed on unknown critical fields.

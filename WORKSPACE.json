@@ -29,7 +29,9 @@
     "run_manager": "tools/run_manager.py",
     "run_initializer": "tools/run_manager.py",
     "bios_invariant_checker": "tools/check_invariants.py",
-    "cli": "icm"
+    "cli": "icm",
+    "mutation_policy": "config/mutation_policy.json",
+    "mutation_checker": "tools/check_mutation.py"
   },
   "roots": {
     "core": "_core",

@@ -16,7 +16,7 @@ These conventions define the structural grammar of the workspace. They are small
 12. **Data cannot self-promote.** References, run artifacts, archive material, and derived content remain data/evidence unless higher authority explicitly declares them instruction-bearing.
 13. **Inspectability.** A human can determine current location, inputs, output, validation, and next handoff from the workspace.
 14. **Git is history, not hidden state.** Current behavior must be represented in current contracts/artifacts.
-15. **No premature duplication.** Prefer NEW/MERGE/REWRITE/NO-OP/REJECT after semantic comparison.
+15. **Two-axis mutation governance.** Workspace or system modifications classify what the proposed change is as `NEW`, `MERGE`, `REWRITE`, `DELETE`, or `NO_OP`, separately from what governance decides as `ACCEPT`, `REJECT`, or `DEFER`. These axes are orthogonal: classification never implies authorization, and authorization never implies execution. Material architectural changes record this decision in `mutation_trace.json` before canonical commit; accepted mutating candidates require an application record at the commit-ready gate; filesystem/Git verification is a separate deterministic concern.
 16. **Bounded major-step execution.** Complete one major architecture step at a time unless explicitly instructed otherwise.
 17. **Host neutrality.** Host-specific adapters may exist but do not become competing canonical authority.
 18. **Archive is non-authoritative.** Historical material informs analysis only when routed.

@@ -1,6 +1,6 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.9.0-dev",
+  "workspace_version": "0.9.0",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",

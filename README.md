@@ -2,11 +2,9 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current stable release: **v0.8.1 - Correctness & Boundary Hardening**.
+Current stable release: **v0.9.0 - Role Architecture & Scoped Mutation**.
 
-Development line: **v0.9.0-dev - Role Architecture & Scoped Mutation**.
-
-Planned v1.0 development: **Local Worker Delegation**, including the Ornith worker integration.
+Next planned development: **v1.0.0 - Context-Efficient Local Worker Delegation**, including measurement, deterministic source navigation/context escalation, cache-aware telemetry, local compute capability discovery, and Ornith worker integration.
 
 Start here:
 1. `WORKSPACE.md` - orientation.

@@ -16,8 +16,8 @@ class ReleasePolicyTests(unittest.TestCase):
     def test_current_workspace_release_is_valid(self):
         result = release_validator.validate_workspace()
         self.assertTrue(result["valid"])
-        self.assertEqual(result["workspace_version"], "0.9.0-dev")
-        self.assertEqual(result["expected_tag"], "v0.9.0-dev")
+        self.assertEqual(result["workspace_version"], "0.9.0")
+        self.assertEqual(result["expected_tag"], "v0.9.0")
 
     def test_standard_semver_versions_pass(self):
         for version in ["0.6.1", "0.7.0", "1.0.0", "0.7.0-dev.1", "1.2.3+build.7"]:

@@ -14,11 +14,11 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
     p=_read(root/'config/evaluation_arena_policy.json','evaluation arena policy')
-    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions'}
+    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items'}
     if set(p)!=required or p.get('schema_version')!='1.0' or p.get('experiment_outputs_canonical') is not False or p.get('execution_authority')!='NONE' or p.get('automatic_promotion') is not False or p.get('quality_floor_required') is not True: raise EvaluationArenaError('evaluation arena policy safety contract invalid')
     for key in ('partitions','task_kinds','evaluator_kinds','forbidden_keys'):
         if not isinstance(p[key],list) or not p[key] or len(p[key])!=len(set(p[key])) or any(not isinstance(v,str) or not v for v in p[key]): raise EvaluationArenaError(f'{key} must be unique non-empty strings')
-    for key in ('max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls'):
+    for key in ('max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','max_suite_cases','max_suite_variants','max_experiment_config_items'):
         if isinstance(p[key],bool) or not isinstance(p[key],int) or p[key]<1: raise EvaluationArenaError(f'{key} must be positive integer')
     for key in ('score_min','score_max'):
         if isinstance(p[key],bool) or not isinstance(p[key],(int,float)) or not math.isfinite(p[key]): raise EvaluationArenaError(f'{key} must be finite number')
@@ -203,6 +203,45 @@ def analyze_trials(trials:list[dict],root:Path=ROOT):
     return {'schema_version':'1.0','experiment_id':next(iter(experiments)),'partition':next(iter(partitions)),'trial_count':len(vals),'variant_count':len(groups),'case_count':len(expected or []),'required_frontier_metrics':required,'optional_metrics_used':common_optional,'optional_metrics_omitted':[m for m in optional if m not in common_optional],'metrics_used_for_pareto':metrics_used,'variants':summaries,'pareto_frontier':sorted(frontier),'dominated_by':dominated_by,'canonical_total_rank':None,'automatic_promotion':False,'authority':'DERIVED_EVALUATION_ANALYSIS','execution_authority':'NONE'}
 
 
+def _bounded_scalar_map(value,label,max_items):
+    if not isinstance(value,dict) or len(value)>max_items or any(not isinstance(k,str) or not k or not _json_scalar(v) or (isinstance(v,float) and not math.isfinite(v)) for k,v in value.items()): raise EvaluationArenaError(f'{label} must be bounded scalar mapping')
+    return dict(sorted(value.items()))
+
+def build_suite_manifest(cases:list[dict],variants:list[dict],experiment_config:dict,experiment_id:str,root:Path=ROOT):
+    p=load_policy(root); _nonempty(experiment_id,'experiment_id')
+    if not isinstance(cases,list) or not cases or len(cases)>p['max_suite_cases']: raise EvaluationArenaError('cases must be non-empty bounded list')
+    if not isinstance(variants,list) or not variants or len(variants)>p['max_suite_variants']: raise EvaluationArenaError('variants must be non-empty bounded list')
+    cv=[validate_case(c,root) for c in cases]; vv=[validate_variant(v,root) for v in variants]; cfg=_bounded_scalar_map(experiment_config,'experiment_config',p['max_experiment_config_items'])
+    revisions={x['base_revision'] for x in cv+vv}
+    if len(revisions)!=1: raise EvaluationArenaError('suite cases and variants must pin one base_revision')
+    case_fps=[x['case_fingerprint'] for x in cv]; variant_fps=[x['variant_fingerprint'] for x in vv]
+    if len(case_fps)!=len(set(case_fps)) or len(variant_fps)!=len(set(variant_fps)): raise EvaluationArenaError('suite identities must be unique')
+    base_revision=next(iter(revisions))
+    body={'schema_version':'1.0','experiment_id':experiment_id.strip(),'base_revision':base_revision,'case_fingerprints':sorted(case_fps),'variant_fingerprints':sorted(variant_fps),'experiment_config':cfg}
+    execution_variants=[]
+    for v in vv:
+        execution_variants.append({k:v[k] for k in ('schema_version','variant_id','base_revision','model_ref','context_policy_ref','planner_enabled','verification_mode','max_model_calls','max_tool_calls','strategy_params','variant_fingerprint')})
+    partitions={name:sum(1 for c in cv if c['partition']==name) for name in p['partitions']}
+    return {**body,'suite_fingerprint':fingerprint(body),'partition_counts':partitions,'execution_view':{'schema_version':'1.0','experiment_id':experiment_id.strip(),'base_revision':base_revision,'cases':[case_execution_view(c,root) for c in cases],'variants':execution_variants,'experiment_config':cfg,'partition_metadata_exposed':False},'automatic_promotion':False,'authority':'NONCANONICAL_SUITE_MANIFEST','execution_authority':'NONE'}
+
+def compare_partitions(tune:dict,holdout:dict):
+    if not isinstance(tune,dict) or not isinstance(holdout,dict): raise EvaluationArenaError('partition analyses must be objects')
+    if tune.get('authority')!='DERIVED_EVALUATION_ANALYSIS' or holdout.get('authority')!='DERIVED_EVALUATION_ANALYSIS': raise EvaluationArenaError('partition analyses must be arena analysis outputs')
+    if tune.get('experiment_id')!=holdout.get('experiment_id'): raise EvaluationArenaError('partition analyses must share experiment_id')
+    if tune.get('partition')!='TUNE' or holdout.get('partition')!='HOLDOUT': raise EvaluationArenaError('partition analyses must be TUNE then HOLDOUT')
+    tv=set(tune.get('variants',{})); hv=set(holdout.get('variants',{}))
+    if tv!=hv or not tv: raise EvaluationArenaError('partition analyses must cover identical variants')
+    tune_front=set(tune.get('pareto_frontier',[])); hold_front=set(holdout.get('pareto_frontier',[])); variants={}
+    for vid in sorted(tv):
+        ta=tune['variants'][vid]; ha=holdout['variants'][vid]; signals=[]
+        if vid in tune_front and vid not in hold_front: signals.append('TUNE_FRONTIER_NOT_REPRODUCED_ON_HOLDOUT')
+        if ta.get('quality_eligible') and not ha.get('quality_eligible'): signals.append('QUALITY_FLOOR_NOT_REPRODUCED_ON_HOLDOUT')
+        tq=ta.get('distributions',{}).get('quality_score',{}).get('median'); hq=ha.get('distributions',{}).get('quality_score',{}).get('median')
+        tw=ta.get('distributions',{}).get('wall_time_ms',{}).get('median'); hw=ha.get('distributions',{}).get('wall_time_ms',{}).get('median')
+        variants[vid]={'tune':{'quality_median':tq,'wall_time_median_ms':tw,'frontier':vid in tune_front,'quality_eligible':ta.get('quality_eligible')},'holdout':{'quality_median':hq,'wall_time_median_ms':hw,'frontier':vid in hold_front,'quality_eligible':ha.get('quality_eligible')},'observed_delta':{'quality_median':None if tq is None or hq is None else hq-tq,'wall_time_median_ms':None if tw is None or hw is None else hw-tw},'signals':signals}
+    return {'schema_version':'1.0','experiment_id':tune['experiment_id'],'tune_frontier':sorted(tune_front),'holdout_frontier':sorted(hold_front),'stable_frontier':sorted(tune_front&hold_front),'variants':variants,'generalization_claim':'HOLDOUT_EVIDENCE_ONLY_NOT_PROOF_OF_GENERALIZATION','automatic_promotion':False,'authority':'DERIVED_HOLDOUT_COMPARISON','execution_authority':'NONE'}
+
+
 def main():
     ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True)
     c=sub.add_parser('case'); c.add_argument('case_json')
@@ -210,15 +249,19 @@ def main():
     e=sub.add_parser('evidence'); e.add_argument('evidence_json'); e.add_argument('--quality-floor',type=float,required=True)
     m=sub.add_parser('prepare'); m.add_argument('case_json'); m.add_argument('variant_json'); m.add_argument('--experiment-id',required=True)
     a=sub.add_parser('analyze'); a.add_argument('trials_json')
+    sm=sub.add_parser('suite'); sm.add_argument('suite_json')
+    cp=sub.add_parser('compare-partitions'); cp.add_argument('tune_json'); cp.add_argument('holdout_json')
     args=ap.parse_args()
     try:
         if args.cmd=='case': out=validate_case(_read(Path(args.case_json),'case'))
         elif args.cmd=='variant': out=validate_variant(_read(Path(args.variant_json),'variant'))
         elif args.cmd=='evidence': out=validate_quality_evidence(_read(Path(args.evidence_json),'quality evidence'),args.quality_floor)
         elif args.cmd=='prepare': out=prepare_manifest(_read(Path(args.case_json),'case'),_read(Path(args.variant_json),'variant'),args.experiment_id)
-        else:
-            payload=_read(Path(args.trials_json),'trial set'); trials=payload.get('trials')
-            out=analyze_trials(trials)
+        elif args.cmd=='analyze':
+            payload=_read(Path(args.trials_json),'trial set'); trials=payload.get('trials'); out=analyze_trials(trials)
+        elif args.cmd=='suite':
+            payload=_read(Path(args.suite_json),'suite'); out=build_suite_manifest(payload.get('cases'),payload.get('variants'),payload.get('experiment_config'),payload.get('experiment_id'))
+        else: out=compare_partitions(_read(Path(args.tune_json),'tune analysis'),_read(Path(args.holdout_json),'holdout analysis'))
         print(json.dumps({'valid':True,'result':out},indent=2)); return 0
     except EvaluationArenaError as exc:
         print(json.dumps({'valid':False,'error':str(exc)},indent=2),file=sys.stderr); return 2

@@ -53,5 +53,8 @@
     "model_calls": "MINIMIZE",
     "tool_calls": "MINIMIZE",
     "rework_count": "MINIMIZE"
-  }
+  },
+  "max_suite_cases": 500,
+  "max_suite_variants": 128,
+  "max_experiment_config_items": 32
 }

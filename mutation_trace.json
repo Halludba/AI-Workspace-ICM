@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1220-arena-analysis",
+  "directive_id": "DIR-2026-09-15:T-1230-arena-replay",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add deterministic quality-floor and Pareto analysis for Evaluation Arena trials using existing benchmark/observatory metric vocabularies.",
+  "summary": "Add reproducible Evaluation Arena suite manifests and separate tune/holdout comparison safeguards against benchmark gaming.",
   "candidates": [
     {
       "candidate_id": "C-001",
@@ -14,13 +14,13 @@
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Implement the planner-approved analyzer without adding model calls or canonical promotion authority."
+      "rationale": "Implement planner-approved replay and holdout safeguards without exposing partition metadata to strategy execution or granting promotion authority."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added trial validation, repeated-trial distributions, fair coverage checks, explicit missing metrics, quality gating, and non-dominated frontier analysis."
+      "description": "Added suite fingerprints, blinded execution views, partition-separated analysis comparison, holdout sensitivity signals, and no-generalization/no-auto-promotion boundaries."
     }
   ]
 }

@@ -30,8 +30,8 @@ class EvaluationArenaTests(unittest.TestCase):
   p=subprocess.run([sys.executable,str(ROOT/'icm'),'arena','--help'],cwd=ROOT,text=True,capture_output=True); self.assertEqual(p.returncode,0); self.assertIn('prepare',p.stdout)
  def metrics(self,**kw):
   keys=m._benchmark_policy(ROOT)['required_metrics']; x={k:None for k in keys}; x.update({'wall_time_ms':100.0,'input_tokens_total':1000.0,'model_calls':1.0,'tool_calls':1.0}); x.update(kw); return x
- def trial(self,variant='1',case='1',replicate=0,score=0.95,wall=100,tokens=1000,outcome='SUCCESS',rework_class=None,**kw):
-  x={'schema_version':'1.0','trial_id':f'T-{variant}-{case}-{replicate}','experiment_id':'EXP-1','manifest_fingerprint':('1'*63+variant[-1]),'case_fingerprint':('2'*63+case[-1]),'variant_fingerprint':('3'*63+variant[-1]),'partition':'TUNE','replicate':replicate,'quality_floor':0.9,'quality_evidence':{'schema_version':'1.0','evaluator_kind':'DETERMINISTIC','evaluator_id':'tests:check','score':score,'evidence_refs':['test:pass']},'observed_metrics':self.metrics(wall_time_ms=wall,input_tokens_total=tokens),'outcome':outcome,'rework_class':rework_class}; x.update(kw); return x
+ def trial(self,variant='1',case='1',replicate=0,score=0.95,wall=100,tokens=1000,outcome='SUCCESS',rework_class=None,partition='TUNE',**kw):
+  x={'schema_version':'1.0','trial_id':f'T-{variant}-{case}-{replicate}','experiment_id':'EXP-1','manifest_fingerprint':('1'*63+variant[-1]),'case_fingerprint':('2'*63+case[-1]),'variant_fingerprint':('3'*63+variant[-1]),'partition':partition,'replicate':replicate,'quality_floor':0.9,'quality_evidence':{'schema_version':'1.0','evaluator_kind':'DETERMINISTIC','evaluator_id':'tests:check','score':score,'evidence_refs':['test:pass']},'observed_metrics':self.metrics(wall_time_ms=wall,input_tokens_total=tokens),'outcome':outcome,'rework_class':rework_class}; x.update(kw); return x
  def test_pareto_keeps_quality_time_tradeoff_and_excludes_dominated(self):
   trials=[self.trial('1',score=.95,wall=100,tokens=1000),self.trial('2',score=.96,wall=200,tokens=1200),self.trial('3',score=.94,wall=150,tokens=1200)]
   r=m.analyze_trials(trials,ROOT); self.assertEqual(r['pareto_frontier'],['3'*63+'1','3'*63+'2']); self.assertIn('3'*63+'1',r['dominated_by']['3'*63+'3']); self.assertIsNone(r['canonical_total_rank'])
@@ -47,5 +47,15 @@ class EvaluationArenaTests(unittest.TestCase):
   r=m.analyze_trials([self.trial('1',replicate=0,wall=100),self.trial('1',replicate=1,wall=140)],ROOT); d=r['variants']['3'*63+'1']['distributions']['wall_time_ms']; self.assertEqual(d['values'],[100.0,140.0]); self.assertEqual(d['median'],120.0)
  def test_variant_case_coverage_must_match(self):
   with self.assertRaises(m.EvaluationArenaError): m.analyze_trials([self.trial('1',case='1'),self.trial('2',case='2')],ROOT)
+
+ def test_suite_manifest_is_replay_identified_and_blinded(self):
+  suite=m.build_suite_manifest([self.case(partition='TUNE'),self.case(case_id='C-2',partition='HOLDOUT',input_sha256='c'*64)],[self.variant()],{'repetitions':2},'EXP-1',ROOT); again=m.build_suite_manifest([self.case(partition='TUNE'),self.case(case_id='C-2',partition='HOLDOUT',input_sha256='c'*64)],[self.variant()],{'repetitions':2},'EXP-1',ROOT); self.assertEqual(suite['suite_fingerprint'],again['suite_fingerprint']); text=str(suite['execution_view']); self.assertNotIn("'partition':",text); self.assertNotIn("'evaluator':",text); self.assertFalse(suite['execution_view']['partition_metadata_exposed'])
+ def test_suite_fingerprint_changes_with_config(self):
+  a=m.build_suite_manifest([self.case()],[self.variant()],{'repetitions':1},'EXP-1',ROOT); b=m.build_suite_manifest([self.case()],[self.variant()],{'repetitions':2},'EXP-1',ROOT); self.assertNotEqual(a['suite_fingerprint'],b['suite_fingerprint'])
+ def test_holdout_comparison_keeps_partitions_separate_and_never_promotes(self):
+  tune=m.analyze_trials([self.trial('1',score=.95,wall=100,partition='TUNE'),self.trial('2',score=.94,wall=130,partition='TUNE')],ROOT); hold=m.analyze_trials([self.trial('1',score=.85,wall=110,partition='HOLDOUT'),self.trial('2',score=.95,wall=140,partition='HOLDOUT')],ROOT); r=m.compare_partitions(tune,hold); self.assertIn('TUNE_FRONTIER_NOT_REPRODUCED_ON_HOLDOUT',r['variants']['3'*63+'1']['signals']); self.assertIn('QUALITY_FLOOR_NOT_REPRODUCED_ON_HOLDOUT',r['variants']['3'*63+'1']['signals']); self.assertFalse(r['automatic_promotion']); self.assertEqual(r['generalization_claim'],'HOLDOUT_EVIDENCE_ONLY_NOT_PROOF_OF_GENERALIZATION')
+ def test_partition_comparison_requires_same_variants(self):
+  tune=m.analyze_trials([self.trial('1',partition='TUNE')],ROOT); hold=m.analyze_trials([self.trial('2',partition='HOLDOUT')],ROOT)
+  with self.assertRaises(m.EvaluationArenaError): m.compare_partitions(tune,hold)
 
 if __name__=='__main__': unittest.main()

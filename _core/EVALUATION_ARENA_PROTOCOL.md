@@ -20,3 +20,7 @@ Arena inputs/results are noncanonical evaluation evidence. They grant no executi
 Trials reuse the benchmark metric vocabulary. Comparable variants must cover the same case set. Required frontier metrics are quality and wall time; missing optional metrics remain explicitly unavailable and are omitted from that frontier comparison rather than interpreted as zero. Repeated trials retain sorted value distributions plus medians.
 
 A variant is quality-eligible only when every included trial meets its case quality floor and is not failed/blocked. Pareto dominance means no worse on every metric used and strictly better on at least one; the Arena does not assign a canonical total rank.
+## Replay and holdout safeguards
+A suite manifest hashes the experiment ID, full pinned revision, sorted case fingerprints, sorted variant fingerprints, and bounded experiment configuration. Its execution view contains strategy inputs and variants but omits case partitions/evaluator contracts.
+
+TUNE and HOLDOUT analyses remain separate. The comparison may report that a tune-frontier result was not reproduced on HOLDOUT or that its quality floor failed there. These are benchmark-sensitivity signals, not proof of overfitting or universal generalization. No result promotes itself into canonical configuration.

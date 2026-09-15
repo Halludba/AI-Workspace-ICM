@@ -1,0 +1,157 @@
+{
+  "schema_version": "1.0",
+  "protocol": "_core/ROLE_PROTOCOL.md",
+  "default_role": "icm-system-architect",
+  "mutation_modes": [
+    "READ_ONLY",
+    "SCOPED_MUTATION",
+    "RUNTIME_MUTATION"
+  ],
+  "task_classes": {
+    "GENERAL_ICM": "icm-system-architect",
+    "ARCHITECTURE": "icm-system-architect",
+    "RESEARCH": "icm-system-architect",
+    "SYSTEM_REVIEW": "icm-system-architect",
+    "PLANNING": "icm-system-architect",
+    "PROMPT_WORK": "prompt-architect",
+    "EPISTEMIC_REVIEW": "reasoning-auditor",
+    "PROJECT_SCOUTING": "project-scout",
+    "WORKFLOW_AUTHORING": "workflow-architect",
+    "PROFILE_AUTHORING": "profile-architect",
+    "SKILL_AUTHORING": "skill-architect",
+    "RUNTIME_IMPLEMENTATION": "icm-runtime-architect",
+    "LIVE_RUN": "icm-runtime-architect",
+    "RELEASE": "icm-runtime-architect"
+  },
+  "roles": {
+    "icm-system-architect": {
+      "profile": "profiles/icm-system-architect/PROFILE.md",
+      "mutation_mode": "READ_ONLY",
+      "primary_paths": [],
+      "supporting_paths": [],
+      "task_classes": [
+        "GENERAL_ICM",
+        "ARCHITECTURE",
+        "RESEARCH",
+        "SYSTEM_REVIEW",
+        "PLANNING"
+      ]
+    },
+    "icm-runtime-architect": {
+      "profile": "profiles/icm-runtime-architect/PROFILE.md",
+      "mutation_mode": "RUNTIME_MUTATION",
+      "primary_paths": [
+        "*"
+      ],
+      "supporting_paths": [],
+      "task_classes": [
+        "RUNTIME_IMPLEMENTATION",
+        "LIVE_RUN",
+        "RELEASE"
+      ]
+    },
+    "workflow-architect": {
+      "profile": "profiles/workflow-architect/PROFILE.md",
+      "mutation_mode": "SCOPED_MUTATION",
+      "primary_paths": [
+        "workflows/"
+      ],
+      "supporting_paths": [
+        "tests/",
+        "mutation_trace.json"
+      ],
+      "task_classes": [
+        "WORKFLOW_AUTHORING"
+      ]
+    },
+    "profile-architect": {
+      "profile": "profiles/profile-architect/PROFILE.md",
+      "mutation_mode": "SCOPED_MUTATION",
+      "primary_paths": [
+        "profiles/"
+      ],
+      "supporting_paths": [
+        "tests/",
+        "mutation_trace.json"
+      ],
+      "task_classes": [
+        "PROFILE_AUTHORING"
+      ]
+    },
+    "skill-architect": {
+      "profile": "profiles/skill-architect/PROFILE.md",
+      "mutation_mode": "SCOPED_MUTATION",
+      "primary_paths": [
+        "skills/"
+      ],
+      "supporting_paths": [
+        "tests/",
+        "mutation_trace.json"
+      ],
+      "task_classes": [
+        "SKILL_AUTHORING"
+      ]
+    },
+    "prompt-architect": {
+      "profile": "profiles/prompt-architect/PROFILE.md",
+      "mutation_mode": "READ_ONLY",
+      "primary_paths": [],
+      "supporting_paths": [],
+      "task_classes": [
+        "PROMPT_WORK"
+      ]
+    },
+    "reasoning-auditor": {
+      "profile": "profiles/reasoning-auditor/PROFILE.md",
+      "mutation_mode": "READ_ONLY",
+      "primary_paths": [],
+      "supporting_paths": [],
+      "task_classes": [
+        "EPISTEMIC_REVIEW"
+      ]
+    },
+    "project-scout": {
+      "profile": "profiles/project-scout/PROFILE.md",
+      "mutation_mode": "READ_ONLY",
+      "primary_paths": [],
+      "supporting_paths": [],
+      "task_classes": [
+        "PROJECT_SCOUTING"
+      ]
+    }
+  },
+  "handoff": {
+    "schema_version": "1.0",
+    "authority_disclaimer": "NON_AUTHORITATIVE_EXECUTION_HANDOFF",
+    "root": ".session/handoffs",
+    "required_fields": [
+      "schema_version",
+      "authority_disclaimer",
+      "source_role",
+      "target_role",
+      "source_revision",
+      "objective",
+      "decisions",
+      "invariants",
+      "relevant_paths",
+      "mutation_scope",
+      "forbidden_scope",
+      "verification",
+      "open_questions"
+    ],
+    "list_fields": [
+      "decisions",
+      "invariants",
+      "relevant_paths",
+      "mutation_scope",
+      "forbidden_scope",
+      "verification",
+      "open_questions"
+    ]
+  },
+  "planner_continuity": {
+    "resolved_deferred_work": "RECORD_IN_SESSION_PLANNER",
+    "speculative_work": "CHAT_ONLY",
+    "authority": "NON_AUTHORITATIVE_INTENT_QUEUE"
+  }
+}

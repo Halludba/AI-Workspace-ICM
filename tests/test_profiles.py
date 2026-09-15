@@ -8,6 +8,11 @@ EXPECTED = {
     "reasoning-auditor": "Reasoning Auditor",
     "prompt-architect": "Prompt Architect",
     "project-scout": "Project Scout",
+    "icm-system-architect": "ICM System Architect",
+    "icm-runtime-architect": "ICM Runtime Architect",
+    "workflow-architect": "Workflow Architect",
+    "profile-architect": "Profile Architect",
+    "skill-architect": "Skill Architect",
 }
 REQUIRED_SECTIONS = [
     "Identity", "Purpose", "Activation", "Operating Priorities",
@@ -37,12 +42,15 @@ class SpecialistProfileTests(unittest.TestCase):
             text = (PROFILES / profile_id / "PROFILE.md").read_text(encoding="utf-8")
             self.assertIn(f"`╰── ֎ [{display_name}] ◄`", text, profile_id)
 
-    def test_activation_is_explicit_not_resident(self):
+    def test_activation_is_policy_selected_not_resident(self):
         for profile_id in EXPECTED:
             text = (PROFILES / profile_id / "PROFILE.md").read_text(encoding="utf-8")
             activation = text.split("## Activation\n", 1)[1].split("\n## ", 1)[0].lower()
-            self.assertIn("explicit", activation, profile_id)
-            self.assertIn("load only", activation, profile_id)
+            if profile_id == "icm-system-architect":
+                self.assertIn("default", activation)
+                self.assertIn("role policy", activation)
+            else:
+                self.assertIn("load only", activation, profile_id)
 
     def test_authority_boundary_remains_below_core(self):
         for profile_id in EXPECTED:

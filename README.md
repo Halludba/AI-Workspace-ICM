@@ -4,7 +4,7 @@ A host-neutral, filesystem-first template for structured AI work.
 
 Current stable release: **v0.8.1 - Correctness & Boundary Hardening**.
 
-Next planned development: **v0.9.0 - Role Architecture & Scoped Mutation**.
+Development line: **v0.9.0-dev - Role Architecture & Scoped Mutation**.
 
 Planned v1.0 development: **Local Worker Delegation**, including the Ornith worker integration.
 
@@ -27,6 +27,8 @@ Token/context diagnostics are exposed through `icm inspect tokens ...`; the dete
 Artifact capability routing is exposed through `icm capability ...`; operation + artifact type selects only matching skill context. `CREATE`/`EDIT`/`STYLE` + `PDF` routes to the shared `pdf-styler`, while ordinary PDF reading does not.
 
 Upload-only hosts use `icm export capsule ...`: ICM resolves the task before packaging, so Qwen/Gemini-style project uploads receive a bounded task capsule instead of the whole repository. Capsules include a bootstrap, exact inventory/hashes, selected skill context, explicit task inputs, and an estimated text-token footprint.
+
+Role governance is exposed through `icm role ...`: System Architect is the default read-only ICM role, mutation requires explicit user authorization, and scoped workflow/profile/skill authors cannot silently widen their write envelope. Bounded role handoffs carry decisions and constraints rather than whole-chat context.
 
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 

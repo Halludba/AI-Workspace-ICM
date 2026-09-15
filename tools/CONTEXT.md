@@ -4,6 +4,7 @@ Deterministic software lives here. Load only the tool/module relevant to the sel
 
 Current generic tools:
 - `context_resolver.py` -> bounded context-selection plans.
+- `role_resolver.py` -> deterministic validation of declared role routing, mutation envelopes, and bounded role handoffs; it does not infer natural-language task class.
 - `workflow_validator.py` -> workflow/stage structural validation.
 - `create_workflow.py` -> validated DRAFT workflow scaffolding.
 - `run_validator.py` -> full journal/projection/artifact/definition validation.

@@ -45,7 +45,7 @@ def load_session_policy(root: Path = ROOT) -> dict:
         "priority_classes", "declared_scopes", "priority_class_rank", "declared_scope_rank",
         "priority_order", "max_tasks", "required_plan_fields", "allowed_plan_fields",
         "required_task_fields", "allowed_task_fields", "auto_delete_on_empty_required",
-        "max_in_progress",
+        "max_in_progress", "role_policy",
     }
     missing = sorted(required - set(policy))
     if missing:
@@ -77,8 +77,8 @@ def load_session_policy(root: Path = ROOT) -> dict:
         values = list(ranks.values())
         if any(not isinstance(value, int) or isinstance(value, bool) for value in values) or len(values) != len(set(values)):
             raise PolicyError(f"{key} values must be unique integers")
-    if not isinstance(policy["plan_root"], str) or not policy["plan_root"] or not isinstance(policy["route_registry"], str) or not policy["route_registry"]:
-        raise PolicyError("plan_root and route_registry must be non-empty strings")
+    if not isinstance(policy["plan_root"], str) or not policy["plan_root"] or not isinstance(policy["route_registry"], str) or not policy["route_registry"] or not isinstance(policy["role_policy"], str) or not policy["role_policy"]:
+        raise PolicyError("plan_root, route_registry, and role_policy must be non-empty strings")
     if policy["auto_delete_on_empty_required"] is not True:
         raise PolicyError("auto_delete_on_empty_required must be true")
     if not isinstance(policy["max_tasks"], int) or policy["max_tasks"] < 1:
@@ -86,6 +86,14 @@ def load_session_policy(root: Path = ROOT) -> dict:
     if policy["max_in_progress"] != 1:
         raise PolicyError("v0.6 session planner requires max_in_progress=1")
     return policy
+
+
+def load_role_ids(root: Path, policy: dict) -> set[str]:
+    registry = _load_object(root / policy["role_policy"], "role policy")
+    roles = registry.get("roles")
+    if not isinstance(roles, dict) or not roles:
+        raise PolicyError("role policy roles must be a non-empty object")
+    return set(roles)
 
 
 def load_route_ids(root: Path, policy: dict) -> set[str]:
@@ -198,6 +206,7 @@ def validate_plan(plan: dict, policy: dict | None = None, *, root: Path = ROOT) 
     if len(tasks) > pol["max_tasks"]:
         raise SessionPlanError("tasks exceeds max_tasks")
     route_ids = load_route_ids(root, pol)
+    role_ids = load_role_ids(root, pol)
     by_id: dict[str, dict] = {}
     user_orders: set[int] = set()
     in_progress = 0
@@ -246,6 +255,17 @@ def validate_plan(plan: dict, policy: dict | None = None, *, root: Path = ROOT) 
             _nonempty(task.get("status_reason"), f"{tid}.status_reason")
         elif "status_reason" in task:
             raise SessionPlanError(f"{tid}.status_reason is only valid for BLOCKED tasks")
+        if "target_role" in task:
+            target_role = _nonempty(task["target_role"], f"{tid}.target_role")
+            if target_role not in role_ids:
+                raise SessionPlanError(f"{tid}: unknown target_role {target_role}")
+        for field in ("context_refs", "acceptance_criteria"):
+            if field in task:
+                values = task[field]
+                if not isinstance(values, list) or not values or any(not isinstance(value, str) or not value.strip() for value in values):
+                    raise SessionPlanError(f"{tid}.{field} must be a non-empty list of non-empty strings")
+                if len(values) != len(set(values)):
+                    raise SessionPlanError(f"{tid}.{field} must not contain duplicates")
         by_id[tid] = task
     if in_progress > pol["max_in_progress"]:
         raise SessionPlanError("more than one task is IN_PROGRESS")

@@ -23,6 +23,7 @@ class SessionPlannerTests(unittest.TestCase):
         (self.root / "config").mkdir()
         shutil.copy(ROOT / "config/session_policy.json", self.root / "config/session_policy.json")
         shutil.copy(ROOT / "config/routes.json", self.root / "config/routes.json")
+        shutil.copy(ROOT / "config/role_policy.json", self.root / "config/role_policy.json")
         self.policy = session_planner.load_session_policy(self.root)
 
     def tearDown(self):
@@ -251,3 +252,23 @@ class SessionPlannerTests(unittest.TestCase):
         policy_path.write_text(json.dumps(data), encoding="utf-8")
         with self.assertRaises(session_planner.PolicyError):
             session_planner.load_session_policy(self.root)
+
+    def test_optional_role_continuity_metadata_is_valid(self):
+        task = self.task("T-01")
+        task["target_role"] = "icm-runtime-architect"
+        task["context_refs"] = ["_core/ROLE_PROTOCOL.md"]
+        task["acceptance_criteria"] = ["Full regression passes."]
+        result = session_planner.validate_plan(self.plan([task]), self.policy, root=self.root)
+        self.assertTrue(result["valid"])
+
+    def test_unknown_target_role_fails(self):
+        task = self.task("T-01")
+        task["target_role"] = "imaginary-role"
+        with self.assertRaises(session_planner.SessionPlanError):
+            session_planner.validate_plan(self.plan([task]), self.policy, root=self.root)
+
+    def test_empty_continuity_metadata_fails(self):
+        task = self.task("T-01")
+        task["context_refs"] = []
+        with self.assertRaises(session_planner.SessionPlanError):
+            session_planner.validate_plan(self.plan([task]), self.policy, root=self.root)

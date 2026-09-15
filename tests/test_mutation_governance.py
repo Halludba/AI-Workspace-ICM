@@ -24,6 +24,7 @@ class MutationGovernanceTests(unittest.TestCase):
         return {
             "schema_version": "1.0",
             "directive_id": "DIR-2026-09-15:step2",
+            "actor_role": "icm-runtime-architect",
             "summary": "Introduce two-axis mutation governance.",
             "candidates": [
                 {
@@ -55,6 +56,7 @@ class MutationGovernanceTests(unittest.TestCase):
         return {
             "schema_version": "1.0",
             "directive_id": "DIR-002",
+            "actor_role": "icm-runtime-architect",
             "summary": "No material change proposed.",
             "candidates": [
                 {
@@ -217,6 +219,46 @@ class MutationGovernanceTests(unittest.TestCase):
         trace["applied_changes"] = [{"candidate_id": "C-001"}, {"candidate_id": "C-001"}]
         with self.assertRaises(check_mutation.MutationError):
             check_mutation.validate_mutation_trace(trace, self.policy)
+
+    def test_system_architect_cannot_govern_accepted_repository_mutation(self):
+        trace = self.sample()
+        trace["actor_role"] = "icm-system-architect"
+        with self.assertRaises(check_mutation.MutationError) as ctx:
+            check_mutation.validate_mutation_trace(trace, self.policy)
+        self.assertIn("read-only role", str(ctx.exception))
+
+    def test_system_architect_can_govern_noop_without_mutation(self):
+        trace = self.noop("ACCEPT")
+        trace["actor_role"] = "icm-system-architect"
+        result = check_mutation.validate_mutation_trace(trace, self.policy, is_none_turn=True, commit_ready=True)
+        self.assertEqual(result["actor_mutation_mode"], "READ_ONLY")
+
+    def test_workflow_architect_accepts_owned_scope(self):
+        trace = self.sample()
+        trace["actor_role"] = "workflow-architect"
+        trace["candidates"] = [{
+            "candidate_id": "C-001",
+            "target_paths": ["workflows/example/WORKFLOW.json", "tests/test_workflow_contracts.py", "mutation_trace.json"],
+            "change_kind": "REWRITE",
+            "disposition": "ACCEPT",
+            "rationale": "Author a workflow and directly necessary validation.",
+        }]
+        result = check_mutation.validate_mutation_trace(trace, self.policy)
+        self.assertEqual(result["actor_mutation_mode"], "SCOPED_MUTATION")
+
+    def test_workflow_architect_cannot_govern_runtime_tool_mutation(self):
+        trace = self.sample()
+        trace["actor_role"] = "workflow-architect"
+        trace["candidates"] = [{
+            "candidate_id": "C-001",
+            "target_paths": ["tools/run_manager.py"],
+            "change_kind": "REWRITE",
+            "disposition": "ACCEPT",
+            "rationale": "Out-of-scope runtime change.",
+        }]
+        with self.assertRaises(check_mutation.MutationError) as ctx:
+            check_mutation.validate_mutation_trace(trace, self.policy)
+        self.assertIn("outside role envelope", str(ctx.exception))
 
     def test_unknown_top_level_field_fails_closed(self):
         trace = self.sample()

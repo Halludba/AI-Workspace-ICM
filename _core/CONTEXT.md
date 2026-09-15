@@ -16,6 +16,7 @@ Use this root only for the workstation's constitutional architecture.
 - Release/version governance -> `RELEASE_POLICY.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
 - Adaptive deliberation / epistemic assurance -> `ASSURANCE_PROTOCOL.md`
+- Role selection, mutation envelopes, and bounded role handoff -> `ROLE_PROTOCOL.md`
 
 Do not load every core contract for an unrelated task.
 Core rules outrank lower local contracts according to `AUTHORITY.md`.

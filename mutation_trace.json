@@ -1,37 +1,101 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v081-release-closure",
-  "summary": "Promote the verified v0.8.1 correctness and boundary hardening patch to public release metadata and roadmap the role architecture for v0.9 with local worker delegation deferred to v1.0.",
+  "directive_id": "DIR-2026-09-15:v090-role-governance",
+  "actor_role": "icm-runtime-architect",
+  "summary": "Implement v0.9 role architecture with System Architect default, mutation-capable specialists, deterministic role/mutation governance, bounded handoffs, and planner continuity metadata; defer local worker delegation to v1.0.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "WORKSPACE.json",
-        "README.md"
+        "_core/ROLE_PROTOCOL.md",
+        "config/role_policy.json",
+        "profiles/icm-system-architect/PROFILE.md",
+        "profiles/icm-runtime-architect/PROFILE.md",
+        "profiles/workflow-architect/PROFILE.md",
+        "profiles/profile-architect/PROFILE.md",
+        "profiles/skill-architect/PROFILE.md",
+        "tests/test_role_routing.py",
+        "tools/role_resolver.py"
       ],
-      "change_kind": "REWRITE",
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Promote verified v0.8.1-dev hardening to v0.8.1 and update the forward roadmap."
+      "rationale": "Create the canonical role protocol, policy, profiles, deterministic resolver, handoff validator, and tests."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
+        "profiles/CONTEXT.md",
+        "profiles/README.md",
+        "tools/CONTEXT.md",
+        "tools/README.md",
+        "config/CONTEXT.md",
+        "config/impact_policy.json",
+        "icm",
+        "tests/test_profiles.py",
+        "tests/test_impact_classifier.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Integrate role routing into existing selective-context, CLI, profile, and verification surfaces."
+    },
+    {
+      "candidate_id": "C-003",
+      "target_paths": [
+        "config/session_policy.json",
+        "tools/session_planner.py",
+        "tests/test_session_planner.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Allow non-authoritative planner tasks to carry optional target-role, context-reference, and acceptance-criteria continuity metadata."
+    },
+    {
+      "candidate_id": "C-004",
+      "target_paths": [
+        "config/mutation_policy.json",
+        "tools/check_mutation.py",
+        "tests/test_mutation_governance.py"
+      ],
+      "change_kind": "REWRITE",
+      "disposition": "ACCEPT",
+      "rationale": "Bind mutation commit-readiness to an actor role and fail closed when accepted targets exceed that role mutation envelope."
+    },
+    {
+      "candidate_id": "C-005",
+      "target_paths": [
+        "WORKSPACE.md",
+        "CONTEXT.md",
+        "WORKSPACE.json",
+        "README.md",
+        "_core/CONTEXT.md",
         "tests/test_context_routing.py",
         "tests/test_release_policy.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Align executable metadata assertions with the v0.8.1 public release identity."
+      "rationale": "Open v0.9.0-dev, route role selection during startup, preserve planner continuity guidance, and defer Ornith/local-worker delegation to v1.0."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted workspace/README to v0.8.1 and set v0.9 role architecture with v1.0 local worker delegation roadmap."
+      "description": "Added role protocol/policy, System/Runtime and scoped authoring profiles, role resolver, handoff validation, and role tests."
     },
     {
       "candidate_id": "C-002",
-      "description": "Updated version/tag assertions for v0.8.1."
+      "description": "Integrated role routing into profile/tool/config routers, CLI, impact policy, and specialist tests."
+    },
+    {
+      "candidate_id": "C-003",
+      "description": "Extended planner tasks with optional non-authoritative role/context/acceptance continuity metadata."
+    },
+    {
+      "candidate_id": "C-004",
+      "description": "Added actor-role mutation-envelope validation to mutation governance and commit-readiness tests."
+    },
+    {
+      "candidate_id": "C-005",
+      "description": "Opened v0.9.0-dev role-governed runtime metadata and updated startup/roadmap contracts."
     }
   ]
 }

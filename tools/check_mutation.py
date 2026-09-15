@@ -12,6 +12,8 @@ import re
 import sys
 from pathlib import Path, PurePosixPath
 
+import role_resolver
+
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "mutation_policy.json"
 
@@ -41,7 +43,7 @@ def load_mutation_policy(root: Path = ROOT) -> dict:
         "required_trace_fields", "allowed_trace_fields",
         "required_candidate_fields", "allowed_candidate_fields",
         "required_applied_fields", "allowed_applied_fields",
-        "commit_ready_requires_applied_accepts",
+        "commit_ready_requires_applied_accepts", "role_policy",
     }
     missing = sorted(required - set(policy))
     if missing:
@@ -80,6 +82,8 @@ def load_mutation_policy(root: Path = ROOT) -> dict:
         raise PolicyError(f"mutation policy contains invalid regex: {exc}") from exc
     if not isinstance(policy["commit_ready_requires_applied_accepts"], bool):
         raise PolicyError("commit_ready_requires_applied_accepts must be boolean")
+    if policy["role_policy"] != "config/role_policy.json":
+        raise PolicyError("mutation role_policy must identify config/role_policy.json")
     return policy
 
 
@@ -120,6 +124,7 @@ def validate_mutation_trace(
     declared_targets: list[str] | None = None,
     is_none_turn: bool = False,
     commit_ready: bool = False,
+    root: Path = ROOT,
 ) -> dict:
     if not isinstance(trace, dict):
         raise MutationError("mutation trace root must be a JSON object")
@@ -131,6 +136,7 @@ def validate_mutation_trace(
     if not re.fullmatch(pol["directive_id_pattern"], directive_id):
         raise MutationError("directive_id does not match mutation policy")
     _nonempty_string(trace.get("summary"), "summary")
+    actor_role = _nonempty_string(trace.get("actor_role"), "actor_role")
 
     candidates = trace.get("candidates")
     applied = trace.get("applied_changes")
@@ -185,6 +191,12 @@ def validate_mutation_trace(
                 accepted_mutating.add(cid)
                 accepted_targets.update(normalized)
 
+    try:
+        role_policy = role_resolver.load_policy(root)
+        role_result = role_resolver.validate_mutation_scope(actor_role, sorted(accepted_targets), root, role_policy)
+    except role_resolver.RolePolicyError as exc:
+        raise MutationError(f"actor role mutation envelope violation: {exc}") from exc
+
     if is_none_turn and accepted_mutating:
         raise MutationError("turn declared TARGET: NONE but governance accepted mutating candidates")
     if declared_targets is not None:
@@ -224,6 +236,8 @@ def validate_mutation_trace(
     return {
         "valid": True,
         "directive_id": directive_id,
+        "actor_role": actor_role,
+        "actor_mutation_mode": role_result["mutation_mode"],
         "candidate_count": len(candidates),
         "accepted_count": sum(1 for item in candidates if item["disposition"] == "ACCEPT"),
         "rejected_count": sum(1 for item in candidates if item["disposition"] == "REJECT"),

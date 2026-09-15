@@ -18,3 +18,5 @@ Read `_core/AUTHORITY.md` and only the config relevant to the active route.
 Config cannot override the workspace constitution.
 Validation should fail closed on unknown critical fields.
 Do not load unrelated config files.
+
+- `role_policy.json` -> default System Architect, specialist task classes, mutation envelopes, bounded handoff schema, and planner-continuity policy.

@@ -188,6 +188,10 @@ class ImpactClassifierTests(unittest.TestCase):
         self.assertEqual(payload["impact"], "SCOPED_VALIDATION")
         self.assertEqual(payload["canonical_commit_verification"], "FULL_REGRESSION")
 
+    def test_role_resolver_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/role_resolver.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
 
 if __name__ == "__main__":
     unittest.main()

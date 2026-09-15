@@ -22,7 +22,8 @@
     "_core/EXECUTION_KERNEL.md",
     "_core/STATE_MODEL.md",
     "config/routes.json",
-    "skills/registry.json"
+    "skills/registry.json",
+    "_core/ROLE_PROTOCOL.md"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -46,7 +47,8 @@
     "tools/assurance_controller.py",
     "tools/token_profiler.py",
     "tools/capability_resolver.py",
-    "tools/capsule_exporter.py"
+    "tools/capsule_exporter.py",
+    "tools/role_resolver.py"
   ],
   "semantic_diff_tokens": [
     "authority",

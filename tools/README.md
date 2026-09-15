@@ -27,3 +27,5 @@ Use `capsule_exporter.py` / `icm export capsule ...` for upload-only hosts such 
 The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
 
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.
+
+Use `role_resolver.py` / `icm role ...` to validate a semantically declared task class, selected profile, user-authorized mutation request, scoped write envelope, and bounded role handoff. It validates declared policy; it does not infer natural-language task class or grant authority.

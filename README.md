@@ -2,7 +2,9 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current release: **v0.7.0 - Adaptive Assurance Runtime**.
+Current stable release: **v0.7.0 - Adaptive Assurance Runtime**.
+
+Development line: **v0.8.0-dev - Shared Capabilities & Context Economics**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -17,6 +19,8 @@ The base repository is intentionally domain-neutral and designed to be pinned as
 Run lifecycle operations use the single `icm run ...` / `tools/run_manager.py` authority. The kernel owns sequencing, attempt numbering, hashing, idempotency, confinement, state transitions, crash recovery, checkpoints, and projection materialization; models/humans retain semantic decision authority.
 
 Adaptive assurance is exposed through `icm assurance ...` / `tools/assurance_controller.py`; it can gate or escalate semantic work but cannot mutate run state or bypass the run manager.
+
+Token/context diagnostics are exposed through `icm inspect tokens ...`; the deterministic profiler is loaded only when invoked and can trigger the routed `context-optimizer` skill for semantic redundancy/value review.
 
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 

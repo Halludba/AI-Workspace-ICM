@@ -18,6 +18,8 @@ Use `session_planner.py` for Git-ignored per-agent continuity queues under `.ses
 
 Use `assurance_controller.py` for the adaptive-assurance boundary. Run its cheap `trigger` path first; only invoke full assessment when a policy floor or known uncertainty signal fires. Self-reported confidence is observational only, assurance increases require evidence-backed epistemic deltas, and `.session/assurance/` cache entries are noncanonical performance hints keyed by caller-supplied basis fingerprints.
 
+Use `token_profiler.py` / `icm inspect tokens ...` only for diagnostics and release context-economics checks. Estimates are explicitly heuristic; a growth warning requests review and never proves redundancy or authorizes deletion.
+
 The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
 
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

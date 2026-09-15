@@ -14,9 +14,25 @@
     "annotated_tags_required": true,
     "published_tags_immutable": true,
     "full_regression_required": true,
-    "tag_note_sections": ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security", "Breaking", "Verification"],
-    "required_tag_note_sections": ["Verification"],
-    "omit_empty_sections": true
+    "tag_note_sections": [
+      "Added",
+      "Changed",
+      "Deprecated",
+      "Removed",
+      "Fixed",
+      "Security",
+      "Breaking",
+      "Verification"
+    ],
+    "required_tag_note_sections": [
+      "Verification"
+    ],
+    "omit_empty_sections": true,
+    "context_metrics": {
+      "tracked_text_growth_warning_percent": 25.0,
+      "orientation_growth_warning_percent": 15.0,
+      "growth_review_skill": "skills/context-optimizer/SKILL.md"
+    }
   },
   "history": {
     "canonical_release_history": "GIT_TAGS",

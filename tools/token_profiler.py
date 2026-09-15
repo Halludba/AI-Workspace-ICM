@@ -1,0 +1,248 @@
+import argparse
+import ast
+import json
+import math
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+ORIENTATION_FILES = ("WORKSPACE.md", "CONTEXT.md", "WORKSPACE.json")
+TEXT_SUFFIXES = {
+    ".md", ".json", ".py", ".txt", ".yaml", ".yml", ".toml",
+    ".ini", ".cfg", ".csv", ".tsv", ".xml", ".html", ".css",
+    ".js", ".ts", ".sh", ".ps1", ".cmd", ".bat",
+}
+
+
+class TokenProfileError(ValueError):
+    pass
+
+
+def _git(*args: str, root: Path = ROOT, text: bool = False):
+    proc = subprocess.run(
+        ["git", *args], cwd=root, capture_output=True, text=text, check=False
+    )
+    if proc.returncode != 0:
+        detail = proc.stderr.strip() if text else proc.stderr.decode(errors="replace").strip()
+        raise TokenProfileError(detail or f"git {' '.join(args)} failed")
+    return proc.stdout
+
+def _decode_text(path: str, data: bytes) -> str | None:
+    if b"\x00" in data:
+        return None
+    suffix = Path(path).suffix.lower()
+    if suffix and suffix not in TEXT_SUFFIXES:
+        return None
+    try:
+        return data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return None
+
+
+def _metric(text: str) -> dict:
+    chars = len(text)
+    return {
+        "chars": chars,
+        "lines": len(text.splitlines()),
+        "words": len(text.split()),
+        "estimated_tokens": math.ceil(chars / 4.0),
+        "estimate_low": math.ceil(chars / 4.7),
+        "estimate_high": math.ceil(chars / 3.2),
+    }
+
+
+def _add_metric(total: dict, metric: dict) -> None:
+    for key in ("chars", "lines", "words", "estimated_tokens", "estimate_low", "estimate_high"):
+        total[key] = total.get(key, 0) + metric[key]
+
+def _working_paths(root: Path) -> list[str]:
+    raw = _git("ls-files", "--cached", "--others", "--exclude-standard", "-z", root=root)
+    return sorted({p for p in raw.decode("utf-8", errors="strict").split("\x00") if p})
+
+
+def _ref_paths(ref: str, root: Path) -> list[str]:
+    raw = _git("ls-tree", "-r", "--name-only", "-z", ref, root=root)
+    return sorted({p for p in raw.decode("utf-8", errors="strict").split("\x00") if p})
+
+
+def _working_bytes(path: str, root: Path) -> bytes | None:
+    target = root / path
+    if not target.is_file():
+        return None
+    try:
+        return target.read_bytes()
+    except OSError:
+        return None
+
+
+def _ref_bytes(ref: str, path: str, root: Path) -> bytes | None:
+    proc = subprocess.run(
+        ["git", "show", f"{ref}:{path}"], cwd=root, capture_output=True, check=False
+    )
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def _root_name(path: str) -> str:
+    parts = Path(path).parts
+    return parts[0] if len(parts) > 1 else "<root>"
+
+def profile(ref: str | None = None, root: Path = ROOT, include_files: bool = False) -> dict:
+    paths = _working_paths(root) if ref is None else _ref_paths(ref, root)
+    total: dict = {}
+    orientation: dict = {}
+    by_root: dict[str, dict] = {}
+    by_skill: dict[str, dict] = {}
+    file_metrics: dict[str, dict] = {}
+    text_files = 0
+    for path in paths:
+        data = _working_bytes(path, root) if ref is None else _ref_bytes(ref, path, root)
+        if data is None:
+            continue
+        text = _decode_text(path, data)
+        if text is None:
+            continue
+        metric = _metric(text)
+        text_files += 1
+        _add_metric(total, metric)
+        bucket = by_root.setdefault(_root_name(path), {})
+        _add_metric(bucket, metric)
+        parts = Path(path).parts
+        if len(parts) > 1 and parts[0] == "skills":
+            _add_metric(by_skill.setdefault(parts[1], {}), metric)
+        if path in ORIENTATION_FILES:
+            _add_metric(orientation, metric)
+        if include_files:
+            file_metrics[path] = metric
+    result = {
+        "source": "WORKTREE" if ref is None else ref,
+        "estimator": "heuristic_chars_per_token",
+        "chars_per_token_mid": 4.0,
+        "chars_per_token_range": [3.2, 4.7],
+        "text_files": text_files,
+        "total": total,
+        "orientation": orientation,
+        "by_root": by_root,
+        "by_skill": by_skill,
+    }
+    if include_files:
+        result["by_file"] = file_metrics
+    return result
+
+def _percent_delta(before: int, after: int) -> float | None:
+    if before <= 0:
+        return None
+    return round(((after - before) / before) * 100.0, 2)
+
+
+def _growth_policy(root: Path = ROOT) -> dict:
+    path = root / "config" / "release_policy.json"
+    try:
+        policy = json.loads(path.read_text(encoding="utf-8-sig"))
+        metrics = policy["release"]["context_metrics"]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise TokenProfileError(f"invalid release context_metrics policy: {exc}") from exc
+    required = {"tracked_text_growth_warning_percent", "orientation_growth_warning_percent", "growth_review_skill"}
+    if set(metrics) != required:
+        raise TokenProfileError("release context_metrics fields must match contract")
+    for key in ("tracked_text_growth_warning_percent", "orientation_growth_warning_percent"):
+        value = metrics[key]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+            raise TokenProfileError(f"{key} must be a positive number")
+    skill = metrics["growth_review_skill"]
+    if not isinstance(skill, str) or not skill.startswith("skills/") or not skill.endswith("/SKILL.md"):
+        raise TokenProfileError("growth_review_skill must identify a routed skill")
+    return metrics
+
+
+def compare(base_ref: str, current_ref: str | None = None, root: Path = ROOT) -> dict:
+    base = profile(base_ref, root)
+    current = profile(current_ref, root)
+    total_delta = _percent_delta(base["total"]["estimated_tokens"], current["total"]["estimated_tokens"])
+    orientation_delta = _percent_delta(
+        base["orientation"]["estimated_tokens"], current["orientation"]["estimated_tokens"]
+    )
+    thresholds = _growth_policy(root)
+    total_warn = total_delta is not None and total_delta >= thresholds["tracked_text_growth_warning_percent"]
+    orientation_warn = orientation_delta is not None and orientation_delta >= thresholds["orientation_growth_warning_percent"]
+    return {
+        "base": base,
+        "current": current,
+        "delta_percent": {"tracked_text": total_delta, "orientation": orientation_delta},
+        "thresholds": thresholds,
+        "growth_review_required": total_warn or orientation_warn,
+        "growth_review_skill": thresholds["growth_review_skill"] if (total_warn or orientation_warn) else None,
+        "growth_review_causes": [
+            name for name, fired in (("TRACKED_TEXT_GROWTH", total_warn), ("ORIENTATION_GROWTH", orientation_warn)) if fired
+        ],
+    }
+
+def profile_python_symbols(path: str, ref: str | None = None, root: Path = ROOT) -> list[dict]:
+    data = _working_bytes(path, root) if ref is None else _ref_bytes(ref, path, root)
+    if data is None:
+        raise TokenProfileError(f"file not found: {path}")
+    text = _decode_text(path, data)
+    if text is None or Path(path).suffix.lower() != ".py":
+        raise TokenProfileError("symbol profiling currently supports UTF-8 Python files only")
+    try:
+        tree = ast.parse(text)
+    except SyntaxError as exc:
+        raise TokenProfileError(f"cannot parse Python source: {exc}") from exc
+    lines = text.splitlines(keepends=True)
+    results = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if not hasattr(node, "end_lineno") or node.end_lineno is None:
+            continue
+        segment = "".join(lines[node.lineno - 1:node.end_lineno])
+        kind = "class" if isinstance(node, ast.ClassDef) else "function"
+        results.append({
+            "name": node.name,
+            "kind": kind,
+            "line_start": node.lineno,
+            "line_end": node.end_lineno,
+            **_metric(segment),
+        })
+    return sorted(results, key=lambda item: item["estimated_tokens"], reverse=True)
+
+def _trim_files(result: dict, top: int) -> dict:
+    by_file = result.pop("by_file", {})
+    ranked = sorted(by_file.items(), key=lambda item: item[1]["estimated_tokens"], reverse=True)
+    result["top_files"] = [{"path": path, **metric} for path, metric in ranked[:top]]
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Estimate ICM repository and context token footprint.")
+    sub = parser.add_subparsers(dest="command", required=True)
+    profile_cmd = sub.add_parser("profile", help="Profile a Git ref or the working tree")
+    profile_cmd.add_argument("--ref")
+    profile_cmd.add_argument("--top", type=int, default=15)
+    profile_cmd.add_argument("--all-files", action="store_true")
+    compare_cmd = sub.add_parser("compare", help="Compare token footprint against a base Git ref")
+    compare_cmd.add_argument("--base", required=True)
+    compare_cmd.add_argument("--ref")
+    symbols_cmd = sub.add_parser("symbols", help="Profile Python symbols in one file")
+    symbols_cmd.add_argument("path")
+    symbols_cmd.add_argument("--ref")
+    symbols_cmd.add_argument("--top", type=int, default=20)
+    args = parser.parse_args()
+    try:
+        if args.command == "profile":
+            result = profile(args.ref, include_files=True)
+            if not args.all_files:
+                result = _trim_files(result, args.top)
+        elif args.command == "compare":
+            result = compare(args.base, args.ref)
+        else:
+            symbols = profile_python_symbols(args.path, args.ref)
+            result = {"source": "WORKTREE" if args.ref is None else args.ref, "path": args.path, "symbols": symbols[:args.top]}
+    except (TokenProfileError, OSError) as exc:
+        print(json.dumps({"valid": False, "error": str(exc)}, indent=2))
+        return 1
+    print(json.dumps({"valid": True, **result}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

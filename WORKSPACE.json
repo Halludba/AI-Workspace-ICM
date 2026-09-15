@@ -1,6 +1,6 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.7.0",
+  "workspace_version": "0.8.0-dev",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
@@ -43,7 +43,8 @@
     "release_validator": "tools/release_validator.py",
     "assurance_protocol": "_core/ASSURANCE_PROTOCOL.md",
     "assurance_policy": "config/assurance_policy.json",
-    "assurance_controller": "tools/assurance_controller.py"
+    "assurance_controller": "tools/assurance_controller.py",
+    "token_profiler": "tools/token_profiler.py"
   },
   "roots": {
     "core": "_core",

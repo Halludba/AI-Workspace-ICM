@@ -50,6 +50,17 @@ def load_policy(root: Path = ROOT) -> dict:
         raise ReleasePolicyError("published release tags must be immutable")
     if not release.get("full_regression_required"):
         raise ReleasePolicyError("public releases require full regression")
+    metrics = release.get("context_metrics")
+    required_metrics = {"tracked_text_growth_warning_percent", "orientation_growth_warning_percent", "growth_review_skill"}
+    if not isinstance(metrics, dict) or set(metrics) != required_metrics:
+        raise ReleasePolicyError("release context_metrics fields must match contract")
+    for key in ("tracked_text_growth_warning_percent", "orientation_growth_warning_percent"):
+        value = metrics[key]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+            raise ReleasePolicyError(f"release context metric {key} must be positive")
+    skill = metrics["growth_review_skill"]
+    if not isinstance(skill, str) or not skill.startswith("skills/") or not skill.endswith("/SKILL.md"):
+        raise ReleasePolicyError("growth_review_skill must identify a routed skill")
     history = policy["history"]
     if history.get("canonical_release_history") != "GIT_TAGS":
         raise ReleasePolicyError("Git tags must remain canonical release history")

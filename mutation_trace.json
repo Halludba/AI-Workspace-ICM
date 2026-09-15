@@ -1,99 +1,97 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v070-adaptive-assurance",
-  "summary": "Release v0.7.0 Adaptive Assurance Runtime with trigger-gated deliberation, evidence-backed assurance, bounded escalation, cache reuse, and CLI integration.",
+  "directive_id": "DIR-2026-09-15:v080-context-economics-foundation",
+  "summary": "Start v0.8.0 Shared Capabilities & Context Economics with deterministic token profiling, release growth warnings, and a lazily routed context-optimizer skill.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "_core/ASSURANCE_PROTOCOL.md"
+        "tools/token_profiler.py",
+        "tests/test_token_profiler.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add the constitutional adaptive-assurance contract and explicit semantic/deterministic boundary."
+      "rationale": "Add deterministic on-demand repository/context token estimation, Git-ref comparison, skill/file/root breakdown, and Python symbol profiling with executable tests."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "config/assurance_policy.json"
-      ],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add machine-readable assurance states, deliberation levels, risk floors, trigger policy, budgets, cache rules, actions, and privacy guard."
-    },
-    {
-      "candidate_id": "C-003",
-      "target_paths": [
-        "tools/assurance_controller.py"
-      ],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add deterministic trigger/evaluation, epistemic-delta validation, bounded routing, and confined ephemeral cache mechanics."
-    },
-    {
-      "candidate_id": "C-004",
-      "target_paths": [
-        "tests/test_assurance_controller.py"
-      ],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add executable coverage for assurance routing, evidence provenance, budgets, cache invalidation/confinement, manual modes, and Windows BOM JSON input."
-    },
-    {
-      "candidate_id": "C-005",
-      "target_paths": [
-        "_core/AUTHORITY.md",
-        "_core/CONTEXT.md",
-        "_core/CONVENTIONS.md",
-        "config/CONTEXT.md",
-        "config/impact_policy.json",
         "icm",
+        "tests/test_cli.py",
         "tools/CONTEXT.md",
         "tools/README.md",
-        "tests/test_cli.py",
+        "config/impact_policy.json",
         "tests/test_impact_classifier.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate assurance into authority/routing, full-regression impact signaling, root CLI dispatch, tool documentation, and integration tests without granting run-mutation authority."
+      "rationale": "Expose diagnostics through icm inspect tokens and classify the release-sensitive profiler for full regression without granting mutation authority."
+    },
+    {
+      "candidate_id": "C-003",
+      "target_paths": [
+        "config/release_policy.json",
+        "tools/release_validator.py",
+        "tests/test_release_policy.py"
+      ],
+      "change_kind": "MERGE",
+      "disposition": "ACCEPT",
+      "rationale": "Add 25% tracked-text and 15% orientation-context release warning thresholds plus an exact lazy review-skill route, validated fail-closed."
+    },
+    {
+      "candidate_id": "C-004",
+      "target_paths": [
+        "skills/context-optimizer/SKILL.md"
+      ],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Add a small advisory skill for essentiality, functionality, redundancy, and context-locality review only when explicitly requested or a deterministic growth warning fires."
+    },
+    {
+      "candidate_id": "C-005",
+      "target_paths": [
+        "skills/README.md"
+      ],
+      "change_kind": "MERGE",
+      "disposition": "ACCEPT",
+      "rationale": "Document the routed context-optimizer skill without promoting it to default context."
     },
     {
       "candidate_id": "C-006",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
-        "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_context_routing.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Promote the workspace identity to v0.7.0 Adaptive Assurance Runtime and align release/context regression expectations."
+      "rationale": "Open the v0.8.0-dev development line and register the token-profiler entrypoint while retaining v0.7.0 as current stable release."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added Adaptive Assurance Protocol."
+      "description": "Added token profiler and focused regression tests."
     },
     {
       "candidate_id": "C-002",
-      "description": "Added assurance policy with explicit floors, triggers, budgets, cache, actions, and non-authoritative self-confidence."
+      "description": "Added inspect CLI dispatch, tool documentation, and impact-classifier integration."
     },
     {
       "candidate_id": "C-003",
-      "description": "Added assurance controller and CLI surface."
+      "description": "Added validated release context-growth warning policy and lazy review-skill route."
     },
     {
       "candidate_id": "C-004",
-      "description": "Added adaptive assurance regression coverage."
+      "description": "Added lazily loaded context-optimizer skill."
     },
     {
       "candidate_id": "C-005",
-      "description": "Integrated assurance with current authority, context routing, impact classification, CLI, and documentation."
+      "description": "Documented the new routed skill."
     },
     {
       "candidate_id": "C-006",
-      "description": "Promoted release metadata to v0.7.0."
+      "description": "Opened v0.8.0-dev metadata and README development identity."
     }
   ]
 }

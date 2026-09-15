@@ -51,5 +51,23 @@ class CliTests(unittest.TestCase):
         self.assertIn("adaptive assurance policy", result.stdout.lower())
 
 
+    def test_python_trampoline_dispatches_token_inspector_help(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "icm"), "inspect", "tokens", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("token footprint", result.stdout.lower())
+
+    @unittest.skipUnless(os.name == "nt", "Windows wrapper test")
+    def test_windows_cmd_trampoline_dispatches_token_inspector_help(self):
+        result = subprocess.run(
+            ["cmd.exe", "/d", "/c", "icm.cmd", "inspect", "tokens", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("token footprint", result.stdout.lower())
+
+
 if __name__ == "__main__":
     unittest.main()

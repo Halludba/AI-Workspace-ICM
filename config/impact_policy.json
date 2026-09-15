@@ -42,7 +42,8 @@
     "tools/record_decision.py",
     "tools/session_planner.py",
     "tools/release_validator.py",
-    "tools/assurance_controller.py"
+    "tools/assurance_controller.py",
+    "tools/token_profiler.py"
   ],
   "semantic_diff_tokens": [
     "authority",

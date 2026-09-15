@@ -1,92 +1,70 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v080-lazy-shared-capabilities",
-  "summary": "Add exact artifact-intent capability routing and the shared lazy-loaded PDF Styler reference capability without creating a plugins root.",
+  "directive_id": "DIR-2026-09-15:v080-upload-only-capsules",
+  "summary": "Add deterministic task-scoped ICM capsule export for upload-only model hosts, routed through the shared capability resolver with explicit context inventories and token estimates.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "skills/registry.json",
-        "tools/capability_resolver.py",
-        "tests/test_capability_resolver.py"
+        "config/capsule_policy.json",
+        "tools/capsule_exporter.py",
+        "tests/test_capsule_exporter.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add a small deterministic registry/resolver that selects skill context from operation + artifact type without loading skill contents."
+      "rationale": "Add deterministic capsule policy, exporter, and regression coverage for minimal/portable packaging, confinement, reproducibility, hashes, and token accounting."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "skills/pdf-styler/SKILL.md",
-        "skills/pdf-styler/manifest.json",
-        "skills/pdf-styler/pdf_style_schema.json",
-        "skills/pdf-styler/pdf_styles/style.pdf.formats.json",
-        "skills/pdf-styler/tools/pdf_styler.py",
-        "tests/test_pdf_styler_skill.py"
+        "skills/pdf-styler/manifest.json"
       ],
-      "change_kind": "NEW",
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Promote the existing Design Workspace PDF Styler into a self-contained shared ICM skill with local manifest/style resolution and executable regression coverage."
+      "rationale": "Declare PDF Styler minimal capsule context and explicit portable runtime inventory without directory walking."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
-        "CONTEXT.md",
         "WORKSPACE.json",
+        "config/CONTEXT.md",
         "config/impact_policy.json",
         "icm",
-        "skills/CONTEXT.md",
-        "skills/README.md",
         "tests/test_cli.py",
-        "tests/test_context_routing.py",
         "tests/test_impact_classifier.py",
         "tools/CONTEXT.md",
         "tools/README.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate lazy capability routing into the root router, CLI, workspace metadata, impact classification, documentation, and locality tests while retaining existing authority boundaries."
+      "rationale": "Integrate capsule export into workspace entrypoints, CLI dispatch, impact classification, config routing, documentation, and CLI/impact tests."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": [
-        "tools/token_profiler.py",
-        "tests/test_token_profiler.py"
-      ],
-      "change_kind": "REWRITE",
-      "disposition": "ACCEPT",
-      "rationale": "Correct skill token accounting so skills-root metadata is not mislabeled as a skill and add PDF Styler context-economics coverage."
-    },
-    {
-      "candidate_id": "C-005",
       "target_paths": [
         "README.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Document the v0.8 lazy shared-capability behavior and PDF routing semantics."
+      "rationale": "Document upload-only task capsules as the bounded alternative to full-repository ZIP ingestion."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added exact artifact-intent capability registry/resolver with composition, explicit selection, extension fallback, confinement, and fail-closed validation."
+      "description": "Added deterministic MINIMAL/PORTABLE capsule exporter with bootstrap, manifest, member hashes, fixed timestamps, sorted ZIP order, and token estimates."
     },
     {
       "candidate_id": "C-002",
-      "description": "Added shared PDF Styler skill derived from Design Workspace v0.24.0, preserving style schema/preset and adapting default style resolution to the local manifest."
+      "description": "Added explicit PDF Styler capsule_context and capsule_portable inventories."
     },
     {
       "candidate_id": "C-003",
-      "description": "Wired capability routing into root context, CLI, workspace metadata, impact policy, docs, and regression tests."
+      "description": "Wired icm export capsule, workspace/config/tool routing, full-regression impact, and integration tests."
     },
     {
       "candidate_id": "C-004",
-      "description": "Fixed token-profiler skill grouping and measured PDF Styler separately from skills-root metadata."
-    },
-    {
-      "candidate_id": "C-005",
-      "description": "Updated v0.8 development documentation for lazy shared capabilities."
+      "description": "Documented task-scoped upload capsules for Qwen/Gemini-style hosts."
     }
   ]
 }

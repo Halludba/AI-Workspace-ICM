@@ -22,6 +22,8 @@ Use `token_profiler.py` / `icm inspect tokens ...` only for diagnostics and rele
 
 Use `capability_resolver.py` / `icm capability ...` to select reusable skills from declared operation + artifact type. The resolver reads registry/manifest metadata only and returns context paths; it never loads all skill instructions or grants capabilities the host does not possess.
 
+Use `capsule_exporter.py` / `icm export capsule ...` for upload-only hosts such as consumer chat apps. It routes first, then packages only base authority/context, selected skill material, and explicitly named task inputs. `MINIMAL` excludes skill runtime code unless declared as capsule context; `PORTABLE` adds only manifest-declared portable files. ZIP inventory, timestamps, hashes, and ordering are deterministic.
+
 The kernel convergence guard derives persisted-state fingerprints from canonical journal replay; it keeps no hidden mutable tracker and terminalizes only non-adjacent state revisits.
 
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

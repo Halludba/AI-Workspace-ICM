@@ -43,5 +43,12 @@
       "pdf_style_schema.json": "0b982c1c89e8c0c1ed850bec903bb76161864625df384bd0e410b70a10120a1a",
       "style.pdf.formats.json": "45ef3677a218ef40e07286d51d64779c4e3030c820bb058fbfb279946fd26c3f"
     }
-  }
+  },
+  "capsule_context": [
+    "skills/pdf-styler/pdf_style_schema.json",
+    "skills/pdf-styler/pdf_styles/style.pdf.formats.json"
+  ],
+  "capsule_portable": [
+    "skills/pdf-styler/tools/pdf_styler.py"
+  ]
 }

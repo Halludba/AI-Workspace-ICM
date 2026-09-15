@@ -86,5 +86,22 @@ class CliTests(unittest.TestCase):
         self.assertIn("artifact intent", result.stdout.lower())
 
 
+    def test_python_trampoline_dispatches_capsule_export_help(self):
+        result = subprocess.run(
+            [sys.executable, str(ROOT / "icm"), "export", "capsule", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("task capsules", result.stdout.lower())
+
+    @unittest.skipUnless(os.name == "nt", "Windows wrapper test")
+    def test_windows_cmd_trampoline_dispatches_capsule_export_help(self):
+        result = subprocess.run(
+            ["cmd.exe", "/d", "/c", "icm.cmd", "export", "capsule", "--help"],
+            cwd=ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("task capsules", result.stdout.lower())
+
 if __name__ == "__main__":
     unittest.main()

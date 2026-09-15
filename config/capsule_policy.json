@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "default_mode": "MINIMAL",
+  "supported_modes": ["MINIMAL", "PORTABLE"],
+  "supported_targets": ["qwen", "gemini", "generic-upload"],
+  "base_context": [
+    "WORKSPACE.md",
+    "CONTEXT.md",
+    "_core/AUTHORITY.md",
+    "skills/CONTEXT.md"
+  ],
+  "generated_files": ["BOOTSTRAP.md", "CAPSULE_MANIFEST.json"],
+  "minimal_rule": "BASE_CONTEXT_PLUS_SELECTED_SKILL_CONTEXT",
+  "portable_rule": "MINIMAL_PLUS_SELECTED_SKILL_PACKAGE",
+  "input_rule": "EXPLICIT_PATHS_ONLY",
+  "archive_rule": "SORTED_FIXED_TIMESTAMP",
+  "token_estimator": {
+    "kind": "HEURISTIC_CHARS_PER_TOKEN",
+    "chars_per_token_mid": 4.0,
+    "chars_per_token_low": 4.7,
+    "chars_per_token_high": 3.2
+  }
+}

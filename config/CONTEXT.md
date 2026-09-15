@@ -13,6 +13,7 @@ Read `_core/AUTHORITY.md` and only the config relevant to the active route.
 - Ephemeral session-plan mechanics -> `session_policy.json`
 - Adaptive assurance / deliberation routing -> `assurance_policy.json`
 - Release/version behavior -> `release_policy.json`
+- Upload-only capsule packaging -> `capsule_policy.json`
 
 Config cannot override the workspace constitution.
 Validation should fail closed on unknown critical fields.

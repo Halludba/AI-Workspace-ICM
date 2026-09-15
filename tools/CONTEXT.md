@@ -17,6 +17,7 @@ Current generic tools:
 - `release_validator.py` -> strict SemVer, release-policy, and annotated-tag-note validation.
 - `token_profiler.py` -> on-demand estimated token/context footprint, Git-ref comparison, growth warnings, and Python symbol profiling; diagnostics only.
 - `capability_resolver.py` -> exact operation/artifact routing to lazily loaded reusable skills; resolver returns paths and does not load skill contents.
+- `capsule_exporter.py` -> deterministic task-scoped ZIP packaging for upload-only model hosts, using capability routing and explicit input paths.
 - `init.py` -> internal initialization helper used by `run_manager.py`; not a competing lifecycle CLI.
 - `kernel/events.py` -> event envelope, taxonomy, and kernel error contracts.
 - `kernel/reducer.py` -> pure event fold/state-machine enforcement.

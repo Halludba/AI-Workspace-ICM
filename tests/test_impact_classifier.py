@@ -142,6 +142,10 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/capability_resolver.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_capsule_exporter_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/capsule_exporter.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
     def test_capability_registry_change_requires_full_regression(self):
         result = self.classify(paths=["skills/registry.json"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")

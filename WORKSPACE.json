@@ -45,7 +45,9 @@
     "assurance_policy": "config/assurance_policy.json",
     "assurance_controller": "tools/assurance_controller.py",
     "token_profiler": "tools/token_profiler.py",
-    "capability_resolver": "tools/capability_resolver.py"
+    "capability_resolver": "tools/capability_resolver.py",
+    "capsule_policy": "config/capsule_policy.json",
+    "capsule_exporter": "tools/capsule_exporter.py"
   },
   "roots": {
     "core": "_core",

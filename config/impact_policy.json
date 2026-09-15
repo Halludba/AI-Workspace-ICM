@@ -45,7 +45,8 @@
     "tools/release_validator.py",
     "tools/assurance_controller.py",
     "tools/token_profiler.py",
-    "tools/capability_resolver.py"
+    "tools/capability_resolver.py",
+    "tools/capsule_exporter.py"
   ],
   "semantic_diff_tokens": [
     "authority",

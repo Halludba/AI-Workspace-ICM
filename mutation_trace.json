@@ -1,41 +1,40 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step4",
-  "summary": "Add append-only privacy-safe decision records as non-authoritative audit evidence.",
+  "directive_id": "DIR-2026-09-15:v06-step5",
+  "summary": "Add a non-authoritative, self-deleting, agent-namespaced ephemeral session planner with deterministic DAG eligibility and ordering.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": ["_core/CONVENTIONS.md"],
-      "change_kind": "NEW",
+      "target_paths": ["_core/AUTHORITY.md", "_core/CONTEXT_PROTOCOL.md", "_core/CONVENTIONS.md"],
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Add the universal privacy and append-only decision-rationale invariant."
+      "rationale": "Place ephemeral plans below durable run state and define their non-authoritative Continue semantics."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": ["config/decision_policy.json"],
+      "target_paths": ["config/session_policy.json"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Define the machine-readable decision-record contract without third-party schema dependencies."
+      "rationale": "Define the machine-readable ephemeral plan schema, transitions, and priority hierarchy."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": ["tools/record_decision.py"],
+      "target_paths": ["tools/session_planner.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add standard-library validation and append-only decision-record writing."
+      "rationale": "Implement plan validation, DAG selection, lifecycle transitions, and auto-deletion."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": ["tests/test_decision_records.py"],
+      "target_paths": ["tests/test_session_planner.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add adversarial privacy, supersession, path, and append-only tests."
+      "rationale": "Add adversarial DAG, priority, lifecycle, namespacing, and cleanup coverage."
     },
     {
       "candidate_id": "C-005",
       "target_paths": [
-        "archive/CONTEXT.md",
-        "archive/decisions/.gitkeep",
+        ".gitignore",
         "WORKSPACE.json",
         "config/CONTEXT.md",
         "config/impact_policy.json",
@@ -46,14 +45,14 @@
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate decision audit evidence into the existing archive route and workspace indexes without creating new authority."
+      "rationale": "Integrate the ephemeral planner into existing policy/tool/test indexes while keeping .session non-canonical and ignored."
     }
   ],
   "applied_changes": [
-    {"candidate_id": "C-001", "description": "Added Convention 29 for privacy-safe append-only decision evidence."},
-    {"candidate_id": "C-002", "description": "Added machine-readable decision-record policy."},
-    {"candidate_id": "C-003", "description": "Added standard-library decision-record validator and append-only writer."},
-    {"candidate_id": "C-004", "description": "Added adversarial decision-record tests."},
-    {"candidate_id": "C-005", "description": "Integrated decision records into archive routing, indexes, workspace metadata, and impact policy."}
+    {"candidate_id": "C-001", "description": "Integrated non-authoritative session plans into authority, context, and conventions."},
+    {"candidate_id": "C-002", "description": "Added machine-readable session planner policy."},
+    {"candidate_id": "C-003", "description": "Added deterministic ephemeral session planner tool."},
+    {"candidate_id": "C-004", "description": "Added adversarial session planner tests."},
+    {"candidate_id": "C-005", "description": "Added Git ignore and integrated session planner into workspace/config/tool/test indexes and impact policy."}
   ]
 }

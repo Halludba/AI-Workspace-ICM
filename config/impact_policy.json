@@ -38,7 +38,8 @@
     "tools/check_invariants.py",
     "tools/check_mutation.py",
     "tools/impact_classifier.py",
-    "tools/record_decision.py"
+    "tools/record_decision.py",
+    "tools/session_planner.py"
   ],
   "semantic_diff_tokens": [
     "authority",

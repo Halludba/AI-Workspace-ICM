@@ -9,3 +9,4 @@ venv/
 Thumbs.db
 *.tmp
 *.bak
+.session/

@@ -12,10 +12,15 @@ Define how an AI enters, narrows, inherits, expands, and exits context in this w
 
 Derived indexes/caches may accelerate selection but are not an authority layer.
 
+Ephemeral continuity state may exist under `.session/plans/<agent-id>.json`. It is not a context authority layer and is never a substitute for durable `work/` state.
+
 ## Startup and inheritance
 Startup reads `WORKSPACE.md` then `/CONTEXT.md`. Before semantic execution, `_core/AUTHORITY.md` is inherited. `_core/CONVENTIONS.md` is additionally required for workspace mutation. A local `CONTEXT.md` may narrow behavior but cannot override higher authority.
 
 Inheritance is vertical, not lateral. Selecting `profiles/` does not automatically load `skills/`, `references/`, or sibling profile contexts. Selecting a workflow stage does not load sibling stages unless the workflow contract explicitly requires them.
+
+## Ephemeral Continue protocol
+When the user explicitly asks to continue prior unfinished work, an agent may load only its own `.session/plans/<agent-id>.json` after startup authority. The planner deterministically identifies the active or next mechanically eligible task. The task's declared `route_id` then re-enters the normal ICM router, which loads the smallest sufficient current context. Before execution, current user intent and all higher authority are re-evaluated. The planner never authorizes a workflow transition or run mutation; those remain subject to the active contracts and kernel. When every task is completed, the planner file deletes itself.
 
 ## Scope classes
 ### DIRECT

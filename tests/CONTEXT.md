@@ -8,6 +8,7 @@ Current suites:
 - `test_mutation_governance.py` -> two-axis mutation governance, target linkage, and commit-readiness invariants.
 - `test_impact_classifier.py` -> Git-aware verification-scope classification, staged/unstaged discovery, and pre-commit full-regression invariants.
 - `test_decision_records.py` -> privacy-key guards, append-only writes, supersession, and decision-record schema invariants.
+- `test_session_planner.py` -> ephemeral DAG validation, priority ordering, per-agent namespacing, lifecycle transitions, and self-deletion invariants.
 - `test_workflow_contracts.py` -> workflow/stage/template invariants.
 - `test_run_contracts.py` -> run creation, snapshot, projection, and artifact invariants.
 - `test_run_manager.py` -> deterministic journal lifecycle, retries, idempotency, recovery, checkpoints, limits, and confinement.

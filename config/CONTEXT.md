@@ -10,6 +10,7 @@ Read `_core/AUTHORITY.md` and only the config relevant to the active route.
 - Mutation classification/disposition governance -> `mutation_policy.json`
 - Verification blast-radius classification -> `impact_policy.json`
 - Privacy-safe decision-record contract -> `decision_policy.json`
+- Ephemeral session-plan mechanics -> `session_policy.json`
 
 Config cannot override the workspace constitution.
 Validation should fail closed on unknown critical fields.

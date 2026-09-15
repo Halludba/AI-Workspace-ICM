@@ -1,0 +1,79 @@
+{
+  "policy_schema": "1.0",
+  "plan_schema": "1.0",
+  "plan_root": ".session/plans",
+  "authority_disclaimer": "NON_AUTHORITATIVE_INTENT_QUEUE",
+  "route_registry": "config/routes.json",
+  "agent_id_pattern": "^[A-Za-z0-9._-]{1,120}$",
+  "session_id_pattern": "^[A-Za-z0-9._:-]{1,200}$",
+  "task_id_pattern": "^T-[A-Za-z0-9._-]{2,120}$",
+  "statuses": ["PENDING", "IN_PROGRESS", "BLOCKED", "COMPLETED"],
+  "priority_classes": ["CORRECTNESS_REPAIR", "NORMAL"],
+  "declared_scopes": ["SCOPED", "GLOBAL"],
+  "priority_class_rank": {
+    "CORRECTNESS_REPAIR": 0,
+    "NORMAL": 1
+  },
+  "declared_scope_rank": {
+    "SCOPED": 0,
+    "GLOBAL": 1
+  },
+  "priority_order": [
+    "dependency_eligibility",
+    "explicit_user_order",
+    "priority_class",
+    "derived_unlock_count",
+    "declared_scope",
+    "creation_order"
+  ],
+  "max_tasks": 200,  "required_plan_fields": [
+    "schema_version",
+    "session_id",
+    "agent_id",
+    "agent_role",
+    "created_utc",
+    "updated_utc",
+    "authority_disclaimer",
+    "active_run_id",
+    "tasks",
+    "auto_delete_on_empty"
+  ],
+  "allowed_plan_fields": [
+    "schema_version",
+    "session_id",
+    "agent_id",
+    "agent_role",
+    "created_utc",
+    "updated_utc",
+    "authority_disclaimer",
+    "active_run_id",
+    "tasks",
+    "auto_delete_on_empty"
+  ],  "required_task_fields": [
+    "task_id",
+    "route_id",
+    "stage_id",
+    "title",
+    "status",
+    "depends_on",
+    "user_order",
+    "user_directive_ref",
+    "priority_class",
+    "declared_scope"
+  ],
+  "allowed_task_fields": [
+    "task_id",
+    "route_id",
+    "stage_id",
+    "title",
+    "status",
+    "depends_on",
+    "user_order",
+    "user_directive_ref",
+    "priority_class",
+    "declared_scope",
+    "status_reason"
+  ],
+  "auto_delete_on_empty_required": true,
+  "max_in_progress": 1
+}

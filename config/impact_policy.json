@@ -31,7 +31,9 @@
     "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
     "_core/META_ADVISOR_PROTOCOL.md",
     "_core/EVALUATION_ARENA_PROTOCOL.md",
-    "tools/evaluation_arena.py"
+    "tools/evaluation_arena.py",
+    "_core/INTERACTION_PROTOCOL.md",
+    "tools/interaction_contracts.py"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -65,7 +67,8 @@
     "tools/local_worker.py",
     "tools/plan_intelligence.py",
     "tools/developer_observatory.py",
-    "tools/meta_advisor.py"
+    "tools/meta_advisor.py",
+    "tools/interaction_contracts.py"
   ],
   "semantic_diff_tokens": [
     "authority",

@@ -37,3 +37,5 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry and explicit audit deltas; never private reasoning or authority.
 - `meta_advisor.py` -> suggestion eligibility/value-density review, research escalation/prompt compilation, and presentation-only SIMPLE/STANDARD/TECHNICAL rendering.
 - `evaluation_arena.py` -> content-addressed case/variant contracts, blinded execution views, typed quality evidence, and replay manifests.
+
+- `interaction_contracts.py` -> validates shared subsystem bridges and conservative rule-deduplication coverage; it never proves semantic equivalence or deletes rules.

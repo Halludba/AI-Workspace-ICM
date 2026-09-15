@@ -30,3 +30,5 @@ Do not load unrelated config files.
 - `developer_observatory_policy.json` -> local NORMAL/DEVELOPER/AUDIT telemetry vocabulary, privacy guards, and no-authority limits.
 - `meta_advisor_policy.json` -> evidence-gated suggestion/research/presentation classifications; raw model confidence and automatic mutation are non-authoritative.
 - `evaluation_arena_policy.json` -> bounded evaluation partitions/evaluator vocabulary, noncanonical outputs, no automatic promotion.
+
+- `interaction_policy.json` -> shared cross-system invariants and bridge ownership; subordinate to source protocols and never grants authority.

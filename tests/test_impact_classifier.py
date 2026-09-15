@@ -216,6 +216,10 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/evaluation_arena.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_interaction_contract_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/interaction_contracts.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
     def test_developer_observatory_change_requires_full_regression(self):
         result = self.classify(paths=["tools/developer_observatory.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")

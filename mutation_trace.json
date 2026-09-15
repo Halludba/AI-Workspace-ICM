@@ -1,26 +1,37 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1240-v12-release",
+  "directive_id": "DIR-2026-09-15:T-1310-interaction-contracts",
   "actor_role": "icm-runtime-architect",
-  "summary": "Promote validated Evaluation Arena development state to immutable v1.2.0 release metadata without changing implementation semantics.",
+  "summary": "Add subordinate shared interaction contracts and conservative compatibility/deduplication validation.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
+        "_core/CONTEXT.md",
+        "_core/INTERACTION_PROTOCOL.md",
+        "config/CONTEXT.md",
+        "config/impact_policy.json",
+        "config/interaction_policy.json",
+        "icm",
+        "tests/CONTEXT.md",
         "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_impact_classifier.py",
+        "tests/test_interaction_contracts.py",
+        "tests/test_release_policy.py",
+        "tools/CONTEXT.md",
+        "tools/interaction_contracts.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Release closure updates only version assertions/public release description after the completed arena regression and clean context-growth check."
+      "rationale": "Make important subsystem relationships first-class without granting authority or auto-deleting duplicated safety rules."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted 1.2.0-dev to 1.2.0 and aligned release assertions/README."
+      "description": "Added interaction protocol/registry/tool/tests, CLI/docs/impact wiring, and opened v1.3.0-dev."
     }
   ]
 }

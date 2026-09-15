@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "levels": [
+    "C0_MAP",
+    "C1_EXACT_SYMBOL",
+    "C2_LOCAL_DEPENDENCIES",
+    "C3_CROSS_FILE_SLICE",
+    "C4_WHOLE_SOURCE",
+    "C5_SUBSYSTEM_GLOBAL"
+  ],
+  "adjacent_only": true,
+  "reasons": {
+    "C0_MAP->C1_EXACT_SYMBOL": [
+      "TARGET_DEFINITION_REQUIRED",
+      "AMBIGUITY_REQUIRES_EXACT_SYMBOL"
+    ],
+    "C1_EXACT_SYMBOL->C2_LOCAL_DEPENDENCIES": [
+      "LOCAL_DEPENDENCY_UNRESOLVED",
+      "CALLSITE_REQUIRED",
+      "LOCAL_INVARIANT_REQUIRED"
+    ],
+    "C2_LOCAL_DEPENDENCIES->C3_CROSS_FILE_SLICE": [
+      "CROSS_FILE_DEPENDENCY_UNRESOLVED",
+      "EXTERNAL_OWNER_REQUIRED"
+    ],
+    "C3_CROSS_FILE_SLICE->C4_WHOLE_SOURCE": [
+      "SLICE_INSUFFICIENT",
+      "FILE_WIDE_INVARIANT_REQUIRED"
+    ],
+    "C4_WHOLE_SOURCE->C5_SUBSYSTEM_GLOBAL": [
+      "CROSS_SYSTEM_CONTRACT_REQUIRED",
+      "GLOBAL_VERIFICATION_REQUIRED"
+    ]
+  },
+  "forbidden_reason_classes": [
+    "SELF_CONFIDENCE",
+    "MORE_TOKENS_AVAILABLE",
+    "THINK_HARDER_ONLY"
+  ],
+  "provenance": {
+    "sha256_length": 64,
+    "exact_source_recoverable_required": true
+  },
+  "context_delta": {
+    "positive_delta_required": true,
+    "added_items_required": true
+  },
+  "assurance_effect": "NO_AUTOMATIC_INCREASE",
+  "authority": "VALIDATION_AND_PROVENANCE_ONLY"
+}

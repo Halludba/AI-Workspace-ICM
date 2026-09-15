@@ -57,3 +57,6 @@ The controller does not calibrate semantic truth, prove source independence, est
 - `DEEP`: raises the minimum deliberation floor to corroboration but does not manufacture additional assurance.
 
 Risk classification and evidence relevance remain semantic inputs. Impact scope may come from deterministic change classification. The controller enforces relationships between those declared inputs; it does not infer their semantic correctness.
+
+## Context sufficiency boundary
+Context escalation (`C0`-`C5`) and assurance deliberation (`L0`-`L4`) are orthogonal. A larger or more exact context may create new evidence, but changing context level never increases assurance by itself. Any assurance increase still requires an approved epistemic delta and evidence reference under this protocol. Model self-confidence cannot substitute for missing source evidence or trigger a deterministic context escalation by itself.

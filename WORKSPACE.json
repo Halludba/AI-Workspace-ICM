@@ -52,7 +52,9 @@
     "role_policy": "config/role_policy.json",
     "role_resolver": "tools/role_resolver.py",
     "context_benchmark": "tools/context_benchmark.py",
-    "source_navigator": "tools/source_navigator.py"
+    "source_navigator": "tools/source_navigator.py",
+    "context_escalation_policy": "config/context_escalation_policy.json",
+    "context_escalation_controller": "tools/context_escalation.py"
   },
   "roots": {
     "core": "_core",

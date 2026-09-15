@@ -22,3 +22,4 @@ Do not load unrelated config files.
 - `role_policy.json` -> default System Architect, specialist task classes, mutation envelopes, bounded handoff schema, and planner-continuity policy.
 - `context_benchmark_policy.json` -> deterministic benchmark metric schema, heuristic estimator, and synthetic scale-case catalog; no live-model requirement.
 - `source_navigator_policy.json` -> bounded deterministic source-map cache, region/symbol limits, and explicit exact-file fallback for unsupported sources.
+- `context_escalation_policy.json` -> bounded C0-C5 context-sufficiency transitions, permitted evidence reasons, provenance requirements, and assurance separation.

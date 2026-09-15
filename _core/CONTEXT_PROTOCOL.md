@@ -37,3 +37,12 @@ Escalate `DIRECT -> SCOPED -> GLOBAL` only when the current scope cannot answer 
 
 ## Completion
 After producing an artifact, validate it using the stage/local contract. Persist material decisions in canonical/run artifacts rather than relying on conversation memory. Hand off only declared outputs to the next context.
+
+## Evidence-bounded context sufficiency ladder
+Sub-file/source escalation is distinct from route scope and from epistemic assurance. The bounded levels are `C0_MAP -> C1_EXACT_SYMBOL -> C2_LOCAL_DEPENDENCIES -> C3_CROSS_FILE_SLICE -> C4_WHOLE_SOURCE -> C5_SUBSYSTEM_GLOBAL`. Escalation advances one level at a time and only for a policy-approved unresolved-evidence reason.
+
+Every escalation record must preserve exact-source provenance, record a positive measured context delta, and keep exact canonical source recoverable. `C5_SUBSYSTEM_GLOBAL` still uses explicit ICM routing; it is not permission to dump the repository. Derived maps/indexes remain noncanonical. Self-confidence, available context-window capacity, or generic requests to think harder are not valid escalation reasons.
+
+`tools/context_escalation.py` validates declared transitions. It does not infer semantic sufficiency, retrieve source, increase assurance, or create a second context authority. `tools/source_navigator.py` owns exact source retrieval and `tools/context_resolver.py` owns route selection.
+
+The escalation validator checks record structure and provenance fields; it does not independently prove that caller-supplied hashes match current bytes. Use Source Navigator retrieval evidence when loaded-byte verification is required.

@@ -50,7 +50,8 @@
     "tools/capsule_exporter.py",
     "tools/role_resolver.py",
     "tools/context_benchmark.py",
-    "tools/source_navigator.py"
+    "tools/source_navigator.py",
+    "tools/context_escalation.py"
   ],
   "semantic_diff_tokens": [
     "authority",

@@ -196,6 +196,10 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/context_benchmark.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_context_escalation_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/context_escalation.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
 
 if __name__ == "__main__":
     unittest.main()

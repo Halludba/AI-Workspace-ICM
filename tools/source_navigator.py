@@ -237,6 +237,20 @@ def _lines(text: str) -> list[str]:
     return text.splitlines()
 
 
+def retrieve_file(path: str, ref: str | None = None, *, root: Path = ROOT) -> dict:
+    text, identity, _mapping, _cache = _prepare(path, ref, root, semantic=False)
+    lines = _lines(text)
+    return {
+        "schema_version": "1.0",
+        "retrieval_kind": "EXACT_FILE",
+        "source": identity,
+        "selection": {"line_start": 1, "line_end": len(lines), "line_count": len(lines)},
+        "text": text,
+        "semantic_coverage": "NOT_CLAIMED",
+        "exact_source_recoverable": True,
+    }
+
+
 def retrieve_region(path: str, start: int, end: int, ref: str | None = None, *, root: Path = ROOT) -> dict:
     policy = load_policy(root)
     text, identity, _mapping, _cache = _prepare(path, ref, root, semantic=False)
@@ -308,6 +322,9 @@ def main() -> int:
     symbol_cmd.add_argument("--ref")
     symbol_cmd.add_argument("--context-lines", type=int)
     symbol_cmd.add_argument("--no-cache", action="store_true")
+    file_cmd = sub.add_parser("file")
+    file_cmd.add_argument("path")
+    file_cmd.add_argument("--ref")
     region_cmd = sub.add_parser("region")
     region_cmd.add_argument("path")
     region_cmd.add_argument("--start", type=int, required=True)
@@ -319,6 +336,8 @@ def main() -> int:
             result = map_source(args.path, args.ref, use_cache=not args.no_cache)
         elif args.command == "symbol":
             result = retrieve_symbol(args.path, args.symbol, args.ref, args.context_lines, use_cache=not args.no_cache)
+        elif args.command == "file":
+            result = retrieve_file(args.path, args.ref)
         else:
             result = retrieve_region(args.path, args.start, args.end, args.ref)
         print(json.dumps({"valid": True, **result}, indent=2, ensure_ascii=False))

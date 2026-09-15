@@ -43,3 +43,6 @@ Use `role_resolver.py` / `icm role ...` to validate a semantically declared task
 - `icm inspect source symbol <path> <symbol> [--context-lines N]` returns only the exact symbol slice plus bounded surrounding lines.
 - `icm inspect source region <path> --start N --end N` returns only the requested bounded exact-source region.
 - Derived maps live under `.session/source-index/`, are noncanonical, and are invalidated by source-byte identity. Unsupported/malformed sources explicitly fall back to exact-file access.
+- `icm inspect escalation policy` prints the bounded context-sufficiency contract; `icm inspect escalation validate <record.json>` validates a declared transition without retrieving source or changing assurance.
+
+Escalation record validation is structural; Source Navigator retrieval evidence supplies loaded-byte/hash verification when required.

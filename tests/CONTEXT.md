@@ -19,3 +19,4 @@ Current suites:
 - `test_convergence_guard.py` -> stable-vs-cycle semantics, kernel terminalization, retry idempotence, and cycle-provenance verification.
 
 Passing tests are evidence, not authority. Tests must encode current contracts rather than stale assumptions. Reachability tests prove graph reachability only, never runtime termination.
+- `test_context_escalation.py` -> bounded context-level transitions, exact provenance, positive deltas, assurance separation, source-navigator integration, and escalation CLI invariants.

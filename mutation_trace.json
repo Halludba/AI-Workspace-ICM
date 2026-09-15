@@ -1,58 +1,61 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-120-source-navigator",
+  "directive_id": "DIR-2026-09-15:T-130-context-escalation",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-120 by extracting the existing Python AST logic into one shared source-map primitive and adding exact provenance-preserving bounded source navigation with noncanonical content-addressed caches.",
+  "summary": "Execute planner task T-130 by adding a bounded provenance-preserving context-sufficiency escalation validator while preserving source navigation, route authority, and assurance separation.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "tools/python_source_map.py",
-        "tools/source_navigator.py",
-        "config/source_navigator_policy.json",
-        "tests/test_source_navigator.py"
+        "config/context_escalation_policy.json",
+        "tools/context_escalation.py",
+        "tests/test_context_escalation.py"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Create one shared Python source-map primitive and a bounded exact-source navigator with hash-keyed derived cache, ambiguity handling, and exact-region fallback."
+      "rationale": "Add deterministic C0-C5 transition validation, approved evidence reasons, exact-source provenance, and positive context-delta requirements."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "tools/token_profiler.py"
+        "tools/source_navigator.py",
+        "tests/test_source_navigator.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Reuse the extracted source-map primitive for symbol profiling instead of maintaining a competing AST parser."
+      "rationale": "Expose explicit exact-file retrieval required by the C4 whole-source level without changing source authority."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
+        "_core/ASSURANCE_PROTOCOL.md",
+        "_core/CONTEXT_PROTOCOL.md",
         "WORKSPACE.json",
-        "icm",
         "config/CONTEXT.md",
         "config/impact_policy.json",
+        "icm",
+        "tests/CONTEXT.md",
+        "tests/test_impact_classifier.py",
         "tools/CONTEXT.md",
-        "tools/README.md",
-        "tests/CONTEXT.md"
+        "tools/README.md"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate source navigation into entrypoints, CLI discovery, policy documentation, and verification scope."
+      "rationale": "Integrate the bounded escalation contract into canonical protocols, CLI discovery, workspace entrypoints, verification scope, and documentation."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added shared Python source maps and source navigation with Git/hash provenance, content-addressed versioned cache, exact symbol/region selection, ambiguity detection, and fail-closed semantic mapping."
+      "description": "Added adjacent C0-C5 escalation validation with approved reason codes, exact SHA-256 provenance, positive context deltas, and no automatic assurance effect."
     },
     {
       "candidate_id": "C-002",
-      "description": "Token symbol profiling now consumes the shared source-map primitive."
+      "description": "Added explicit exact whole-file retrieval with exact loaded-byte provenance for C4."
     },
     {
       "candidate_id": "C-003",
-      "description": "Integrated source navigation policy/tool into workspace, CLI, docs, and full-regression classification."
+      "description": "Integrated the context-sufficiency ladder across protocol docs, CLI, workspace metadata, impact classification, and test/context discovery."
     }
   ]
 }

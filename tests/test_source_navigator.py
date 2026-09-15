@@ -137,6 +137,13 @@ class SourceNavigatorTests(unittest.TestCase):
                 nav._source_bytes = original
             self.assertEqual(len(calls), 1)
 
+    def test_exact_file_retrieval_preserves_full_source_and_provenance(self):
+        result = nav.retrieve_file("tools/context_resolver.py", root=ROOT)
+        self.assertEqual(result["retrieval_kind"], "EXACT_FILE")
+        self.assertIn("def build_plan", result["text"])
+        self.assertEqual(len(result["source"]["sha256"]), 64)
+        self.assertTrue(result["exact_source_recoverable"])
+
     def test_workspace_cli_returns_only_requested_symbol_slice(self):
         proc = subprocess.run(
             [sys.executable, str(ROOT / "icm"), "inspect", "source", "symbol", "tools/token_profiler.py", "profile_route"],

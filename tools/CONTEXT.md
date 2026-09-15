@@ -34,3 +34,4 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `local_compute.py` -> read-only host CPU/GPU/executable discovery and named workload readiness; observations are noncanonical and grant no execution or mutation authority.
 - `local_worker.py` -> builds base-revision-verified bounded worker packets, validates candidate Git patches, enforces bounded attempts, and optionally calls loopback Ollama without applying changes.
 - `plan_intelligence.py` -> deterministic plan sufficiency checks and downstream affected-task reconciliation; advisory only, no model calls or plan mutation.
+- `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry and explicit audit deltas; never private reasoning or authority.

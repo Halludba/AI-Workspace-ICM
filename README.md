@@ -34,6 +34,8 @@ Local worker delegation is exposed through `icm worker ...`: Runtime Architect m
 
 Plan intelligence is exposed through `icm plan ...`: execution-class planner tasks can be checked for minimum objective/context/acceptance/verification sufficiency, and material changes can identify only affected downstream tasks without rewriting the plan.
 
+Developer observability is exposed through `icm observe ...`: local Git-ignored telemetry can measure phases, mechanisms, context/directive references, tool/model-call counts, rework, escalation, and explicit audit deltas without storing prompts, responses, transcripts, or private reasoning.
+
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.

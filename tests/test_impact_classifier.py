@@ -208,6 +208,10 @@ class ImpactClassifierTests(unittest.TestCase):
         result = self.classify(paths=["tools/local_compute.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")
 
+    def test_developer_observatory_change_requires_full_regression(self):
+        result = self.classify(paths=["tools/developer_observatory.py"])
+        self.assertEqual(result["impact"], "FULL_REGRESSION")
+
     def test_plan_intelligence_change_requires_full_regression(self):
         result = self.classify(paths=["tools/plan_intelligence.py"])
         self.assertEqual(result["impact"], "FULL_REGRESSION")

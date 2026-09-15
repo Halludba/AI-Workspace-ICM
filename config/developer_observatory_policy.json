@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/observatory",
+  "modes": [
+    "NORMAL",
+    "DEVELOPER",
+    "AUDIT"
+  ],
+  "phases": [
+    "ORIENTATION",
+    "PLANNING",
+    "RETRIEVAL",
+    "IMPLEMENTATION",
+    "VERIFICATION",
+    "RECONCILIATION",
+    "RESEARCH",
+    "OUTPUT"
+  ],
+  "outcomes": [
+    "SUCCESS",
+    "BLOCKED",
+    "FAILED",
+    "REWORK"
+  ],
+  "rework_classes": [
+    "EXPECTED_VERIFICATION_REWORK",
+    "AVOIDABLE_IMPLEMENTATION_REWORK",
+    "REQUIREMENT_CHANGE",
+    "EXTERNAL_CHANGE",
+    "EXPLORATORY_REWORK"
+  ],
+  "forbidden_keys": [
+    "reasoning",
+    "chain_of_thought",
+    "scratchpad",
+    "hidden_deliberation",
+    "raw_prompt",
+    "raw_response",
+    "conversation_transcript"
+  ],
+  "normal_mode_model_calls": false,
+  "canonical": false,
+  "execution_authority": "NONE",
+  "max_context_refs": 64,
+  "max_directive_refs": 64,
+  "max_causal_refs": 64
+}

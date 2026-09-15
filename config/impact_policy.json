@@ -27,7 +27,8 @@
     "_core/CONTEXT_RUNTIME_PROTOCOL.md",
     "_core/LOCAL_COMPUTE_PROTOCOL.md",
     "_core/LOCAL_WORKER_PROTOCOL.md",
-    "_core/PLAN_INTELLIGENCE_PROTOCOL.md"
+    "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+    "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -59,7 +60,8 @@
     "tools/context_runtime.py",
     "tools/local_compute.py",
     "tools/local_worker.py",
-    "tools/plan_intelligence.py"
+    "tools/plan_intelligence.py",
+    "tools/developer_observatory.py"
   ],
   "semantic_diff_tokens": [
     "authority",

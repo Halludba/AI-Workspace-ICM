@@ -1,34 +1,34 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1110-plan-intelligence-corrective-followup",
+  "directive_id": "DIR-2026-09-15:T-1120-developer-observatory",
   "actor_role": "icm-runtime-architect",
-  "summary": "Finalize v1.1 plan intelligence with explicit objectives, fail-closed reconciliation inputs, and complete CLI/session metadata integration.",
+  "summary": "Add lazy local developer observability with privacy-safe phase/mechanism/context/directive/outcome telemetry and explicit audit deltas.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
-        "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+        "WORKSPACE.json",
+        "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/plan_intelligence_policy.json",
-        "config/session_policy.json",
+        "config/developer_observatory_policy.json",
+        "config/impact_policy.json",
         "icm",
         "tests/CONTEXT.md",
-        "tests/test_plan_intelligence.py",
-        "tests/test_session_planner.py",
+        "tests/test_developer_observatory.py",
+        "tests/test_impact_classifier.py",
         "tools/CONTEXT.md",
-        "tools/plan_intelligence.py",
-        "tools/session_planner.py"
+        "tools/developer_observatory.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Close plan-sufficiency integration gaps found immediately after the initial local milestone commit."
+      "rationale": "Add derived local observability substrate without model-call overhead, canonical authority, transcript capture, or invented causal percentages."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added objective metadata validation, unknown changed-task rejection, CLI surface coverage, and aligned docs/tests."
+      "description": "Added observatory protocol/policy/tool/tests, CLI surface, impact registration, workspace/docs integration, and nullable observed call-count semantics."
     }
   ]
 }

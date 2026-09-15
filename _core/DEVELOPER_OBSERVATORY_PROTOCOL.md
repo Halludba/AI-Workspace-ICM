@@ -1,0 +1,18 @@
+# Developer Observatory Protocol
+
+## Purpose
+Collect cheap, structured, local evidence about how ICM mechanisms execute so System Architect can later identify latency, context, rework, and governance inefficiencies without logging private model reasoning.
+
+## Modes
+`NORMAL` records only lightweight observable execution facts and the Observatory itself adds no model call. Observed task call counts may be recorded when known or left unavailable. `DEVELOPER` may add phase timing, context/directive references, trigger/consumer links, and rework classification. `AUDIT` is explicit and may compare predeclared variants or ablations; it is never an always-on counterfactual engine.
+
+## Privacy and authority
+Events must not contain prompts, responses, conversation transcripts, scratchpads, hidden deliberation, chain-of-thought, or private reasoning. Telemetry lives under Git-ignored `.session/observatory/`, is derived/noncanonical, and grants no execution or mutation authority.
+
+The forbidden-key guard is structural and does not semantically prove that arbitrary free-text values contain no private material; callers remain responsible for supplying only observable metadata.
+
+## Contribution claims
+The Observatory may report observed counts, durations, deltas, context use, rework, and explicit ablation outcomes. It must not invent causal percentages for internal reasoning steps. A contribution claim requires an explicit measured comparison, not self-confidence.
+
+## Summaries
+Mechanical summaries may report phase/tool/model-call counts, wall time, rework ratio by class, context escalation counts/token deltas, directive-reference frequency, and audit deltas. Usage frequency is evidence for review, not proof that a capability is valuable or useless.

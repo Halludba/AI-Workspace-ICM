@@ -66,7 +66,10 @@
     "local_worker": "tools/local_worker.py",
     "plan_intelligence_protocol": "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
     "plan_intelligence_policy": "config/plan_intelligence_policy.json",
-    "plan_intelligence": "tools/plan_intelligence.py"
+    "plan_intelligence": "tools/plan_intelligence.py",
+    "developer_observatory_protocol": "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
+    "developer_observatory_policy": "config/developer_observatory_policy.json",
+    "developer_observatory": "tools/developer_observatory.py"
   },
   "roots": {
     "core": "_core",

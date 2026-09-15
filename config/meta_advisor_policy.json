@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "suggestion": {
+    "novelty": [
+      "NEW",
+      "EXTENDS_EXISTING",
+      "DUPLICATE"
+    ],
+    "benefit": [
+      "SUBSTANTIAL",
+      "MODERATE",
+      "LIMITED"
+    ],
+    "frequency": [
+      "COMMON",
+      "OCCASIONAL",
+      "RARE",
+      "UNKNOWN"
+    ],
+    "universality": [
+      "CORE",
+      "SHARED_OPTIONAL",
+      "CLONE_SPECIFIC"
+    ],
+    "complexity": [
+      "LOW",
+      "MEDIUM",
+      "HIGH"
+    ],
+    "compatibility": [
+      "VERIFIED",
+      "LIKELY",
+      "CONFLICT"
+    ],
+    "interaction_risk": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "UNKNOWN"
+    ],
+    "verification": [
+      "DETERMINISTIC",
+      "EMPIRICAL",
+      "SEMANTIC_ONLY",
+      "NONE"
+    ],
+    "reversibility": [
+      "EASY",
+      "MODERATE",
+      "HARD"
+    ],
+    "high_default_context_tax_tokens": 128,
+    "evidence_confidence": [
+      "HIGH",
+      "MEDIUM",
+      "LOW"
+    ],
+    "runtime_call_review_threshold": 0
+  },
+  "research": {
+    "impacts": [
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL"
+    ],
+    "evidence_states": [
+      "SUFFICIENT",
+      "WEAK",
+      "CONFLICTING",
+      "MISSING"
+    ],
+    "max_internal_attempts_before_review": 2
+  },
+  "presentation": {
+    "default": "STANDARD",
+    "modes": {
+      "SIMPLE": {
+        "plain_language_first": true,
+        "technical_detail": "ON_REQUEST"
+      },
+      "STANDARD": {
+        "plain_language_first": true,
+        "technical_detail": "BALANCED"
+      },
+      "TECHNICAL": {
+        "plain_language_first": false,
+        "technical_detail": "FULL"
+      }
+    }
+  },
+  "max_list_items": 32,
+  "authority": "ADVISORY_ONLY",
+  "model_confidence_is_authority": false,
+  "automatic_mutation": false
+}

@@ -1,34 +1,34 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1120-developer-observatory",
+  "directive_id": "DIR-2026-09-15:T-1130-meta-advisors",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add lazy local developer observability with privacy-safe phase/mechanism/context/directive/outcome telemetry and explicit audit deltas.",
+  "summary": "Add evidence-gated architecture suggestion/research advice and presentation-only rendering without raw model confidence or automatic mutation.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
-        "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
+        "_core/META_ADVISOR_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/developer_observatory_policy.json",
         "config/impact_policy.json",
+        "config/meta_advisor_policy.json",
         "icm",
         "tests/CONTEXT.md",
-        "tests/test_developer_observatory.py",
         "tests/test_impact_classifier.py",
+        "tests/test_meta_advisor.py",
         "tools/CONTEXT.md",
-        "tools/developer_observatory.py"
+        "tools/meta_advisor.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Add derived local observability substrate without model-call overhead, canonical authority, transcript capture, or invented causal percentages."
+      "rationale": "Add one lazy advisory tool reusing existing assurance/context-economics principles rather than new always-on agents."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added observatory protocol/policy/tool/tests, CLI surface, impact registration, workspace/docs integration, and nullable observed call-count semantics."
+      "description": "Added suggestion value-density/compatibility gate, evidence-derived confidence, research escalation/prompt compiler, presentation modes, CLI/docs/tests/impact integration."
     }
   ]
 }

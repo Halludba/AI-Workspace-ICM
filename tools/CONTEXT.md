@@ -35,3 +35,4 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `local_worker.py` -> builds base-revision-verified bounded worker packets, validates candidate Git patches, enforces bounded attempts, and optionally calls loopback Ollama without applying changes.
 - `plan_intelligence.py` -> deterministic plan sufficiency checks and downstream affected-task reconciliation; advisory only, no model calls or plan mutation.
 - `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry and explicit audit deltas; never private reasoning or authority.
+- `meta_advisor.py` -> suggestion eligibility/value-density review, research escalation/prompt compilation, and presentation-only SIMPLE/STANDARD/TECHNICAL rendering.

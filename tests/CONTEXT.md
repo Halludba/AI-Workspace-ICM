@@ -25,3 +25,4 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_local_worker.py` -> exact base-source packet provenance, bounded context, candidate patch scope/applicability, no-private-reasoning result schema, Ollama-unavailable preflight, attempt locking/repair budget, and telemetry invariants.
 - `test_plan_intelligence.py` -> execution-task sufficiency, objective/verification requirements, targeted downstream/context reconciliation, and fail-closed unknown-change invariants.
 - `test_developer_observatory.py` -> privacy guards, model-free NORMAL mode, idempotent local recording, rework/escalation summaries, and no-invented-contribution audit deltas.
+- `test_meta_advisor.py` -> suggestion compatibility/value-density gates, evidence-derived confidence, research triggers, bounded prompt compilation, and presentation-only invariants.

@@ -69,7 +69,10 @@
     "plan_intelligence": "tools/plan_intelligence.py",
     "developer_observatory_protocol": "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
     "developer_observatory_policy": "config/developer_observatory_policy.json",
-    "developer_observatory": "tools/developer_observatory.py"
+    "developer_observatory": "tools/developer_observatory.py",
+    "meta_advisor_protocol": "_core/META_ADVISOR_PROTOCOL.md",
+    "meta_advisor_policy": "config/meta_advisor_policy.json",
+    "meta_advisor": "tools/meta_advisor.py"
   },
   "roots": {
     "core": "_core",

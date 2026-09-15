@@ -28,3 +28,4 @@ Do not load unrelated config files.
 - `local_worker_policy.json` -> bounded Ollama/Ornith worker packet, result, attempt, response-size, and repair-cycle limits; it grants no mutation authority.
 - `plan_intelligence_policy.json` -> execution-task sufficiency requirements and targeted reconciliation policy; advisory and model-free.
 - `developer_observatory_policy.json` -> local NORMAL/DEVELOPER/AUDIT telemetry vocabulary, privacy guards, and no-authority limits.
+- `meta_advisor_policy.json` -> evidence-gated suggestion/research/presentation classifications; raw model confidence and automatic mutation are non-authoritative.

@@ -28,7 +28,8 @@
     "_core/LOCAL_COMPUTE_PROTOCOL.md",
     "_core/LOCAL_WORKER_PROTOCOL.md",
     "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
-    "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md"
+    "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
+    "_core/META_ADVISOR_PROTOCOL.md"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -61,7 +62,8 @@
     "tools/local_compute.py",
     "tools/local_worker.py",
     "tools/plan_intelligence.py",
-    "tools/developer_observatory.py"
+    "tools/developer_observatory.py",
+    "tools/meta_advisor.py"
   ],
   "semantic_diff_tokens": [
     "authority",

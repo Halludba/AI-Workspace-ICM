@@ -11,8 +11,8 @@ if str(ROOT) not in sys.path:
 
 
 def main() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "export"}:
-        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,export} <command> [args]", file=sys.stderr)
+    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "advise", "export"}:
+        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,advise,export} <command> [args]", file=sys.stderr)
         return 2
     surface = sys.argv[1]
     if surface == "inspect":
@@ -46,6 +46,10 @@ def main() -> int:
         from tools.capability_resolver import main as capability_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return capability_main()
+    if surface == "advise":
+        from tools.meta_advisor import main as advise_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return advise_main()
     if surface == "observe":
         from tools.developer_observatory import main as observe_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]

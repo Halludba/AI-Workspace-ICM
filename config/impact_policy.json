@@ -29,7 +29,9 @@
     "_core/LOCAL_WORKER_PROTOCOL.md",
     "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
     "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
-    "_core/META_ADVISOR_PROTOCOL.md"
+    "_core/META_ADVISOR_PROTOCOL.md",
+    "_core/EVALUATION_ARENA_PROTOCOL.md",
+    "tools/evaluation_arena.py"
   ],
   "full_regression_prefixes": [
     "config/",

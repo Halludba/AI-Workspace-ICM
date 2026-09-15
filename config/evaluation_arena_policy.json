@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/evaluation-arena",
+  "partitions": [
+    "TUNE",
+    "HOLDOUT"
+  ],
+  "task_kinds": [
+    "QA",
+    "CODE",
+    "RESEARCH",
+    "GENERAL"
+  ],
+  "evaluator_kinds": [
+    "DETERMINISTIC",
+    "HUMAN",
+    "JUDGE"
+  ],
+  "score_min": 0.0,
+  "score_max": 1.0,
+  "max_source_refs": 64,
+  "max_tags": 32,
+  "max_strategy_params": 32,
+  "max_model_calls": 64,
+  "max_tool_calls": 256,
+  "forbidden_keys": [
+    "reasoning",
+    "chain_of_thought",
+    "scratchpad",
+    "hidden_deliberation",
+    "private_reasoning",
+    "raw_model_reasoning"
+  ],
+  "quality_floor_required": true,
+  "experiment_outputs_canonical": false,
+  "execution_authority": "NONE",
+  "automatic_promotion": false
+}

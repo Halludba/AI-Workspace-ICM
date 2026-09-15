@@ -1,26 +1,36 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1140-v11-release",
+  "directive_id": "DIR-2026-09-15:T-1210-arena-contract",
   "actor_role": "icm-runtime-architect",
-  "summary": "Promote validated v1.1 development state to immutable v1.1.0 release metadata without changing implementation semantics.",
+  "summary": "Open v1.2 development and add a bounded host-neutral Evaluation Arena contract with replay identities, holdout blinding, typed quality evidence, and no automatic promotion.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
         "WORKSPACE.json",
+        "_core/EVALUATION_ARENA_PROTOCOL.md",
+        "config/CONTEXT.md",
+        "config/evaluation_arena_policy.json",
+        "config/impact_policy.json",
+        "icm",
+        "tests/CONTEXT.md",
         "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_evaluation_arena.py",
+        "tests/test_impact_classifier.py",
+        "tests/test_release_policy.py",
+        "tools/CONTEXT.md",
+        "tools/evaluation_arena.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Release closure updates only canonical version/status assertions and public release description after completed implementation regression."
+      "rationale": "Implement the planner-approved evaluation contract using existing benchmark/observability/governance primitives."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted 1.1.0-dev to 1.1.0 and aligned release assertions/README."
+      "description": "Added arena protocol/policy/tool/tests, v1.2-dev metadata, CLI/docs/impact integration, and holdout/evaluator privacy boundaries."
     }
   ]
 }

@@ -4,6 +4,8 @@ A host-neutral, filesystem-first template for structured AI work.
 
 Current stable release: **v1.1.0 - Adaptive Planning & Developer Observability**.
 
+Development line: **v1.2.0-dev - Evaluation Arena**. Controlled variants are compared using explicit quality evidence and observed time/token/call/rework cost; holdout metadata is hidden from strategy execution and experiment winners never auto-promote into canonical ICM.
+
 No post-v1 development line is declared in this release; future work should be selected from current user direction and the active noncanonical planner rather than invented in advance.
 
 Start here:

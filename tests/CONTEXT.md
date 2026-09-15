@@ -26,3 +26,4 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_plan_intelligence.py` -> execution-task sufficiency, objective/verification requirements, targeted downstream/context reconciliation, and fail-closed unknown-change invariants.
 - `test_developer_observatory.py` -> privacy guards, model-free NORMAL mode, idempotent local recording, rework/escalation summaries, and no-invented-contribution audit deltas.
 - `test_meta_advisor.py` -> suggestion compatibility/value-density gates, evidence-derived confidence, research triggers, bounded prompt compilation, and presentation-only invariants.
+- `test_evaluation_arena.py` -> arena identity, holdout blinding, evaluator provenance, privacy, and no-auto-promotion invariants.

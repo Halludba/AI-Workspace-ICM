@@ -1,71 +1,55 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step6",
-  "summary": "Add event-derived persisted-state convergence protection without mutable tracker state.",
+  "directive_id": "DIR-2026-09-15:v06-step7",
+  "summary": "Install three opt-in reusable specialist profiles without adding resident profile authority.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "tools/kernel/convergence.py"
+        "profiles/reasoning-auditor/PROFILE.md",
+        "profiles/prompt-architect/PROFILE.md",
+        "profiles/project-scout/PROFILE.md"
       ],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add pure persisted working-state fingerprint and history classification."
+      "rationale": "Add the approved Reasoning Auditor, Prompt Architect, and Project Scout specialists as explicit routed context."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "tools/kernel/events.py",
-        "tools/kernel/journal.py",
-        "tools/run_validator.py",
-        "config/run_policy.json"
+        "profiles/CONTEXT.md",
+        "profiles/README.md",
+        "_core/CONVENTIONS.md",
+        "_core/WORKFLOW_PROTOCOL.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate cycle terminalization, reserved operation provenance, policy, and independent full verification into the existing kernel boundary."
+      "rationale": "Standardize profile grammar and exact-ID routing while preserving lower authority and no sibling autoload."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
-        "tests/test_convergence_guard.py"
-      ],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add adversarial stable/cycle, retry, progress, reserved-operation, malformed-policy, and provenance tests."
-    },
-    {
-      "candidate_id": "C-004",
-      "target_paths": [
-        "_core/CONVENTIONS.md",
-        "_core/EXECUTION_KERNEL.md",
-        "_core/RUN_PROTOCOL.md",
-        "WORKSPACE.json",
-        "tools/CONTEXT.md",
-        "tools/README.md",
+        "tests/test_profiles.py",
         "tests/CONTEXT.md",
         "tests/README.md"
       ],
-      "change_kind": "MERGE",
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Document and route the convergence guard without changing the frozen event taxonomy."
+      "rationale": "Add machine-verifiable specialist profile grammar, portability, activation, and authority tests."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added pure event-derived convergence fingerprint module."
+      "description": "Added three reusable opt-in specialist PROFILE.md contracts."
     },
     {
       "candidate_id": "C-002",
-      "description": "Integrated cycle detection and reconstructible RUN_FAILED terminalization with full-validator provenance checks."
+      "description": "Integrated exact profile routing and authority boundaries into profile/core/workflow documentation."
     },
     {
       "candidate_id": "C-003",
-      "description": "Added convergence guard adversarial tests."
-    },
-    {
-      "candidate_id": "C-004",
-      "description": "Updated constitutional, kernel, run-protocol, workspace, tool, and test documentation."
+      "description": "Added specialist profile regression coverage and test indexes."
     }
   ]
 }

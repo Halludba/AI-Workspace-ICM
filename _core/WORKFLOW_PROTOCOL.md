@@ -28,8 +28,7 @@ Branches and loops are representable only when explicitly declared.
 No stage may silently jump to an undeclared sibling.
 
 ## Context dependencies
-Profiles, skills, references, and config dependencies are explicit workflow-level declarations.
-They are not auto-loaded merely because they exist in the clone.
+Profiles, skills, references, and config dependencies are explicit workflow-level declarations. A declared profile ID selects exactly `profiles/<profile-id>/PROFILE.md`; sibling profiles are not implied. Dependencies are not auto-loaded merely because they exist in the clone.
 
 ## Execution boundary
 The workflow defines what should happen.

@@ -1,46 +1,26 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-160-ornith-v1",
+  "directive_id": "DIR-2026-09-15:v100-release-closure",
   "actor_role": "icm-runtime-architect",
-  "summary": "Execute planner task T-160 by adding bounded loopback Ollama/Ornith worker delegation with exact-source packets, candidate-only Git patches, bounded repair attempts, and no canonical mutation authority.",
+  "summary": "Promote verified v1.0 development state to public v1.0.0 release metadata after completed context-growth review and fixed-ref benchmark evidence.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "_core/LOCAL_WORKER_PROTOCOL.md",
-        "config/local_worker_policy.json",
-        "tools/local_worker.py",
-        "tests/test_local_worker.py"
-      ],
-      "change_kind": "NEW",
-      "disposition": "ACCEPT",
-      "rationale": "Add the bounded local-worker contract, policy, deterministic packet/result/attempt validation, and regression coverage."
-    },
-    {
-      "candidate_id": "C-002",
-      "target_paths": [
-        "README.md",
         "WORKSPACE.json",
-        "config/CONTEXT.md",
-        "config/impact_policy.json",
-        "icm",
-        "tests/CONTEXT.md",
-        "tests/test_impact_classifier.py",
-        "tools/CONTEXT.md"
+        "README.md",
+        "tests/test_context_routing.py",
+        "tests/test_release_policy.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Integrate the worker surface into workspace discovery, CLI routing, verification impact, and scoped documentation."
+      "rationale": "Promote version/status and release-facing assertions only; implementation semantics remain unchanged."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added exact-base-revision worker packets, loopback-only bounded Ollama transport, structured candidate patch validation through Git, single-flight attempt guarding, explicit repair feedback, telemetry mapping, and fail-closed missing-Ollama behavior."
-    },
-    {
-      "candidate_id": "C-002",
-      "description": "Registered the local-worker entrypoints, CLI surface, full-regression classification, repository documentation, and test discovery."
+      "description": "Promoted workspace metadata to 1.0.0, named the stable release, removed the development-line claim, and updated release/version assertions."
     }
   ]
 }

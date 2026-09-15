@@ -2,7 +2,7 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current release: **v0.6.0 - governance and continuity runtime**.
+Current release: **v0.6.0.5 - release-tag/context hygiene update**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -19,3 +19,5 @@ Run lifecycle operations use the single `icm run ...` / `tools/run_manager.py` a
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.
+
+v0.6.0.5 adds no runtime semantics: it establishes the release convention that the checked-out working tree is current authority, while Git tags/history remain historical evidence loaded only for explicit compatibility, rollback, migration, or history work. Exact older releases remain available through Git tags without duplicating source trees in active context.

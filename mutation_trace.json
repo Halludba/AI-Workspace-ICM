@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-release",
-  "summary": "Freeze v0.6.0 release metadata and public release description after all governance and continuity milestones passed.",
+  "directive_id": "DIR-2026-09-15:v0605-release-tag-context",
+  "summary": "Establish v0.6.0.5 as a metadata-only release that keeps historical versions in Git tags rather than duplicating release trees in active context.",
   "candidates": [
     {
       "candidate_id": "C-001",
@@ -11,39 +11,39 @@
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Replace development version/status metadata with the final v0.6.0 governed runtime identity and matching regression expectation."
+      "rationale": "Advance release identity to v0.6.0.5 without changing runtime semantics."
     },
     {
       "candidate_id": "C-002",
       "target_paths": [
-        "README.md"
+        "CONTEXT.md"
       ],
-      "change_kind": "REWRITE",
+      "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Publish the v0.6.0 release identity and implemented governance/continuity capabilities without changing runtime semantics."
+      "rationale": "Declare the current checkout authoritative and Git history/tags historical-by-default to reduce context pollution."
     },
     {
       "candidate_id": "C-003",
       "target_paths": [
-        "icm"
+        "README.md"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Record the POSIX launcher as executable in Git metadata so the documented ./icm entrypoint is actually runnable after clone."
+      "rationale": "Document the metadata-only release and tag-based compatibility history convention."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Finalized workspace version/status and regression expectation."
+      "description": "Updated workspace release identity and matching regression expectation."
     },
     {
       "candidate_id": "C-002",
-      "description": "Updated public release description for v0.6.0."
+      "description": "Added default routing rule excluding Git history/tags from normal context."
     },
     {
       "candidate_id": "C-003",
-      "description": "Recorded executable Git mode for the POSIX icm launcher."
+      "description": "Documented tag-only historical release strategy."
     }
   ]
 }

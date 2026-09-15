@@ -31,7 +31,9 @@
     "bios_invariant_checker": "tools/check_invariants.py",
     "cli": "icm",
     "mutation_policy": "config/mutation_policy.json",
-    "mutation_checker": "tools/check_mutation.py"
+    "mutation_checker": "tools/check_mutation.py",
+    "impact_policy": "config/impact_policy.json",
+    "impact_classifier": "tools/impact_classifier.py"
   },
   "roots": {
     "core": "_core",

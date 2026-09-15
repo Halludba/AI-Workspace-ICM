@@ -1,0 +1,56 @@
+{
+  "policy_schema": "1.0",
+  "verification_scopes": [
+    "SCOPED_VALIDATION",
+    "FULL_REGRESSION"
+  ],
+  "default_iteration_scope": "SCOPED_VALIDATION",
+  "canonical_commit_scope": "FULL_REGRESSION",
+  "semver_classification": "OUT_OF_SCOPE",
+  "ignored_suffixes": [
+    ".pyc"
+  ],
+  "ignored_path_parts": [
+    "__pycache__"
+  ],
+  "full_regression_paths": [
+    "WORKSPACE.json",
+    "CONTEXT.md",
+    "_core/AUTHORITY.md",
+    "_core/CONVENTIONS.md",
+    "_core/CONTEXT_PROTOCOL.md",
+    "_core/EXECUTION_KERNEL.md",
+    "_core/STATE_MODEL.md",
+    "config/routes.json"
+  ],  "full_regression_prefixes": [
+    "config/",
+    "tools/kernel/",
+    "workflows/_template/",
+    "work/_template/"
+  ],
+  "full_regression_tools": [
+    "tools/context_resolver.py",
+    "tools/create_workflow.py",
+    "tools/workflow_validator.py",
+    "tools/run_validator.py",
+    "tools/run_manager.py",
+    "tools/init.py",
+    "tools/check_invariants.py",
+    "tools/check_mutation.py",
+    "tools/impact_classifier.py"
+  ],
+  "semantic_diff_tokens": [
+    "authority",
+    "fail_closed",
+    "event_type",
+    "schema_version",
+    "max_events_per_run",
+    "terminal_stages",
+    "allowed_next"
+  ],
+  "semantic_scan_prefixes": [
+    "_core/",
+    "config/",
+    "tools/"
+  ]
+}

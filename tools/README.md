@@ -8,4 +8,6 @@ Use `run_validator.py` for expensive/full verification boundaries. Normal kernel
 
 Use `check_invariants.py` for universal response-declaration checks and `check_mutation.py` for two-axis mutation governance. Mutation classification/disposition is policy; application records are separate and become mandatory at the commit-ready gate. `check_mutation.py` validates trace consistency, not whether Git bytes actually changed.
 
+Use `impact_classifier.py` to classify observed Git changes as `SCOPED_VALIDATION` or `FULL_REGRESSION` during iteration. This is blast-radius classification, not SemVer. A canonical commit still requires the complete regression gate even when iteration was scoped.
+
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.

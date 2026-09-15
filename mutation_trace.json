@@ -1,43 +1,35 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v06-step2",
-  "summary": "Add two-axis mutation governance with separate execution evidence and commit-readiness validation.",
+  "directive_id": "DIR-2026-09-15:v06-step3",
+  "summary": "Add a domain-neutral Git-aware verification impact classifier without coupling verification scope to SemVer.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": [
-        "_core/CONVENTIONS.md"
-      ],
-      "change_kind": "REWRITE",
+      "target_paths": ["_core/CONVENTIONS.md"],
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Replace the flat mutation taxonomy with orthogonal change-kind and disposition semantics."
+      "rationale": "Add the universal rule separating iteration blast-radius classification from mandatory pre-commit full regression."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": [
-        "config/mutation_policy.json"
-      ],
+      "target_paths": ["config/impact_policy.json"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Provide the normative machine-readable mutation governance contract."
+      "rationale": "Define domain-neutral sensitive paths, prefixes, and verification scopes in inspectable machine policy."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": [
-        "tools/check_mutation.py"
-      ],
+      "target_paths": ["tools/impact_classifier.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Provide deterministic trace validation, target linkage, rendering, and commit-readiness checks."
+      "rationale": "Implement deterministic Git change discovery and SCOPED_VALIDATION versus FULL_REGRESSION classification."
     },
     {
       "candidate_id": "C-004",
-      "target_paths": [
-        "tests/test_mutation_governance.py"
-      ],
+      "target_paths": ["tests/test_impact_classifier.py"],
       "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Add adversarial coverage for the governance matrix, target linkage, and commit lifecycle."
+      "rationale": "Add adversarial coverage for staged, unstaged, untracked, sensitive, and scoped change classification."
     },
     {
       "candidate_id": "C-005",
@@ -50,30 +42,14 @@
         "tests/README.md"
       ],
       "change_kind": "MERGE",
-      "disposition": "ACCEPT",
-      "rationale": "Integrate the new governance contract and checker into existing routed workspace metadata without adding a competing route."
+      "disposition": "ACCEPT",      "rationale": "Integrate Step 3 into existing routed metadata and capability indexes without creating a competing route."
     }
   ],
   "applied_changes": [
-    {
-      "candidate_id": "C-001",
-      "description": "Rewrote Convention 15."
-    },
-    {
-      "candidate_id": "C-002",
-      "description": "Added mutation policy."
-    },
-    {
-      "candidate_id": "C-003",
-      "description": "Added deterministic mutation checker."
-    },
-    {
-      "candidate_id": "C-004",
-      "description": "Added mutation governance tests."
-    },
-    {
-      "candidate_id": "C-005",
-      "description": "Updated workspace and route-local indexes."
-    }
+    {"candidate_id": "C-001", "description": "Added Convention 28 for verification-scope blast radius."},
+    {"candidate_id": "C-002", "description": "Added machine-readable impact policy."},
+    {"candidate_id": "C-003", "description": "Added Git-aware impact classifier."},
+    {"candidate_id": "C-004", "description": "Added adversarial impact-classifier tests."},
+    {"candidate_id": "C-005", "description": "Integrated Step 3 into routed workspace metadata and indexes."}
   ]
 }

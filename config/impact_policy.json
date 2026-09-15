@@ -37,7 +37,9 @@
     "_core/SUGGESTION_PROTOCOL.md",
     "tools/suggestion_queue.py",
     "_core/HUMAN_PRESENTATION_PROTOCOL.md",
-    "tools/continuity_presenter.py"
+    "tools/continuity_presenter.py",
+    "_core/EVIDENCE_REUSE_PROTOCOL.md",
+    "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -74,7 +76,9 @@
     "tools/meta_advisor.py",
     "tools/interaction_contracts.py",
     "tools/suggestion_queue.py",
-    "tools/continuity_presenter.py"
+    "tools/continuity_presenter.py",
+    "tools/evidence_reuse.py",
+    "tools/local_execution.py"
   ],
   "semantic_diff_tokens": [
     "authority",

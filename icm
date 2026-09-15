@@ -11,8 +11,8 @@ if str(ROOT) not in sys.path:
 
 
 def _dispatch() -> int:
-    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "advise", "arena", "interaction", "suggestions", "present", "export"}:
-        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,advise,arena,interaction,suggestions,present,export <command> [args]", file=sys.stderr)
+    if len(sys.argv) < 2 or sys.argv[1] not in {"run", "assurance", "inspect", "role", "capability", "worker", "plan", "observe", "advise", "arena", "interaction", "suggestions", "present", "evidence", "local-exec", "export"}:
+        print("usage: icm {run,assurance,inspect,role,capability,worker,plan,observe,advise,arena,interaction,suggestions,present,evidence,local-exec,export <command> [args]", file=sys.stderr)
         return 2
     surface = sys.argv[1]
     if surface == "inspect":
@@ -70,6 +70,14 @@ def _dispatch() -> int:
         from tools.developer_observatory import main as observe_main
         sys.argv = [sys.argv[0], *sys.argv[2:]]
         return observe_main()
+    if surface == "evidence":
+        from tools.evidence_reuse import main as evidence_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return evidence_main()
+    if surface == "local-exec":
+        from tools.local_execution import main as local_exec_main
+        sys.argv = [sys.argv[0], *sys.argv[2:]]
+        return local_exec_main()
     if surface == "plan":
         command = sys.argv[2] if len(sys.argv) > 2 else None
         sys.argv = [sys.argv[0], *sys.argv[2:]]

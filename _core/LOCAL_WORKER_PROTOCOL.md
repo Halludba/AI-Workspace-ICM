@@ -16,6 +16,8 @@ The worker has no filesystem tools and cannot mutate canonical `main`. It return
 
 Only an authorized architect may review the candidate, apply an accepted patch through normal mutation governance, run deterministic verification, and commit. Worker output is evidence/candidate material only.
 
+For parallel development, mutation workers run from an isolated worktree prepared by the Local Execution Plane at the packet base revision. Snapshot verification may run concurrently against an immutable revision. An exclusive mutation lease is used only when isolation is insufficient; workers never share uncontrolled canonical mutable state.
+
 ## Attempts and stopping
 Each job ID is tracked under Git-ignored `.session/workers/`. The initial attempt plus at most one repair attempt is permitted. Only one model call may be in flight for a job. A repair following `NEEDS_REPAIR` requires explicit architect repair feedback; that feedback is a dynamic prompt suffix and does not alter the stable context prefix. Timeout, malformed response, or validation failure consumes an attempt. Successful or blocked terminal results do not permit another model call for the same packet. There is no unbounded model-to-model loop.
 

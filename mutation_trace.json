@@ -1,36 +1,45 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-16:T-1410-1430-measured-resource-optimization",
+  "directive_id": "DIR-2026-09-16:T-1440-1470-evidence-reuse-local-execution",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add observable mechanism-cost evidence, execution-window telemetry capture, and quality-gated selective ablation so resource-heavy ICM components can be optimized empirically without private reasoning or automatic removal.",
+  "summary": "Add content-addressed validated-state evidence reuse, reproducible host capability facts, and revision-bound isolated local execution so unchanged evidence can be reused safely and deterministic long-tail work can run against exact snapshots.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
-        "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
-        "_core/EVALUATION_ARENA_PROTOCOL.md",
-        "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
+        "WORKSPACE.json",
+        "_core/EVIDENCE_REUSE_PROTOCOL.md",
+        "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
+        "_core/LOCAL_WORKER_PROTOCOL.md",
         "config/CONTEXT.md",
-        "config/developer_observatory_policy.json",
-        "config/evaluation_arena_policy.json",
+        "config/evidence_reuse_policy.json",
+        "config/impact_policy.json",
+        "config/interaction_policy.json",
+        "config/local_execution_policy.json",
         "icm",
-        "mutation_trace.json",
         "tests/CONTEXT.md",
-        "tests/test_resource_optimization.py",
+        "tests/test_evidence_reuse.py",
+        "tests/test_local_execution.py",
         "tools/CONTEXT.md",
-        "tools/developer_observatory.py",
-        "tools/evaluation_arena.py"
+        "tools/evidence_reuse.py",
+        "tools/local_execution.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Reuse Developer Observatory and Evaluation Arena rather than introduce another always-on optimizer; cost evidence proposes ablation candidates while controlled quality evidence is required before removal review."
+      "rationale": "User authorized the validated-state fingerprint and Ornith/local-execution architecture. The implementation reuses Git/content identity, keeps volatile evidence nonreusable, binds verification to exact tested revisions, isolates mutation workers, and preserves no-auto-merge/no-authority boundaries."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added cross-session mechanism cost profiles/candidates, window-scoped CLI capture, stored-event round-trip support, Arena ablation comparison, CLI surfaces, documentation, and regressions."
+      "description": "Added Evidence Reuse and Local Execution Plane protocols/policies/tools/tests, local host-fact persistence, snapshot regression jobs, stale-success classification, isolated worker handoffs, exclusive-scope collision protection, interaction bridges, and routed documentation.",
+      "evidence_refs": [
+        "focused-regression:100/100",
+        "interaction-contracts:14-valid",
+        "interaction-maintenance:semantic-review-no-safe-deletion",
+        "host-probe:powershell-5.1-utf8NoBOM-unsupported"
+      ]
     }
   ]
 }

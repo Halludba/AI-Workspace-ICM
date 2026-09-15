@@ -19,7 +19,9 @@
     "capability": "skills/CONTEXT.md",
     "host_capability": "_core/LOCAL_COMPUTE_PROTOCOL.md",
     "suggestion": "_core/SUGGESTION_PROTOCOL.md",
-    "presentation": "_core/HUMAN_PRESENTATION_PROTOCOL.md"
+    "presentation": "_core/HUMAN_PRESENTATION_PROTOCOL.md",
+    "evidence_reuse": "_core/EVIDENCE_REUSE_PROTOCOL.md",
+    "local_execution": "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md"
   },
   "invariants": [
     {
@@ -100,6 +102,30 @@
       "source_refs": [
         "_core/HUMAN_PRESENTATION_PROTOCOL.md",
         "_core/AUTHORITY.md"
+      ]
+    },
+    {
+      "id": "INV-EVIDENCE-DEPENDENCY-COMPLETE",
+      "statement": "Reusable evidence is valid only while every declared dependency and required environment fingerprint remains unchanged.",
+      "source_refs": [
+        "_core/EVIDENCE_REUSE_PROTOCOL.md",
+        "_core/STATE_MODEL.md"
+      ]
+    },
+    {
+      "id": "INV-VERIFICATION-REVISION-BOUND",
+      "statement": "Verification evidence belongs to the exact tested repository state and becomes stale, not current proof, when that state changes.",
+      "source_refs": [
+        "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
+        "_core/EVIDENCE_REUSE_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-WORKER-ISOLATED-MUTATION",
+      "statement": "Parallel intelligent mutations use isolated worktrees or an explicit exclusive lease; worker results never share uncontrolled canonical mutable state.",
+      "source_refs": [
+        "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
+        "_core/LOCAL_WORKER_PROTOCOL.md"
       ]
     }
   ],
@@ -190,6 +216,31 @@
       "right": "suggestion",
       "invariants": [
         "INV-PRESENTATION-NOT-AUTH"
+      ]
+    },
+    {
+      "id": "evidence-git",
+      "left": "evidence_reuse",
+      "right": "git_state",
+      "invariants": [
+        "INV-EVIDENCE-DEPENDENCY-COMPLETE"
+      ]
+    },
+    {
+      "id": "execution-evidence",
+      "left": "local_execution",
+      "right": "evidence_reuse",
+      "invariants": [
+        "INV-VERIFICATION-REVISION-BOUND"
+      ]
+    },
+    {
+      "id": "execution-worker",
+      "left": "local_execution",
+      "right": "worker",
+      "invariants": [
+        "INV-WORKER-ISOLATED-MUTATION",
+        "INV-WORKER-CANDIDATE"
       ]
     }
   ],

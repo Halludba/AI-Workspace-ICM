@@ -43,3 +43,5 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `suggestion_queue.py` -> noncanonical per-agent suggestion continuity, compact unresolved summaries, exact approval-scope resolution, and accepted-only promotion eligibility.
 
 - `continuity_presenter.py` -> compiles the next accepted planner step plus compact unresolved suggestion titles and validates evidence-bounded concept callouts.
+- `evidence_reuse.py` -> content-addressed validation evidence, Git/worktree fingerprints, and reproducible local host-capability facts.
+- `local_execution.py` -> detached snapshot regression, isolated mutation worktrees, scope collision checks, worker handoffs, and current/stale verification classification.

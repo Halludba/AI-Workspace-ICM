@@ -6,7 +6,7 @@ Current local release: **v1.3.0 - Interaction & Continuity**.
 
 Published remote release remains **v1.2.0 - Evaluation Arena** until an explicit user-authorized push publishes the local release.
 
-Development line: **v1.4.0-dev - Execution Efficiency**. Planner execution windows, evidence-triggered maintenance, slow-run observability, optional local sealing, and explicit-user publication reduce repeated orchestration without weakening canonical verification boundaries.
+Development line: **v1.4.0-dev - Execution Efficiency**. Planner execution windows, measured resource ROI, validated-state evidence reuse, host capability facts, isolated local execution, optional local sealing, and explicit-user publication reduce repeated work without weakening canonical verification boundaries.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -31,6 +31,10 @@ Upload-only hosts use `icm export capsule ...`: ICM resolves the task before pac
 Role governance is exposed through `icm role ...`: System Architect is the default read-only ICM role, mutation requires explicit user authorization, and scoped workflow/profile/skill authors cannot silently widen their write envelope. Bounded role handoffs carry decisions and constraints rather than whole-chat context.
 
 Local worker delegation is exposed through `icm worker ...`: Runtime Architect may build a bounded exact-source packet for the configured loopback Ollama worker, but the worker receives no repository tools or canonical mutation authority and can return only a validated candidate patch/evidence result. Missing Ollama blocks cleanly; architect review and deterministic verification remain mandatory.
+
+Validated-state reuse is exposed through `icm evidence ...`: deterministic results are keyed by producer/input/environment fingerprints, Git repository state includes committed plus staged/worktree/untracked identity, volatile evidence bypasses reuse, and reproducible host facts invalidate when their environment fingerprint changes.
+
+Local long-tail execution is exposed through `icm local-exec ...`: exact-revision snapshot regressions may run detached in isolated Git worktrees while development continues; mutation workers receive separate worktrees and bounded scopes, overlapping exclusive leases fail deterministically, and old passing verification is retained as `STALE_SUCCESS` rather than misrepresented as current proof.
 
 Plan intelligence is exposed through `icm plan ...`: execution-class planner tasks can be checked for minimum objective/context/acceptance/verification sufficiency, and material changes can identify only affected downstream tasks without rewriting the plan.
 

@@ -35,3 +35,5 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_suggestion_queue.py` -> neutral silence/topic changes, approval scoping, accepted-only promotion, compact summaries, and Git-ignored queue storage.
 
 - `test_continuity_presenter.py` -> strong-vs-weak concept mapping, planner-first next-step compilation, and non-executable candidate presentation.
+- `test_evidence_reuse.py` -> dependency-key invalidation, repository fingerprints, volatility behavior, host-fact durability, and compact reuse invariants.
+- `test_local_execution.py` -> detached snapshot verification, isolated mutation worktrees, collision/lease safety, worker handoffs, and stale-success semantics.

@@ -85,7 +85,13 @@
     "suggestion_queue": "tools/suggestion_queue.py",
     "human_presentation_protocol": "_core/HUMAN_PRESENTATION_PROTOCOL.md",
     "human_presentation_policy": "config/human_presentation_policy.json",
-    "continuity_presenter": "tools/continuity_presenter.py"
+    "continuity_presenter": "tools/continuity_presenter.py",
+    "evidence_reuse_protocol": "_core/EVIDENCE_REUSE_PROTOCOL.md",
+    "evidence_reuse_policy": "config/evidence_reuse_policy.json",
+    "evidence_reuse": "tools/evidence_reuse.py",
+    "local_execution_plane_protocol": "_core/LOCAL_EXECUTION_PLANE_PROTOCOL.md",
+    "local_execution_policy": "config/local_execution_policy.json",
+    "local_execution": "tools/local_execution.py"
   },
   "roots": {
     "core": "_core",

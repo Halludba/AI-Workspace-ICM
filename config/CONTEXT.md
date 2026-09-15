@@ -41,3 +41,5 @@ Do not load unrelated config files.
 - `developer_observatory_policy.json` efficiency/ROI review -> slow-session triggers, execution-window CLI capture, cross-session mechanism cost ranking, and ablation-required worth claims using observable events only.
 - `release_policy.json` publication -> optional local sealing and explicit-user-request batched remote publication.
 - `interaction_policy.json` maintenance -> cheap structural validation triggers and evidence-gated semantic dedup review cadence.
+- `evidence_reuse_policy.json` -> validated-state dependency envelopes, volatility classes, host-fact durability, and Git-ignored evidence stores.
+- `local_execution_policy.json` -> snapshot verification, isolated mutation, exclusive leases, and revision-bound verification evidence.

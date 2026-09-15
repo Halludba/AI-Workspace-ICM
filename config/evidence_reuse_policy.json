@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/evidence-reuse",
+  "host_profile_root": ".session/host-capabilities",
+  "volatility_classes": [
+    "STATIC",
+    "CONTENT_ADDRESSED",
+    "ENVIRONMENT_DEPENDENT",
+    "VOLATILE",
+    "HOST_CAPABILITY"
+  ],
+  "reusable_classes": [
+    "STATIC",
+    "CONTENT_ADDRESSED",
+    "ENVIRONMENT_DEPENDENT",
+    "HOST_CAPABILITY"
+  ],
+  "host_fact_classes": [
+    "STABLE",
+    "ENVIRONMENT_DEPENDENT",
+    "TRANSIENT",
+    "UNKNOWN"
+  ],
+  "durable_host_fact_classes": [
+    "STABLE",
+    "ENVIRONMENT_DEPENDENT"
+  ],
+  "max_inputs": 128,
+  "max_evidence_refs": 64,
+  "max_summary_chars": 2000,
+  "canonical": false,
+  "execution_authority": "NONE",
+  "automatic_authority": false
+}

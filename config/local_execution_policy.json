@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "state_root": ".session/local-execution",
+  "modes": [
+    "SNAPSHOT_VERIFY",
+    "ISOLATED_MUTATION",
+    "EXCLUSIVE_LEASE"
+  ],
+  "job_statuses": [
+    "READY",
+    "RUNNING",
+    "COMPLETE",
+    "FAILED",
+    "CANCELLED"
+  ],
+  "verification_statuses": [
+    "PASS",
+    "FAIL",
+    "ERROR"
+  ],
+  "evidence_currency": [
+    "CURRENT_SUCCESS",
+    "STALE_SUCCESS",
+    "CURRENT_FAILURE",
+    "STALE_FAILURE"
+  ],
+  "verify_suites": {
+    "FULL_REGRESSION": [
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests"
+    ]
+  },
+  "max_jobs": 64,
+  "max_scopes": 32,
+  "worktree_layout": "SIBLING_DERIVED",
+  "automatic_merge": false,
+  "shared_mutable_worktree": false,
+  "execution_authority": "NONE"
+}

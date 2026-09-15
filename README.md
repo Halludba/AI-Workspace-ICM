@@ -2,9 +2,9 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current stable release: **v0.7.0 - Adaptive Assurance Runtime**.
+Current stable release: **v0.8.0 - Shared Capabilities & Context Economics**.
 
-Development line: **v0.8.0-dev - Shared Capabilities & Context Economics**.
+Next planned development: **v0.9.0 - Local Worker Delegation**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -35,4 +35,4 @@ v0.6.1 adds release/version governance without changing runtime semantics: stric
 
 v0.7.0 introduces adaptive assurance as a bounded governance layer: a cheap pre-trigger avoids unnecessary work, evidence-backed assurance states replace raw model confidence as authority, deterministic verification is preferred when available, epistemic increases require recorded evidence deltas, escalation is budgeted, and matching evidence-backed results may be reused through an ephemeral cache.
 
-v0.8.0-dev adds context economics and lazy shared capabilities: release token-growth profiling can route a context-optimizer only when review thresholds fire, while artifact-producing work resolves operation + artifact type through a small registry and loads only the selected skill. The first shared capability is `pdf-styler`; it is inherited by clones that carry the base workspace but remains outside default context.
+v0.8.0 adds context economics, lazy shared capabilities, and upload-only task capsules. Release token-growth profiling can route a context-optimizer only when review thresholds fire; artifact-producing work resolves operation + artifact type through a small registry and loads only selected skills; deterministic MINIMAL/PORTABLE capsules package bounded context for upload-only hosts such as Qwen or Gemini. The first shared capability is `pdf-styler`, which remains outside default context.

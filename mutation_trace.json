@@ -1,70 +1,25 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v080-upload-only-capsules",
-  "summary": "Add deterministic task-scoped ICM capsule export for upload-only model hosts, routed through the shared capability resolver with explicit context inventories and token estimates.",
+  "directive_id": "DIR-2026-09-15:v080-release-closure",
+  "summary": "Finalize v0.8.0 Shared Capabilities & Context Economics after verified context economics, lazy capability routing, PDF Styler, and upload-only capsule milestones.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": [
-        "config/capsule_policy.json",
-        "tools/capsule_exporter.py",
-        "tests/test_capsule_exporter.py"
-      ],
-      "change_kind": "NEW",
+      "target_paths": ["README.md", "WORKSPACE.json"],
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Add deterministic capsule policy, exporter, and regression coverage for minimal/portable packaging, confinement, reproducibility, hashes, and token accounting."
+      "rationale": "Promote v0.8.0-dev metadata to the verified v0.8.0 public release identity and record v0.9 local worker delegation as the next planned line."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": [
-        "skills/pdf-styler/manifest.json"
-      ],
-      "change_kind": "MERGE",
+      "target_paths": ["tests/test_context_routing.py", "tests/test_release_policy.py"],
+      "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Declare PDF Styler minimal capsule context and explicit portable runtime inventory without directory walking."
-    },
-    {
-      "candidate_id": "C-003",
-      "target_paths": [
-        "WORKSPACE.json",
-        "config/CONTEXT.md",
-        "config/impact_policy.json",
-        "icm",
-        "tests/test_cli.py",
-        "tests/test_impact_classifier.py",
-        "tools/CONTEXT.md",
-        "tools/README.md"
-      ],
-      "change_kind": "MERGE",
-      "disposition": "ACCEPT",
-      "rationale": "Integrate capsule export into workspace entrypoints, CLI dispatch, impact classification, config routing, documentation, and CLI/impact tests."
-    },
-    {
-      "candidate_id": "C-004",
-      "target_paths": [
-        "README.md"
-      ],
-      "change_kind": "MERGE",
-      "disposition": "ACCEPT",
-      "rationale": "Document upload-only task capsules as the bounded alternative to full-repository ZIP ingestion."
+      "rationale": "Align executable release/context assertions with the final v0.8.0 metadata and runtime status."
     }
   ],
   "applied_changes": [
-    {
-      "candidate_id": "C-001",
-      "description": "Added deterministic MINIMAL/PORTABLE capsule exporter with bootstrap, manifest, member hashes, fixed timestamps, sorted ZIP order, and token estimates."
-    },
-    {
-      "candidate_id": "C-002",
-      "description": "Added explicit PDF Styler capsule_context and capsule_portable inventories."
-    },
-    {
-      "candidate_id": "C-003",
-      "description": "Wired icm export capsule, workspace/config/tool routing, full-regression impact, and integration tests."
-    },
-    {
-      "candidate_id": "C-004",
-      "description": "Documented task-scoped upload capsules for Qwen/Gemini-style hosts."
-    }
+    {"candidate_id": "C-001", "description": "Promoted workspace and README release identity to v0.8.0 Shared Capabilities & Context Economics."},
+    {"candidate_id": "C-002", "description": "Updated release and context-routing assertions for the final v0.8.0 identity."}
   ]
 }

@@ -33,3 +33,8 @@ Strategy execution receives only the existing blinded case execution view plus t
 Runner strategy parameters are allowlisted data, never shell commands, tool invocations, or executable code. Unknown strategy parameter keys fail closed. Missing budget metrics remain unavailable rather than becoming zero; when a token budget is declared but token usage is unavailable, the run fails closed instead of pretending the budget was respected.
 
 Configured evidence rules may discard a variant early after an observed quality-floor failure or failed/blocked execution. Early-stopped variants are excluded from Pareto comparison rather than padded with fabricated trials. Completed comparable variants still flow through the normal Arena analysis and remain noncanonical evidence with no automatic promotion.
+
+## Selective ablation
+A selective ablation compares a declared baseline with the same workload after one named mechanism is disabled or bypassed in an isolated experiment. The comparison requires observed quality and wall time, preserves unavailable optional metrics as unknown, and reports quality regression before resource savings.
+
+A favorable ablation can only create a removal/optimization review candidate. It never deletes a rule, disables a mechanism, promotes a configuration, or mutates canonical state automatically.

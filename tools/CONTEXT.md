@@ -34,9 +34,9 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `local_compute.py` -> read-only host CPU/GPU/executable discovery and named workload readiness; observations are noncanonical and grant no execution or mutation authority.
 - `local_worker.py` -> builds base-revision-verified bounded worker packets, validates candidate Git patches, enforces bounded attempts, and optionally calls loopback Ollama without applying changes.
 - `plan_intelligence.py` -> deterministic plan sufficiency checks and downstream affected-task reconciliation; advisory only, no model calls or plan mutation.
-- `developer_observatory.py` -> local structured phase/mechanism/context/directive/outcome telemetry, explicit audit deltas, and slow-session efficiency ranking from observable events; never private reasoning or authority.
+- `developer_observatory.py` -> local structured telemetry, execution-window CLI capture, cross-session mechanism cost/ROI candidate ranking, explicit audit deltas, and slow-session analysis; never private reasoning or authority.
 - `meta_advisor.py` -> suggestion eligibility/value-density review, research escalation/prompt compilation, and presentation-only SIMPLE/STANDARD/TECHNICAL rendering.
-- `evaluation_arena.py` -> content-addressed case/variant contracts, blinded execution views, typed quality evidence, replay manifests, and a hard-budgeted strategy runner with separate execution/evaluation callbacks.
+- `evaluation_arena.py` -> content-addressed case/variant contracts, blinded execution views, typed quality evidence, replay manifests, hard-budgeted strategy execution, and quality-gated selective ablation comparison; never auto-promotes/removes.
 
 - `interaction_contracts.py` -> validates shared subsystem bridges, conservative rule-deduplication coverage, and cheap maintenance triggers; it never proves semantic equivalence or deletes rules.
 

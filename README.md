@@ -36,6 +36,8 @@ Plan intelligence is exposed through `icm plan ...`: execution-class planner tas
 
 Developer observability is exposed through `icm observe ...`: local Git-ignored telemetry can measure phases, mechanisms, context/directive references, tool/model-call counts, rework, escalation, and explicit audit deltas without storing prompts, responses, transcripts, or private reasoning.
 
+Execution windows can automatically capture real ICM CLI timings for later `icm observe costs` / `candidates` review. Repeated expensive mechanisms become ablation candidates only; `icm arena ablation` must preserve quality before a mechanism can be considered for removal or simplification, and no optimization auto-applies.
+
 Planner execution windows are exposed through `icm plan window-*`: a bounded task batch is selected from one planner snapshot, task details are read lazily from the window, cheap checkpoints avoid repeated planner reads, and verified task progress is reconciled back to the planner once at window close.
 
 Slow-run efficiency review is exposed through `icm observe efficiency ...`: observable phase/mechanism timing can trigger targeted optimization review when a session is unusually slow, without scraping private reasoning.

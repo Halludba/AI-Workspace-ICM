@@ -14,7 +14,7 @@ def _read(path:Path,label:str):
 
 def load_policy(root:Path=ROOT):
     p=_read(root/'config/evaluation_arena_policy.json','evaluation arena policy')
-    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items','strategy_runner'}
+    required={'schema_version','state_root','partitions','task_kinds','evaluator_kinds','score_min','score_max','max_source_refs','max_tags','max_strategy_params','max_model_calls','max_tool_calls','forbidden_keys','quality_floor_required','experiment_outputs_canonical','execution_authority','automatic_promotion','max_trials','required_frontier_metrics','optional_frontier_metrics','metric_directions','max_suite_cases','max_suite_variants','max_experiment_config_items','strategy_runner','ablation'}
     if set(p)!=required or p.get('schema_version')!='1.0' or p.get('experiment_outputs_canonical') is not False or p.get('execution_authority')!='NONE' or p.get('automatic_promotion') is not False or p.get('quality_floor_required') is not True: raise EvaluationArenaError('evaluation arena policy safety contract invalid')
     for key in ('partitions','task_kinds','evaluator_kinds','forbidden_keys'):
         if not isinstance(p[key],list) or not p[key] or len(p[key])!=len(set(p[key])) or any(not isinstance(v,str) or not v for v in p[key]): raise EvaluationArenaError(f'{key} must be unique non-empty strings')
@@ -44,6 +44,11 @@ def load_policy(root:Path=ROOT):
     stop=sr['early_stop']
     if not isinstance(stop,dict) or set(stop)!={'min_trials','quality_floor_failure','failed_or_blocked'} or isinstance(stop['min_trials'],bool) or not isinstance(stop['min_trials'],int) or stop['min_trials']<1 or not isinstance(stop['quality_floor_failure'],bool) or not isinstance(stop['failed_or_blocked'],bool): raise EvaluationArenaError('strategy runner early_stop invalid')
     if sr['executor_partition_visible'] is not False or sr['executor_evaluator_visible'] is not False or sr['automatic_promotion'] is not False: raise EvaluationArenaError('strategy runner safety boundary invalid')
+    ab=p['ablation']; ab_req={'cost_metrics','minimum_relative_improvement','maximum_quality_regression','automatic_removal','quality_floor_required'}
+    if not isinstance(ab,dict) or set(ab)!=ab_req or ab['automatic_removal'] is not False or ab['quality_floor_required'] is not True: raise EvaluationArenaError('ablation policy invalid')
+    if not isinstance(ab['cost_metrics'],list) or not ab['cost_metrics'] or len(ab['cost_metrics'])!=len(set(ab['cost_metrics'])) or any(x not in all_frontier for x in ab['cost_metrics']): raise EvaluationArenaError('ablation cost_metrics invalid')
+    if isinstance(ab['minimum_relative_improvement'],bool) or not isinstance(ab['minimum_relative_improvement'],(int,float)) or not 0<ab['minimum_relative_improvement']<1: raise EvaluationArenaError('ablation minimum_relative_improvement invalid')
+    if isinstance(ab['maximum_quality_regression'],bool) or not isinstance(ab['maximum_quality_regression'],(int,float)) or not 0<=ab['maximum_quality_regression']<1: raise EvaluationArenaError('ablation maximum_quality_regression invalid')
     rel=PurePosixPath(str(p['state_root']).replace('\\','/'))
     if rel.is_absolute() or '..' in rel.parts or not rel.parts or rel.parts[0]!='.session': raise EvaluationArenaError('state_root must remain under .session')
     return p
@@ -393,6 +398,46 @@ def fixture_callbacks(fixture:dict):
         return fixture['evaluations'][k]
     return executor,evaluator
 
+
+def compare_ablation(request:dict,root:Path=ROOT):
+    p=load_policy(root); cfg=p['ablation']; required={'schema_version','experiment_id','mechanism','quality_floor','baseline','ablated'}
+    if not isinstance(request,dict) or set(request)!=required or request.get('schema_version')!='1.0': raise EvaluationArenaError('ablation request fields must match contract')
+    _nonempty(request['experiment_id'],'experiment_id'); mechanism=_nonempty(request['mechanism'],'mechanism')
+    floor=request['quality_floor']
+    if isinstance(floor,bool) or not isinstance(floor,(int,float)) or not math.isfinite(floor) or floor<p['score_min'] or floor>p['score_max']: raise EvaluationArenaError('ablation quality_floor invalid')
+    measurement_fields={'quality_score',*cfg['cost_metrics'],'evidence_refs'}
+    def measurement(value,label):
+        if not isinstance(value,dict) or set(value)!=measurement_fields: raise EvaluationArenaError(f'{label} fields invalid')
+        q=value['quality_score']
+        if isinstance(q,bool) or not isinstance(q,(int,float)) or not math.isfinite(q) or q<p['score_min'] or q>p['score_max']: raise EvaluationArenaError(f'{label} quality_score invalid')
+        out={'quality_score':float(q)}
+        for key in cfg['cost_metrics']:
+            item=value[key]
+            if item is None:
+                if key=='wall_time_ms': raise EvaluationArenaError(f'{label} wall_time_ms is required')
+                out[key]=None; continue
+            if isinstance(item,bool) or not isinstance(item,(int,float)) or not math.isfinite(item) or item<0: raise EvaluationArenaError(f'{label} {key} invalid')
+            out[key]=float(item)
+        out['evidence_refs']=_refs(value['evidence_refs'],f'{label}.evidence_refs',p['max_source_refs'])
+        return out
+    baseline=measurement(request['baseline'],'baseline'); ablated=measurement(request['ablated'],'ablated')
+    base_floor=baseline['quality_score']>=floor; ab_floor=ablated['quality_score']>=floor; quality_delta=ablated['quality_score']-baseline['quality_score']
+    quality_preserved=base_floor and ab_floor and quality_delta>=-cfg['maximum_quality_regression']
+    deltas={}; improved=[]; regressed=[]
+    for key in cfg['cost_metrics']:
+        a=baseline[key]; b=ablated[key]
+        if a is None or b is None:
+            deltas[key]={'baseline':a,'ablated':b,'delta':None,'relative_improvement':None}; continue
+        delta=b-a; rel=((a-b)/a) if a>0 else (1.0 if a==0 and b<0 else 0.0)
+        deltas[key]={'baseline':a,'ablated':b,'delta':delta,'relative_improvement':rel}
+        if rel>=cfg['minimum_relative_improvement']: improved.append(key)
+        if b>a+1e-9: regressed.append(key)
+    if not quality_preserved: verdict='QUALITY_REGRESSION'
+    elif improved and not regressed: verdict='ABLATION_FAVORABLE'
+    elif improved: verdict='TRADEOFF_REVIEW'
+    else: verdict='NO_MATERIAL_GAIN'
+    return {'schema_version':'1.0','experiment_id':request['experiment_id'],'mechanism':mechanism,'quality_floor':float(floor),'quality_delta':quality_delta,'baseline_meets_quality_floor':base_floor,'ablated_meets_quality_floor':ab_floor,'quality_preserved':quality_preserved,'cost_deltas':deltas,'materially_improved_metrics':improved,'regressed_cost_metrics':regressed,'verdict':verdict,'candidate_for_removal_review':verdict=='ABLATION_FAVORABLE','automatic_removal':False,'automatic_promotion':False,'missing_metrics_treated_as_zero':False,'authority':'ADVISORY_ABLATION_EVIDENCE'}
+
 def main():
     ap=argparse.ArgumentParser(); sub=ap.add_subparsers(dest='cmd',required=True)
     c=sub.add_parser('case'); c.add_argument('case_json')
@@ -403,6 +448,7 @@ def main():
     sm=sub.add_parser('suite'); sm.add_argument('suite_json')
     cp=sub.add_parser('compare-partitions'); cp.add_argument('tune_json'); cp.add_argument('holdout_json')
     r=sub.add_parser('run'); r.add_argument('suite_json'); r.add_argument('request_json'); r.add_argument('--fixture')
+    ab=sub.add_parser('ablation'); ab.add_argument('request_json')
     args=ap.parse_args()
     try:
         if args.cmd=='case': out=validate_case(_read(Path(args.case_json),'case'))
@@ -416,6 +462,7 @@ def main():
         elif args.cmd=='run':
             if not args.fixture: raise EvaluationArenaError('strategy execution capability unavailable; --fixture is required for deterministic CLI execution')
             executor,evaluator=fixture_callbacks(_read(Path(args.fixture),'strategy fixture')); out=run_strategy_search(_read(Path(args.suite_json),'suite'),_read(Path(args.request_json),'strategy run request'),executor,evaluator)
+        elif args.cmd=='ablation': out=compare_ablation(_read(Path(args.request_json),'ablation request'))
         else: out=compare_partitions(_read(Path(args.tune_json),'tune analysis'),_read(Path(args.holdout_json),'holdout analysis'))
         print(json.dumps({'valid':True,'result':out},indent=2)); return 0
     except EvaluationArenaError as exc:

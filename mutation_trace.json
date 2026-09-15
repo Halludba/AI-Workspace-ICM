@@ -1,46 +1,36 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1400-execution-efficiency",
+  "directive_id": "DIR-2026-09-16:T-1410-1430-measured-resource-optimization",
   "actor_role": "icm-runtime-architect",
-  "summary": "Reduce repeated planner, verification, maintenance, release, and publication overhead with bounded execution windows and evidence-triggered review while preserving canonical batch verification.",
+  "summary": "Add observable mechanism-cost evidence, execution-window telemetry capture, and quality-gated selective ablation so resource-heavy ICM components can be optimized empirically without private reasoning or automatic removal.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
         "README.md",
-        "WORKSPACE.json",
         "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
-        "_core/INTERACTION_PROTOCOL.md",
+        "_core/EVALUATION_ARENA_PROTOCOL.md",
         "_core/PLAN_INTELLIGENCE_PROTOCOL.md",
-        "_core/RELEASE_POLICY.md",
-        "_core/SUGGESTION_PROTOCOL.md",
         "config/CONTEXT.md",
         "config/developer_observatory_policy.json",
-        "config/interaction_policy.json",
-        "config/release_policy.json",
-        "config/session_policy.json",
+        "config/evaluation_arena_policy.json",
         "icm",
+        "mutation_trace.json",
         "tests/CONTEXT.md",
-        "tests/test_context_routing.py",
-        "tests/test_developer_observatory.py",
-        "tests/test_interaction_contracts.py",
-        "tests/test_release_policy.py",
-        "tests/test_session_planner.py",
+        "tests/test_resource_optimization.py",
         "tools/CONTEXT.md",
         "tools/developer_observatory.py",
-        "tools/interaction_contracts.py",
-        "tools/release_validator.py",
-        "tools/session_planner.py"
+        "tools/evaluation_arena.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Batch compatible task work behind cheap checkpoints, measure unusually slow sessions from observable evidence, trigger interaction maintenance only when useful, and separate local development/sealing from explicit remote publication."
+      "rationale": "Reuse Developer Observatory and Evaluation Arena rather than introduce another always-on optimizer; cost evidence proposes ablation candidates while controlled quality evidence is required before removal review."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added planner execution windows/lazy task access, slow-run efficiency review, interaction maintenance triggers, explicit-user publication policy, optional local sealing, conditional-continuation rule, development metadata, and focused regression coverage."
+      "description": "Added cross-session mechanism cost profiles/candidates, window-scoped CLI capture, stored-event round-trip support, Arena ablation comparison, CLI surfaces, documentation, and regressions."
     }
   ]
 }

@@ -28,6 +28,7 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_meta_advisor.py` -> suggestion compatibility/value-density gates, evidence-derived confidence, research triggers, bounded prompt compilation, and presentation-only invariants.
 - `test_evaluation_arena.py` -> arena identity, holdout blinding, evaluator provenance, privacy, and no-auto-promotion invariants.
 - `test_strategy_runner.py` -> bounded strategy execution, allowlisted dimensions, budget enforcement, evaluator blinding, early stopping, and no-auto-promotion invariants.
+- `test_resource_optimization.py` -> cross-session mechanism cost candidates, local CLI capture, quality-gated ablation, unknown-metric preservation, and no-auto-removal invariants.
 
 - `test_interaction_contracts.py` -> bridge registry/source provenance, no-authority semantics, conservative deduplication coverage, and event-driven maintenance review triggers.
 

@@ -50,5 +50,20 @@
     "minimum_baseline_sessions": 3,
     "top_mechanisms": 5,
     "private_reasoning_source_allowed": false
+  },
+  "mechanism_roi": {
+    "minimum_events": 3,
+    "minimum_sessions": 2,
+    "high_cost_share": 0.15,
+    "top_candidates": 5,
+    "ablation_required_for_worth_claim": true
+  },
+  "capture": {
+    "state_file": ".session/observatory/CAPTURE.json",
+    "allowed_modes": [
+      "NORMAL",
+      "DEVELOPER"
+    ],
+    "record_cli": true
   }
 }

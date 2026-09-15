@@ -99,5 +99,18 @@
     "executor_partition_visible": false,
     "executor_evaluator_visible": false,
     "automatic_promotion": false
+  },
+  "ablation": {
+    "cost_metrics": [
+      "wall_time_ms",
+      "input_tokens_total",
+      "model_calls",
+      "tool_calls",
+      "rework_count"
+    ],
+    "minimum_relative_improvement": 0.05,
+    "maximum_quality_regression": 0.01,
+    "automatic_removal": false,
+    "quality_floor_required": true
   }
 }

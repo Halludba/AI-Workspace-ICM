@@ -19,3 +19,8 @@ Mechanical summaries may report phase/tool/model-call counts, wall time, rework 
 
 ## Efficiency review trigger
 Long runs are reviewed from observable execution evidence, not private reasoning. A session at or above the configured absolute threshold, or materially slower than a sufficient historical baseline, may trigger an optimization review. The review ranks recorded mechanisms and phases by observed duration/calls and may measure the Observatory itself when it is recorded as a mechanism. It does not scrape chain-of-thought or infer hidden causal contributions.
+
+## Mechanism cost and ROI
+Observable events may be aggregated by mechanism across sessions to rank repeated wall-time/call/rework cost. High observed cost is only an ablation candidate; it is not evidence that the mechanism lacks value. A worth/removal claim requires controlled benefit evidence such as an Evaluation Arena ablation.
+
+Execution-window CLI capture may record bounded local mechanism timings under `.session/observatory/`. Capture stores no prompts, responses, transcripts, or private reasoning, adds no model call, and stops when the execution window closes. Its own observable commands may be measured like any other mechanism.

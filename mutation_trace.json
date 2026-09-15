@@ -1,36 +1,26 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1210-arena-contract",
+  "directive_id": "DIR-2026-09-15:T-1220-arena-analysis",
   "actor_role": "icm-runtime-architect",
-  "summary": "Open v1.2 development and add a bounded host-neutral Evaluation Arena contract with replay identities, holdout blinding, typed quality evidence, and no automatic promotion.",
+  "summary": "Add deterministic quality-floor and Pareto analysis for Evaluation Arena trials using existing benchmark/observatory metric vocabularies.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
-        "README.md",
-        "WORKSPACE.json",
         "_core/EVALUATION_ARENA_PROTOCOL.md",
-        "config/CONTEXT.md",
         "config/evaluation_arena_policy.json",
-        "config/impact_policy.json",
-        "icm",
-        "tests/CONTEXT.md",
-        "tests/test_context_routing.py",
         "tests/test_evaluation_arena.py",
-        "tests/test_impact_classifier.py",
-        "tests/test_release_policy.py",
-        "tools/CONTEXT.md",
         "tools/evaluation_arena.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Implement the planner-approved evaluation contract using existing benchmark/observability/governance primitives."
+      "rationale": "Implement the planner-approved analyzer without adding model calls or canonical promotion authority."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added arena protocol/policy/tool/tests, v1.2-dev metadata, CLI/docs/impact integration, and holdout/evaluator privacy boundaries."
+      "description": "Added trial validation, repeated-trial distributions, fair coverage checks, explicit missing metrics, quality gating, and non-dominated frontier analysis."
     }
   ]
 }

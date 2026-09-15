@@ -34,5 +34,24 @@
   "quality_floor_required": true,
   "experiment_outputs_canonical": false,
   "execution_authority": "NONE",
-  "automatic_promotion": false
+  "automatic_promotion": false,
+  "max_trials": 5000,
+  "required_frontier_metrics": [
+    "quality_score",
+    "wall_time_ms"
+  ],
+  "optional_frontier_metrics": [
+    "input_tokens_total",
+    "model_calls",
+    "tool_calls",
+    "rework_count"
+  ],
+  "metric_directions": {
+    "quality_score": "MAXIMIZE",
+    "wall_time_ms": "MINIMIZE",
+    "input_tokens_total": "MINIMIZE",
+    "model_calls": "MINIMIZE",
+    "tool_calls": "MINIMIZE",
+    "rework_count": "MINIMIZE"
+  }
 }

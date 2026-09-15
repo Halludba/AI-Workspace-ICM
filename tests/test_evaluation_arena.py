@@ -28,4 +28,24 @@ class EvaluationArenaTests(unittest.TestCase):
   with self.assertRaises(m.EvaluationArenaError): m.validate_variant(self.variant(strategy_params={'nested':{'cmd':'x'}}),ROOT)
  def test_workspace_cli_exposes_arena_surface(self):
   p=subprocess.run([sys.executable,str(ROOT/'icm'),'arena','--help'],cwd=ROOT,text=True,capture_output=True); self.assertEqual(p.returncode,0); self.assertIn('prepare',p.stdout)
+ def metrics(self,**kw):
+  keys=m._benchmark_policy(ROOT)['required_metrics']; x={k:None for k in keys}; x.update({'wall_time_ms':100.0,'input_tokens_total':1000.0,'model_calls':1.0,'tool_calls':1.0}); x.update(kw); return x
+ def trial(self,variant='1',case='1',replicate=0,score=0.95,wall=100,tokens=1000,outcome='SUCCESS',rework_class=None,**kw):
+  x={'schema_version':'1.0','trial_id':f'T-{variant}-{case}-{replicate}','experiment_id':'EXP-1','manifest_fingerprint':('1'*63+variant[-1]),'case_fingerprint':('2'*63+case[-1]),'variant_fingerprint':('3'*63+variant[-1]),'partition':'TUNE','replicate':replicate,'quality_floor':0.9,'quality_evidence':{'schema_version':'1.0','evaluator_kind':'DETERMINISTIC','evaluator_id':'tests:check','score':score,'evidence_refs':['test:pass']},'observed_metrics':self.metrics(wall_time_ms=wall,input_tokens_total=tokens),'outcome':outcome,'rework_class':rework_class}; x.update(kw); return x
+ def test_pareto_keeps_quality_time_tradeoff_and_excludes_dominated(self):
+  trials=[self.trial('1',score=.95,wall=100,tokens=1000),self.trial('2',score=.96,wall=200,tokens=1200),self.trial('3',score=.94,wall=150,tokens=1200)]
+  r=m.analyze_trials(trials,ROOT); self.assertEqual(r['pareto_frontier'],['3'*63+'1','3'*63+'2']); self.assertIn('3'*63+'1',r['dominated_by']['3'*63+'3']); self.assertIsNone(r['canonical_total_rank'])
+ def test_below_quality_floor_is_not_frontier_eligible(self):
+  r=m.analyze_trials([self.trial('1',score=.85),self.trial('2',score=.95,wall=200)],ROOT); self.assertFalse(r['variants']['3'*63+'1']['quality_eligible']); self.assertNotIn('3'*63+'1',r['pareto_frontier'])
+ def test_missing_optional_metric_is_reported_not_zero(self):
+  a=self.trial('1'); a['observed_metrics']['input_tokens_total']=None; b=self.trial('2',wall=120)
+  r=m.analyze_trials([a,b],ROOT); self.assertIn('input_tokens_total',r['optional_metrics_omitted']); self.assertNotIn('input_tokens_total',r['metrics_used_for_pareto'])
+ def test_missing_wall_time_makes_variant_incomparable(self):
+  a=self.trial('1'); a['observed_metrics']['wall_time_ms']=None; b=self.trial('2')
+  r=m.analyze_trials([a,b],ROOT); self.assertFalse(r['variants']['3'*63+'1']['frontier_eligible'])
+ def test_repeated_trials_preserve_values_and_median(self):
+  r=m.analyze_trials([self.trial('1',replicate=0,wall=100),self.trial('1',replicate=1,wall=140)],ROOT); d=r['variants']['3'*63+'1']['distributions']['wall_time_ms']; self.assertEqual(d['values'],[100.0,140.0]); self.assertEqual(d['median'],120.0)
+ def test_variant_case_coverage_must_match(self):
+  with self.assertRaises(m.EvaluationArenaError): m.analyze_trials([self.trial('1',case='1'),self.trial('2',case='2')],ROOT)
+
 if __name__=='__main__': unittest.main()

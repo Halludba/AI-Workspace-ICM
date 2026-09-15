@@ -12,6 +12,7 @@ import json
 import math
 import subprocess
 import sys
+import statistics
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,18 @@ def load_policy(root: Path = ROOT) -> dict:
         raise PolicyError("required_metrics must be a non-empty list of strings")
     if len(metrics) != len(set(metrics)):
         raise PolicyError("required_metrics must not contain duplicates")
+    groups = policy.get("metric_groups")
+    if not isinstance(groups, dict) or not groups:
+        raise PolicyError("metric_groups must be a non-empty object")
+    grouped: list[str] = []
+    for group, names in groups.items():
+        if not isinstance(group, str) or not group or not isinstance(names, list) or not names:
+            raise PolicyError("metric_groups must map non-empty names to non-empty lists")
+        if any(not isinstance(name, str) or not name for name in names):
+            raise PolicyError(f"metric group {group} must contain metric names")
+        grouped.extend(names)
+    if len(grouped) != len(set(grouped)) or set(grouped) != set(metrics):
+        raise PolicyError("metric_groups must partition required_metrics exactly once")
     cases = policy.get("cases")
     if not isinstance(cases, list) or not cases:
         raise PolicyError("cases must be a non-empty list")
@@ -108,6 +121,7 @@ def baseline(ref: str, root: Path = ROOT) -> dict:
         "routed_context": {"status": "UNAVAILABLE", "reason": "Route-aware profiling is a separate benchmark layer."},
         "observed_metrics": values,
         "metric_availability": availability,
+        "metric_groups": policy["metric_groups"],
         "benchmark_cases": [case["id"] for case in policy["cases"]],
     }
 
@@ -171,10 +185,10 @@ def materialize(case_id: str, output: Path, root: Path = ROOT) -> dict:
         for pos in case.get("positions", ["start", "middle", "end"]):
             _write_text(output / f"evidence_{pos}.py", _fill(f'"""Evidence {pos}."""\n', per, f"ICM_EVIDENCE_{pos.upper()}", ratios[pos]))
     elif kind == "one_symbol_change":
-        base_prefix = '"""One-symbol-change base."""\n\ndef changed_symbol():\n    return 1\n\n'
+        base_prefix = '"""One-symbol-change fixture."""\n\ndef changed_symbol():\n    return 1\n\n'
         changed_prefix = base_prefix.replace("return 1", "return 2")
-        _write_text(output / "base.py", _fill(base_prefix, target_chars))
-        _write_text(output / "changed.py", _fill(changed_prefix, target_chars))
+        _write_text(output / "base" / "source.py", _fill(base_prefix, target_chars))
+        _write_text(output / "changed" / "source.py", _fill(changed_prefix, target_chars))
     elif kind == "cross_file_dependency":
         per = max(1, target_chars // 2)
         _write_text(output / "alpha.py", _fill('from beta import dependency\n\ndef target_symbol():\n    return dependency()\n', per))
@@ -211,6 +225,15 @@ def materialize(case_id: str, output: Path, root: Path = ROOT) -> dict:
         "estimated_tokens": total_tokens,
         "files": files,
     }
+    if kind == "one_symbol_change":
+        manifest["measurement_mode"] = "PER_VARIANT"
+        manifest["variants"] = {
+            variant: {
+                "estimated_tokens": sum(item["estimated_tokens"] for item in files if item["path"].startswith(variant + "/")),
+                "files": [item["path"] for item in files if item["path"].startswith(variant + "/")],
+            }
+            for variant in ("base", "changed")
+        }
     (output / "FIXTURE_MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
     return manifest
 
@@ -241,7 +264,7 @@ def summarize_samples(samples: list[dict], root: Path = ROOT) -> dict:
                 raise BenchmarkError(f"{name} must be finite numeric or null")
             values.append(float(value))
         summary[name] = (
-            {"status": "OBSERVED", "samples": len(values), "p50": _nearest_rank(values, 0.50), "p95": _nearest_rank(values, 0.95)}
+            {"status": "OBSERVED", "samples": len(values), "p50": float(statistics.median(values)), "p95": _nearest_rank(values, 0.95)}
             if values else {"status": "UNAVAILABLE", "samples": 0, "p50": None, "p95": None}
         )
     return {"schema_version": "1.0", "sample_count": len(samples), "metrics": summary}

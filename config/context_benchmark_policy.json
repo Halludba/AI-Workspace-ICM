@@ -94,5 +94,31 @@
       "target_tokens": 5000,
       "description": "Cross-file import/dependency fixture."
     }
-  ]
+  ],
+  "metric_groups": {
+    "tokens": [
+      "input_tokens_total",
+      "input_tokens_cached",
+      "input_tokens_uncached",
+      "output_tokens",
+      "reasoning_tokens"
+    ],
+    "calls": [
+      "model_calls",
+      "tool_calls"
+    ],
+    "timing": [
+      "retrieval_time_ms",
+      "ttft_ms",
+      "decode_tokens_per_second",
+      "model_time_ms",
+      "tool_time_ms",
+      "wall_time_ms"
+    ],
+    "correctness": [
+      "correctness_score",
+      "context_recall",
+      "unnecessary_context_ratio"
+    ]
+  }
 }

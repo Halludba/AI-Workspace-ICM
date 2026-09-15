@@ -55,14 +55,31 @@ class ContextBenchmarkTests(unittest.TestCase):
     def test_change_and_dependency_fixtures_preserve_intended_structure(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            context_benchmark.materialize("one-symbol-change", root / "change", ROOT)
-            base = (root / "change/base.py").read_text(encoding="utf-8")
-            changed = (root / "change/changed.py").read_text(encoding="utf-8")
+            manifest = context_benchmark.materialize("one-symbol-change", root / "change", ROOT)
+            base = (root / "change/base/source.py").read_text(encoding="utf-8")
+            changed = (root / "change/changed/source.py").read_text(encoding="utf-8")
+            self.assertEqual(manifest["measurement_mode"], "PER_VARIANT")
+            for variant in ("base", "changed"):
+                self.assertLess(abs(manifest["variants"][variant]["estimated_tokens"] - 5000) / 5000, 0.01)
             self.assertIn("return 1", base)
             self.assertIn("return 2", changed)
             context_benchmark.materialize("cross-file-dependency", root / "dep", ROOT)
             self.assertIn("from beta import dependency", (root / "dep/alpha.py").read_text(encoding="utf-8"))
             self.assertIn("def dependency", (root / "dep/beta.py").read_text(encoding="utf-8"))
+
+    def test_every_catalog_case_materializes_without_live_model(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            for case in context_benchmark.catalog(ROOT):
+                manifest = context_benchmark.materialize(case["id"], root / case["id"], ROOT)
+                self.assertEqual(manifest["case_id"], case["id"])
+                self.assertGreater(len(manifest["files"]), 0)
+
+    def test_metric_groups_partition_schema(self):
+        policy = context_benchmark.load_policy(ROOT)
+        grouped = [name for names in policy["metric_groups"].values() for name in names]
+        self.assertEqual(set(grouped), set(policy["required_metrics"]))
+        self.assertEqual(len(grouped), len(set(grouped)))
 
     def test_summary_reports_p50_p95_and_preserves_unavailable_metrics(self):
         samples = [
@@ -74,6 +91,9 @@ class ContextBenchmarkTests(unittest.TestCase):
         self.assertEqual(result["metrics"]["wall_time_ms"]["p50"], 20.0)
         self.assertEqual(result["metrics"]["wall_time_ms"]["p95"], 100.0)
         self.assertEqual(result["metrics"]["ttft_ms"]["status"], "UNAVAILABLE")
+        even = context_benchmark.summarize_samples([{ "observed_metrics": {"wall_time_ms": 10}}, {"observed_metrics": {"wall_time_ms": 20}}], ROOT)
+        self.assertEqual(even["metrics"]["wall_time_ms"]["p50"], 15.0)
+        self.assertEqual(even["metrics"]["wall_time_ms"]["p95"], 20.0)
 
     def test_workspace_cli_exposes_benchmark_catalog(self):
         proc = subprocess.run([sys.executable, str(ROOT / "icm"), "inspect", "benchmark", "catalog"], cwd=ROOT, text=True, capture_output=True)

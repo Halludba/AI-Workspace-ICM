@@ -48,7 +48,8 @@
     "tools/token_profiler.py",
     "tools/capability_resolver.py",
     "tools/capsule_exporter.py",
-    "tools/role_resolver.py"
+    "tools/role_resolver.py",
+    "tools/context_benchmark.py"
   ],
   "semantic_diff_tokens": [
     "authority",

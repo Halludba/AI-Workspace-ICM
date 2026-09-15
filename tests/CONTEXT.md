@@ -3,6 +3,7 @@
 Machine-verifiable invariants live here. During iteration run the narrowest relevant tests; broaden before release closure.
 
 Current suites:
+- `test_context_benchmark.py` -> fixed-ref baseline reproducibility, synthetic scale/evidence/dependency fixtures, unavailable-metric semantics, summary percentiles, and CLI coverage.
 - `test_context_routing.py` -> context-routing invariants.
 - `test_profiles.py` -> installed specialist profile grammar, activation, portability, and authority-boundary invariants.
 - `test_bios_invariants.py` -> universal persona/lock/target/NO_OP/terminal-seal response invariants.

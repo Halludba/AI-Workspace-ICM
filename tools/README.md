@@ -29,3 +29,10 @@ The kernel convergence guard derives persisted-state fingerprints from canonical
 Do not edit `RUN.json` or `ATTEMPT.json` as a state-changing operation; they are derived projections. Do not hide semantic governance exclusively inside code: structured policy/core contracts remain inspectable authority and tests remain executable evidence.
 
 Use `role_resolver.py` / `icm role ...` to validate a semantically declared task class, selected profile, user-authorized mutation request, scoped write envelope, and bounded role handoff. It validates declared policy; it does not infer natural-language task class or grant authority.
+
+### Context benchmark harness
+- `python tools/context_benchmark.py catalog` lists deterministic benchmark cases.
+- `python tools/context_benchmark.py baseline --ref <git-ref>` records a reproducible repository/orientation baseline while leaving unavailable provider metrics null.
+- `python tools/context_benchmark.py fixture --case <id> --output <dir>` materializes synthetic scale fixtures on demand.
+- `python tools/context_benchmark.py summarize <samples.json>` reports p50/p95 for observed metrics only.
+- Workspace surface: `icm inspect benchmark <command>`.

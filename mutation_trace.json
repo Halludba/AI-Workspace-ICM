@@ -1,26 +1,48 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v090-release-closure",
+  "directive_id": "DIR-2026-09-15:T-100-context-benchmarks",
   "actor_role": "icm-runtime-architect",
-  "summary": "Promote the verified v0.9 role-governed development snapshot to the v0.9.0 release without changing role or mutation semantics.",
+  "summary": "Execute planner task T-100 by opening v1.0.0-dev and adding deterministic context-economics benchmark infrastructure before retrieval optimization.",
   "candidates": [
     {
       "candidate_id": "C-001",
       "target_paths": [
+        "config/context_benchmark_policy.json",
+        "tools/context_benchmark.py",
+        "tests/test_context_benchmark.py"
+      ],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Add a host-neutral benchmark schema, fixed-ref baseline, on-demand scale fixtures, and observed-metric summaries without requiring a live model."
+    },
+    {
+      "candidate_id": "C-002",
+      "target_paths": [
         "WORKSPACE.json",
         "README.md",
+        "icm",
+        "config/impact_policy.json",
+        "tools/CONTEXT.md",
+        "tools/README.md",
+        "config/CONTEXT.md",
+        "tests/CONTEXT.md",
         "tests/test_context_routing.py",
-        "tests/test_release_policy.py"
+        "tests/test_release_policy.py",
+        "tests/test_impact_classifier.py"
       ],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Promote release metadata and exact release assertions from 0.9.0-dev to 0.9.0 while preserving the verified implementation."
+      "rationale": "Open v1 development and integrate the benchmark harness into entrypoints, CLI discovery, verification scope, documentation, and release assertions."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Promoted workspace/release metadata to v0.9.0 and retained v1.0 context-efficient local-worker work as the next development line."
+      "description": "Added deterministic benchmark policy/tool/tests with synthetic 1k-150k, distributed, evidence-position, one-symbol-change, and cross-file fixtures."
+    },
+    {
+      "candidate_id": "C-002",
+      "description": "Opened v1.0.0-dev and integrated benchmark inspection, docs, impact classification, and exact workspace-version assertions."
     }
   ]
 }

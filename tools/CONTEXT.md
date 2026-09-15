@@ -27,3 +27,4 @@ Current generic tools:
 - `kernel/journal.py` -> durable event commit, replay, checkpoints, projections, hashing, and confinement.
 
 Tools enforce mechanical invariants; they do not decide semantic policy. Structured policy/core contracts define intent and authority. Tool output is evidence or derived state unless a governing contract explicitly promotes it.
+- `context_benchmark.py` -> deterministic context-economics benchmark catalog, synthetic scale fixtures, fixed-ref baselines, and p50/p95 summaries; unavailable provider metrics remain explicit.

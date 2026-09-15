@@ -1,6 +1,6 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.9.0",
+  "workspace_version": "1.0.0-dev",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
@@ -50,7 +50,8 @@
     "capsule_exporter": "tools/capsule_exporter.py",
     "role_protocol": "_core/ROLE_PROTOCOL.md",
     "role_policy": "config/role_policy.json",
-    "role_resolver": "tools/role_resolver.py"
+    "role_resolver": "tools/role_resolver.py",
+    "context_benchmark": "tools/context_benchmark.py"
   },
   "roots": {
     "core": "_core",

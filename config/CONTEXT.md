@@ -20,3 +20,4 @@ Validation should fail closed on unknown critical fields.
 Do not load unrelated config files.
 
 - `role_policy.json` -> default System Architect, specialist task classes, mutation envelopes, bounded handoff schema, and planner-continuity policy.
+- `context_benchmark_policy.json` -> deterministic benchmark metric schema, heuristic estimator, and synthetic scale-case catalog; no live-model requirement.

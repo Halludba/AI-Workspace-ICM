@@ -93,7 +93,7 @@ class ContextRoutingTests(unittest.TestCase):
 
     def test_workspace_version(self):
         ws = json.loads((ROOT / "WORKSPACE.json").read_text(encoding="utf-8"))
-        self.assertEqual(ws["workspace_version"], "0.9.0")
+        self.assertEqual(ws["workspace_version"], "1.0.0-dev")
         self.assertEqual(ws["status"], "EXECUTABLE_ROLE_GOVERNED_RUNTIME")
 
     def test_supporting_routes_are_explicit_and_ordered(self):

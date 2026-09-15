@@ -13,6 +13,7 @@ Use this root only for the workstation's constitutional architecture.
 - Concrete run lifecycle -> `RUN_PROTOCOL.md`
 - Deterministic run mutation/journal/recovery -> `EXECUTION_KERNEL.md`
 - Run artifact integrity/provenance -> `ARTIFACT_PROTOCOL.md`
+- Release/version governance -> `RELEASE_POLICY.md`
 - Structural workspace mutation -> `CONVENTIONS.md` plus the relevant contract above
 
 Do not load every core contract for an unrelated task.

@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "versioning": {
+    "scheme": "SEMVER",
+    "tag_prefix": "v",
+    "development_identity": "git_commit"
+  },
+  "development": {
+    "public_tag_each_commit": false,
+    "local_commits_allowed": true,
+    "push_policy": "VERIFIED_RELEASE_MILESTONES"
+  },
+  "release": {
+    "annotated_tags_required": true,
+    "published_tags_immutable": true,
+    "full_regression_required": true,
+    "tag_note_sections": ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security", "Breaking", "Verification"],
+    "required_tag_note_sections": ["Verification"],
+    "omit_empty_sections": true
+  },
+  "history": {
+    "canonical_release_history": "GIT_TAGS",
+    "retain_published_tags": true,
+    "duplicate_release_trees": false,
+    "default_context": "EXCLUDE"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "workspace_schema": "1.3",
-  "workspace_version": "0.6.0.5",
+  "workspace_version": "0.6.1",
   "workspace_name": "AI Workspace ICM",
   "architecture": "filesystem-first-context-routing",
   "canonical_branch": "main",
@@ -38,7 +38,9 @@
     "decision_recorder": "tools/record_decision.py",
     "session_policy": "config/session_policy.json",
     "session_planner": "tools/session_planner.py",
-    "convergence_guard": "tools/kernel/convergence.py"
+    "convergence_guard": "tools/kernel/convergence.py",
+    "release_policy": "_core/RELEASE_POLICY.md",
+    "release_validator": "tools/release_validator.py"
   },
   "roots": {
     "core": "_core",

@@ -10,6 +10,8 @@ Use `check_invariants.py` for universal response-declaration checks and `check_m
 
 Use `impact_classifier.py` to classify observed Git changes as `SCOPED_VALIDATION` or `FULL_REGRESSION` during iteration. This is blast-radius classification, not SemVer. A canonical commit still requires the complete regression gate even when iteration was scoped.
 
+Use `release_validator.py` to validate strict SemVer release identities, release-policy invariants, and structured annotated-tag notes. Ordinary development commits are not public releases.
+
 Use `record_decision.py` for append-only, privacy-safe decision summaries under `archive/decisions/`. The tool rejects forbidden private-reasoning keys and supports superseding records; these records are audit evidence and never replace current governing contracts.
 
 Use `session_planner.py` for Git-ignored per-agent continuity queues under `.session/plans/`. It validates DAG mechanics and deterministic task ordering, but it does not interpret authority or execute work; selected tasks must re-enter normal routing and execution boundaries.

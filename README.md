@@ -2,7 +2,7 @@
 
 A host-neutral, filesystem-first template for structured AI work.
 
-Current release: **v0.6.0.5 - release-tag/context hygiene update**.
+Current release: **v0.6.1 - release and version governance**.
 
 Start here:
 1. `WORKSPACE.md` - orientation.
@@ -20,4 +20,4 @@ The model performs semantic reasoning; the filesystem carries interpretable cont
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.
 
-v0.6.0.5 adds no runtime semantics: it establishes the release convention that the checked-out working tree is current authority, while Git tags/history remain historical evidence loaded only for explicit compatibility, rollback, migration, or history work. Exact older releases remain available through Git tags without duplicating source trees in active context.
+v0.6.1 adds release/version governance without changing runtime semantics: strict Semantic Versioning for public releases, Git commits as development identities, verified annotated tags as public release boundaries, structured tag notes, immutable published tags, and tag-based historical compatibility without duplicated release trees.

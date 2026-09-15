@@ -1,49 +1,49 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:v0605-release-tag-context",
-  "summary": "Establish v0.6.0.5 as a metadata-only release that keeps historical versions in Git tags rather than duplicating release trees in active context.",
+  "directive_id": "DIR-2026-09-15:v061-release-governance",
+  "summary": "Adopt strict SemVer release governance, local Git commits as development identities, structured annotated release tags, and correct the malformed v0.6.0.5 release identity to v0.6.1.",
   "candidates": [
     {
       "candidate_id": "C-001",
-      "target_paths": [
-        "WORKSPACE.json",
-        "tests/test_context_routing.py"
-      ],
+      "target_paths": ["WORKSPACE.json", "README.md", "tests/test_context_routing.py"],
       "change_kind": "REWRITE",
       "disposition": "ACCEPT",
-      "rationale": "Advance release identity to v0.6.0.5 without changing runtime semantics."
+      "rationale": "Correct the public release identity to strict SemVer v0.6.1 while preserving runtime semantics."
     },
     {
       "candidate_id": "C-002",
-      "target_paths": [
-        "CONTEXT.md"
-      ],
-      "change_kind": "MERGE",
+      "target_paths": ["_core/RELEASE_POLICY.md", "config/release_policy.json"],
+      "change_kind": "NEW",
       "disposition": "ACCEPT",
-      "rationale": "Declare the current checkout authoritative and Git history/tags historical-by-default to reduce context pollution."
+      "rationale": "Add human-readable and machine-readable release/version governance."
     },
     {
       "candidate_id": "C-003",
-      "target_paths": [
-        "README.md"
-      ],
+      "target_paths": ["_core/CONTEXT.md", "config/CONTEXT.md"],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Document the metadata-only release and tag-based compatibility history convention."
+      "rationale": "Route release work selectively without loading release policy during unrelated tasks."
+    },
+    {
+      "candidate_id": "C-004",
+      "target_paths": ["tools/release_validator.py", "tests/test_release_policy.py"],
+      "change_kind": "NEW",
+      "disposition": "ACCEPT",
+      "rationale": "Make SemVer, release-policy, and structured annotated-tag-note rules mechanically testable."
+    },
+    {
+      "candidate_id": "C-005",
+      "target_paths": ["tools/CONTEXT.md", "tools/README.md"],
+      "change_kind": "MERGE",
+      "disposition": "ACCEPT",
+      "rationale": "Document the release validator in the deterministic tools route."
     }
   ],
   "applied_changes": [
-    {
-      "candidate_id": "C-001",
-      "description": "Updated workspace release identity and matching regression expectation."
-    },
-    {
-      "candidate_id": "C-002",
-      "description": "Added default routing rule excluding Git history/tags from normal context."
-    },
-    {
-      "candidate_id": "C-003",
-      "description": "Documented tag-only historical release strategy."
-    }
+    {"candidate_id": "C-001", "description": "Updated release metadata and regression expectation to v0.6.1."},
+    {"candidate_id": "C-002", "description": "Added release policy contracts."},
+    {"candidate_id": "C-003", "description": "Added selective release-policy routing."},
+    {"candidate_id": "C-004", "description": "Added release validator and regression tests."},
+    {"candidate_id": "C-005", "description": "Documented the release validator in tool context."}
   ]
 }

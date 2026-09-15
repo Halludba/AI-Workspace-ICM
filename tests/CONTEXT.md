@@ -29,3 +29,5 @@ Passing tests are evidence, not authority. Tests must encode current contracts r
 - `test_evaluation_arena.py` -> arena identity, holdout blinding, evaluator provenance, privacy, and no-auto-promotion invariants.
 
 - `test_interaction_contracts.py` -> bridge registry/source provenance, no-authority semantics, and conservative deduplication coverage.
+
+- `test_suggestion_queue.py` -> neutral silence/topic changes, approval scoping, accepted-only promotion, compact summaries, and Git-ignored queue storage.

@@ -36,6 +36,8 @@ Developer observability is exposed through `icm observe ...`: local Git-ignored 
 
 Evidence-gated meta-advice is exposed through `icm advise ...`: suggestion candidates are screened for value density, compatibility and interaction risk; research escalation requires an explicit evidence deficit/current empirical need; SIMPLE/STANDARD/TECHNICAL affect presentation only.
 
+Suggestion continuity is exposed through `icm suggestions ...`: unresolved ideas can persist in a Git-ignored per-agent queue without treating silence or topic changes as rejection or authorization. Only accepted suggestions are promotion-eligible, and planner/mutation governance still applies.
+
 The model performs semantic reasoning; the filesystem carries interpretable context and durable state; deterministic software enforces mechanical invariants; Git is canonical revision history.
 
 v0.6.0 keeps the v0.5 execution kernel as the mechanical foundation and adds domain-neutral governance/continuity controls: universal BIOS response invariants, two-axis mutation governance, Git-aware verification impact classification, privacy-safe append-only decision records, Git-ignored per-agent session plans, event-derived convergence protection, and explicitly routed specialist profiles. These layers remain subordinate to current user instruction, `_core/`, active workflow/stage contracts, and deterministic kernel enforcement.

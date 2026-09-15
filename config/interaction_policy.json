@@ -17,24 +17,155 @@
     "meta_advisor": "_core/META_ADVISOR_PROTOCOL.md",
     "arena": "_core/EVALUATION_ARENA_PROTOCOL.md",
     "capability": "skills/CONTEXT.md",
-    "host_capability": "_core/LOCAL_COMPUTE_PROTOCOL.md"
+    "host_capability": "_core/LOCAL_COMPUTE_PROTOCOL.md",
+    "suggestion": "_core/SUGGESTION_PROTOCOL.md"
   },
   "invariants": [
-    {"id":"INV-PLANNER-NONAUTH","statement":"Planner intent never overrides current canonical Git/run truth.","source_refs":["_core/STATE_MODEL.md","_core/PLAN_INTELLIGENCE_PROTOCOL.md"]},
-    {"id":"INV-CONTEXT-NOT-ASSURANCE","statement":"Loading more context can provide evidence but does not itself raise assurance.","source_refs":["_core/CONTEXT_PROTOCOL.md","_core/ASSURANCE_PROTOCOL.md"]},
-    {"id":"INV-ROLE-NOT-AUTH","statement":"Role selection never grants mutation authorization by itself.","source_refs":["_core/ROLE_PROTOCOL.md","_core/AUTHORITY.md"]},
-    {"id":"INV-WORKER-CANDIDATE","statement":"Worker output remains a candidate until architect review and deterministic governance accept it.","source_refs":["_core/LOCAL_WORKER_PROTOCOL.md","_core/AUTHORITY.md"]},
-    {"id":"INV-USAGE-NOT-CAUSAL","statement":"Observed usage or timing does not by itself prove causal value.","source_refs":["_core/DEVELOPER_OBSERVATORY_PROTOCOL.md","_core/META_ADVISOR_PROTOCOL.md"]},
-    {"id":"INV-ARENA-NO-PROMOTION","statement":"An Evaluation Arena winner cannot automatically change canonical ICM behavior.","source_refs":["_core/EVALUATION_ARENA_PROTOCOL.md","_core/AUTHORITY.md"]},
-    {"id":"INV-SKILL-NOT-CAPABILITY","statement":"Selecting a skill does not create host capability or mutation authority.","source_refs":["skills/CONTEXT.md","_core/LOCAL_COMPUTE_PROTOCOL.md"]}
+    {
+      "id": "INV-PLANNER-NONAUTH",
+      "statement": "Planner intent never overrides current canonical Git/run truth.",
+      "source_refs": [
+        "_core/STATE_MODEL.md",
+        "_core/PLAN_INTELLIGENCE_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-CONTEXT-NOT-ASSURANCE",
+      "statement": "Loading more context can provide evidence but does not itself raise assurance.",
+      "source_refs": [
+        "_core/CONTEXT_PROTOCOL.md",
+        "_core/ASSURANCE_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-ROLE-NOT-AUTH",
+      "statement": "Role selection never grants mutation authorization by itself.",
+      "source_refs": [
+        "_core/ROLE_PROTOCOL.md",
+        "_core/AUTHORITY.md"
+      ]
+    },
+    {
+      "id": "INV-WORKER-CANDIDATE",
+      "statement": "Worker output remains a candidate until architect review and deterministic governance accept it.",
+      "source_refs": [
+        "_core/LOCAL_WORKER_PROTOCOL.md",
+        "_core/AUTHORITY.md"
+      ]
+    },
+    {
+      "id": "INV-USAGE-NOT-CAUSAL",
+      "statement": "Observed usage or timing does not by itself prove causal value.",
+      "source_refs": [
+        "_core/DEVELOPER_OBSERVATORY_PROTOCOL.md",
+        "_core/META_ADVISOR_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-ARENA-NO-PROMOTION",
+      "statement": "An Evaluation Arena winner cannot automatically change canonical ICM behavior.",
+      "source_refs": [
+        "_core/EVALUATION_ARENA_PROTOCOL.md",
+        "_core/AUTHORITY.md"
+      ]
+    },
+    {
+      "id": "INV-SKILL-NOT-CAPABILITY",
+      "statement": "Selecting a skill does not create host capability or mutation authority.",
+      "source_refs": [
+        "skills/CONTEXT.md",
+        "_core/LOCAL_COMPUTE_PROTOCOL.md"
+      ]
+    },
+    {
+      "id": "INV-SILENCE-NOT-AUTH",
+      "statement": "Silence or topic change never authorizes suggestion execution or mutation.",
+      "source_refs": [
+        "_core/SUGGESTION_PROTOCOL.md",
+        "_core/AUTHORITY.md"
+      ]
+    },
+    {
+      "id": "INV-SUGGESTION-PLANNER",
+      "statement": "Only accepted suggestions are eligible for planner promotion, and promotion still requires planner/governance validation.",
+      "source_refs": [
+        "_core/SUGGESTION_PROTOCOL.md",
+        "_core/PLAN_INTELLIGENCE_PROTOCOL.md"
+      ]
+    }
   ],
   "contracts": [
-    {"id":"planner-git","left":"planner","right":"git_state","invariants":["INV-PLANNER-NONAUTH"]},
-    {"id":"context-assurance","left":"context","right":"assurance","invariants":["INV-CONTEXT-NOT-ASSURANCE"]},
-    {"id":"role-mutation","left":"role","right":"mutation","invariants":["INV-ROLE-NOT-AUTH"]},
-    {"id":"worker-governance","left":"worker","right":"governance","invariants":["INV-WORKER-CANDIDATE"]},
-    {"id":"observatory-meta-advisor","left":"observatory","right":"meta_advisor","invariants":["INV-USAGE-NOT-CAUSAL"]},
-    {"id":"arena-governance","left":"arena","right":"governance","invariants":["INV-ARENA-NO-PROMOTION"]},
-    {"id":"capability-host","left":"capability","right":"host_capability","invariants":["INV-SKILL-NOT-CAPABILITY"]}
+    {
+      "id": "planner-git",
+      "left": "planner",
+      "right": "git_state",
+      "invariants": [
+        "INV-PLANNER-NONAUTH"
+      ]
+    },
+    {
+      "id": "context-assurance",
+      "left": "context",
+      "right": "assurance",
+      "invariants": [
+        "INV-CONTEXT-NOT-ASSURANCE"
+      ]
+    },
+    {
+      "id": "role-mutation",
+      "left": "role",
+      "right": "mutation",
+      "invariants": [
+        "INV-ROLE-NOT-AUTH"
+      ]
+    },
+    {
+      "id": "worker-governance",
+      "left": "worker",
+      "right": "governance",
+      "invariants": [
+        "INV-WORKER-CANDIDATE"
+      ]
+    },
+    {
+      "id": "observatory-meta-advisor",
+      "left": "observatory",
+      "right": "meta_advisor",
+      "invariants": [
+        "INV-USAGE-NOT-CAUSAL"
+      ]
+    },
+    {
+      "id": "arena-governance",
+      "left": "arena",
+      "right": "governance",
+      "invariants": [
+        "INV-ARENA-NO-PROMOTION"
+      ]
+    },
+    {
+      "id": "capability-host",
+      "left": "capability",
+      "right": "host_capability",
+      "invariants": [
+        "INV-SKILL-NOT-CAPABILITY"
+      ]
+    },
+    {
+      "id": "suggestion-governance",
+      "left": "suggestion",
+      "right": "governance",
+      "invariants": [
+        "INV-SILENCE-NOT-AUTH"
+      ]
+    },
+    {
+      "id": "suggestion-planner",
+      "left": "suggestion",
+      "right": "planner",
+      "invariants": [
+        "INV-SUGGESTION-PLANNER"
+      ]
+    }
   ]
 }

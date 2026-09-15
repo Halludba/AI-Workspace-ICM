@@ -33,7 +33,9 @@
     "_core/EVALUATION_ARENA_PROTOCOL.md",
     "tools/evaluation_arena.py",
     "_core/INTERACTION_PROTOCOL.md",
-    "tools/interaction_contracts.py"
+    "tools/interaction_contracts.py",
+    "_core/SUGGESTION_PROTOCOL.md",
+    "tools/suggestion_queue.py"
   ],
   "full_regression_prefixes": [
     "config/",
@@ -68,7 +70,8 @@
     "tools/plan_intelligence.py",
     "tools/developer_observatory.py",
     "tools/meta_advisor.py",
-    "tools/interaction_contracts.py"
+    "tools/interaction_contracts.py",
+    "tools/suggestion_queue.py"
   ],
   "semantic_diff_tokens": [
     "authority",

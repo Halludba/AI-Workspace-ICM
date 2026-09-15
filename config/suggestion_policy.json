@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "queue_root": ".session/suggestions",
+  "authority": "NON_AUTHORITATIVE_SUGGESTION_QUEUE",
+  "statuses": ["PROPOSED","UNOPPOSED","ACCEPTED","REJECTED","SUPERSEDED","EXPIRED"],
+  "unresolved_statuses": ["PROPOSED","UNOPPOSED"],
+  "promotion_status": "ACCEPTED",
+  "topic_change_effect": "NONE",
+  "silence_effect": "NONE",
+  "approval_scopes": ["PRIMARY_CURRENT","CURRENT_BUNDLE","ALL_PENDING"],
+  "exact_phrase_scopes": {
+    "go ahead": "PRIMARY_CURRENT",
+    "go ahead with all": "CURRENT_BUNDLE",
+    "go ahead with all pending suggestions": "ALL_PENDING"
+  },
+  "max_suggestions": 200,
+  "compact_summary_limit": 5,
+  "automatic_execution": false,
+  "automatic_planner_mutation": false
+}

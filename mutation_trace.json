@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "directive_id": "DIR-2026-09-15:T-1310-interaction-contracts",
+  "directive_id": "DIR-2026-09-15:T-1320-suggestion-continuity",
   "actor_role": "icm-runtime-architect",
-  "summary": "Add subordinate shared interaction contracts and conservative compatibility/deduplication validation.",
+  "summary": "Add noncanonical suggestion continuity, explicit approval scopes, and accepted-only planner promotion eligibility.",
   "candidates": [
     {
       "candidate_id": "C-001",
@@ -10,28 +10,27 @@
         "README.md",
         "WORKSPACE.json",
         "_core/CONTEXT.md",
-        "_core/INTERACTION_PROTOCOL.md",
+        "_core/SUGGESTION_PROTOCOL.md",
         "config/CONTEXT.md",
         "config/impact_policy.json",
         "config/interaction_policy.json",
+        "config/suggestion_policy.json",
         "icm",
         "tests/CONTEXT.md",
-        "tests/test_context_routing.py",
         "tests/test_impact_classifier.py",
-        "tests/test_interaction_contracts.py",
-        "tests/test_release_policy.py",
+        "tests/test_suggestion_queue.py",
         "tools/CONTEXT.md",
-        "tools/interaction_contracts.py"
+        "tools/suggestion_queue.py"
       ],
       "change_kind": "MERGE",
       "disposition": "ACCEPT",
-      "rationale": "Make important subsystem relationships first-class without granting authority or auto-deleting duplicated safety rules."
+      "rationale": "Preserve unresolved ideas across topic changes without treating silence as approval or bypassing planner/mutation governance."
     }
   ],
   "applied_changes": [
     {
       "candidate_id": "C-001",
-      "description": "Added interaction protocol/registry/tool/tests, CLI/docs/impact wiring, and opened v1.3.0-dev."
+      "description": "Added suggestion protocol/policy/queue/tests, interaction bridges, CLI/docs/impact integration."
     }
   ]
 }

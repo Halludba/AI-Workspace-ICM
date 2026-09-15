@@ -39,3 +39,5 @@ Tools enforce mechanical invariants; they do not decide semantic policy. Structu
 - `evaluation_arena.py` -> content-addressed case/variant contracts, blinded execution views, typed quality evidence, and replay manifests.
 
 - `interaction_contracts.py` -> validates shared subsystem bridges and conservative rule-deduplication coverage; it never proves semantic equivalence or deletes rules.
+
+- `suggestion_queue.py` -> noncanonical per-agent suggestion continuity, compact unresolved summaries, exact approval-scope resolution, and accepted-only promotion eligibility.
